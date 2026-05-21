@@ -535,11 +535,15 @@ namespace RussianLocalization
     [HarmonyPatch(typeof(TMPro.TMP_Text), "text", MethodType.Setter)]
     public static class TMPText_Patch
     {
-        public static void Prefix(ref string value)
+        public static void Prefix(TMPro.TMP_Text __instance, ref string value)
         {
             if (TranslationEngine.Initialized)
             {
                 value = TranslationEngine.Translate(value);
+                if (__instance != null)
+                {
+                    FontUtils.EnsureCyrillicFallback(__instance);
+                }
             }
         }
     }
@@ -547,11 +551,15 @@ namespace RussianLocalization
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string) })]
     public static class TMPText_SetText_Patch
     {
-        public static void Prefix(ref string sourceText)
+        public static void Prefix(TMPro.TMP_Text __instance, ref string sourceText)
         {
             if (TranslationEngine.Initialized)
             {
                 sourceText = TranslationEngine.Translate(sourceText);
+                if (__instance != null)
+                {
+                    FontUtils.EnsureCyrillicFallback(__instance);
+                }
             }
         }
     }
@@ -559,11 +567,15 @@ namespace RussianLocalization
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string), typeof(float) })]
     public static class TMPText_SetText_Float1_Patch
     {
-        public static void Prefix(ref string sourceText)
+        public static void Prefix(TMPro.TMP_Text __instance, ref string sourceText)
         {
             if (TranslationEngine.Initialized)
             {
                 sourceText = TranslationEngine.Translate(sourceText);
+                if (__instance != null)
+                {
+                    FontUtils.EnsureCyrillicFallback(__instance);
+                }
             }
         }
     }
@@ -571,11 +583,15 @@ namespace RussianLocalization
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string), typeof(float), typeof(float) })]
     public static class TMPText_SetText_Float2_Patch
     {
-        public static void Prefix(ref string sourceText)
+        public static void Prefix(TMPro.TMP_Text __instance, ref string sourceText)
         {
             if (TranslationEngine.Initialized)
             {
                 sourceText = TranslationEngine.Translate(sourceText);
+                if (__instance != null)
+                {
+                    FontUtils.EnsureCyrillicFallback(__instance);
+                }
             }
         }
     }
@@ -583,11 +599,15 @@ namespace RussianLocalization
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string), typeof(float), typeof(float), typeof(float) })]
     public static class TMPText_SetText_Float3_Patch
     {
-        public static void Prefix(ref string sourceText)
+        public static void Prefix(TMPro.TMP_Text __instance, ref string sourceText)
         {
             if (TranslationEngine.Initialized)
             {
                 sourceText = TranslationEngine.Translate(sourceText);
+                if (__instance != null)
+                {
+                    FontUtils.EnsureCyrillicFallback(__instance);
+                }
             }
         }
     }
