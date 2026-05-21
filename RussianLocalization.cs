@@ -15,6 +15,7 @@ namespace RussianLocalization
     public static class TranslationEngine
     {
         public static ConcurrentDictionary<string, string> staticDictionary = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public static ConcurrentDictionary<int, string> hashedDictionary = new ConcurrentDictionary<int, string>();
         public static ConcurrentDictionary<string, string> translationCache = new ConcurrentDictionary<string, string>();
         public static List<string> sortedKeys = new List<string>();
         public static object FileLock = new object();
@@ -24,9 +25,33 @@ namespace RussianLocalization
         private static HashSet<string> loggedStrings = new HashSet<string>();
         private static object LogLock = new object();
 
+        // Набор одушевленных существ для морфологического склонения
+        private static HashSet<string> animates = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "шакал", "краб", "жук", "бык", "бабуин", "гиршлинг", "козел", "волк", "червь", "паук", "слизень", "вестник",
+            "садовник", "погонщик", "страж", "сектант", "шаман", "охотник", "разбойник", "рейдер", "пехотинец", "рыцарь",
+            "гризли", "вор", "принц", "житель", "сталкер", "солдат", "стрелок", "лидер", "ткач", "киборг"
+        };
+
         static TranslationEngine()
         {
             Initialize();
+        }
+
+        // Стабильный DJB2 алгоритм хэширования в нижнем регистре
+        public static int GetStableHashCode(string str)
+        {
+            if (string.IsNullOrEmpty(str)) return 0;
+            unchecked
+            {
+                int hash = 5381;
+                for (int i = 0; i < str.Length; i++)
+                {
+                    char c = char.ToLowerInvariant(str[i]);
+                    hash = ((hash << 5) + hash) ^ c;
+                }
+                return hash;
+            }
         }
 
         public static void Initialize()
@@ -48,6 +73,8 @@ namespace RussianLocalization
                     if (dict != null)
                     {
                         staticDictionary.Clear();
+                        hashedDictionary.Clear();
+                        
                         foreach (var kvp in dict)
                         {
                             string normKey = kvp.Key.Replace('\u00A0', ' ')
@@ -56,6 +83,9 @@ namespace RussianLocalization
                                                     .Replace('\u202F', ' ')
                                                     .Trim();
                             staticDictionary[normKey] = kvp.Value;
+                            
+                            int keyHash = GetStableHashCode(normKey);
+                            hashedDictionary[keyHash] = kvp.Value;
                         }
 
                         sortedKeys.Clear();
@@ -142,9 +172,16 @@ namespace RussianLocalization
                 return cached;
             }
 
-            // Ищем точное совпадение в словаре по нормализованному ключу
-            if (staticDictionary.TryGetValue(trimmed, out string exactMatch))
+            // Ищем точное совпадение в словаре по хэш-коду DJB2
+            int textHash = GetStableHashCode(trimmed);
+            if (hashedDictionary.TryGetValue(textHash, out string exactMatch))
             {
+                // Применяем морфологию, если это контекст винительного падежа
+                if (IsAccusativeContext(text))
+                {
+                    exactMatch = DeclinePhraseToAccusative(exactMatch);
+                }
+                
                 string result = normalized.Replace(trimmed, exactMatch);
                 translationCache[text] = result;
                 return result;
@@ -153,8 +190,8 @@ namespace RussianLocalization
             // Пытаемся сделать пофразовые замены на нормализованном тексте
             string processedText = TryWordReplacement(normalized);
             
-            // Если текст остался на английском (или содержит английские буквы) и его нет в словаре - логируем в HashSet
-            if (ContainsEnglish(processedText) && !staticDictionary.ContainsKey(trimmed))
+            // Если текст остался на английском (или содержит английские буквы) и его нет в словаре - логируем
+            if (ContainsEnglish(processedText) && !hashedDictionary.ContainsKey(textHash))
             {
                 LogUntranslated(trimmed);
             }
@@ -173,7 +210,7 @@ namespace RussianLocalization
                 if (!ContainsEnglish(result)) return result;
 
                 string key = sortedKeys[i];
-                // Если ключ пустой или он длиннее, чем текущая строка, он физически не может быть подстрокой
+                // Если ключ пустой или он длиннее, чем текущая строка, он не может быть подстрокой
                 if (string.IsNullOrEmpty(key) || result.Length < key.Length) continue;
 
                 if (staticDictionary.TryGetValue(key, out string translation))
@@ -217,10 +254,17 @@ namespace RussianLocalization
                             if (translation.Length > 0)
                             {
                                 string finalTrans = translation;
+                                
+                                // Применяем морфологию винительного падежа при пофразовой замене
+                                if (IsAccusativeContext(text))
+                                {
+                                    finalTrans = DeclinePhraseToAccusative(finalTrans);
+                                }
+
                                 char origChar = result[index];
                                 if (char.IsLower(origChar))
                                 {
-                                    bool skipLowering = char.IsUpper(translation[0]) && 
+                                    bool skipLowering = char.IsUpper(finalTrans[0]) && 
                                         (key.StartsWith("the ", StringComparison.OrdinalIgnoreCase) || 
                                          key.StartsWith("a ", StringComparison.OrdinalIgnoreCase) || 
                                          key.StartsWith("an ", StringComparison.OrdinalIgnoreCase));
@@ -245,7 +289,7 @@ namespace RussianLocalization
                         }
                         else
                         {
-                            // Это ложное срабатывание подстроки внутри другого слова, пропускаем его и ищем дальше
+                            // Это ложное срабатывание подстроки, пропускаем его и ищем дальше
                             index = result.IndexOf(key, index + 1, StringComparison.OrdinalIgnoreCase);
                         }
                     }
@@ -274,9 +318,9 @@ namespace RussianLocalization
             try
             {
                 string trimmed = text.Trim();
-                if (trimmed.Length < 3) return; // Пропускаем слишком короткие фразы
+                if (trimmed.Length < 3) return; // Пропускаем короткие фразы
                 
-                // Пропускаем строки, которые выглядят как чисто технические теги Unity/TMPro
+                // Пропускаем технические теги Unity/TMPro
                 if (trimmed.StartsWith("<") && trimmed.EndsWith(">")) return;
 
                 lock (LogLock)
@@ -284,11 +328,91 @@ namespace RussianLocalization
                     if (!loggedStrings.Contains(trimmed))
                     {
                         loggedStrings.Add(trimmed);
-                        // Все новые непереведенные строки безопасно накапливаются в памяти
                     }
                 }
             }
             catch {}
+        }
+
+        // --- МОРФОЛОГИЧЕСКИЙ МОДУЛЬ SMART WORD REPLACEMENT ---
+
+        private static bool IsAccusativeContext(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+            string lower = text.ToLowerInvariant();
+            return lower.Contains("hit ") || 
+                   lower.Contains("kill ") || 
+                   lower.Contains("attack ") || 
+                   lower.Contains("bite ") || 
+                   lower.Contains("strike ") || 
+                   lower.Contains("defeat ") || 
+                   lower.Contains("garrote ") || 
+                   lower.Contains("destroy ") ||
+                   lower.Contains("equip ") ||
+                   lower.Contains("equipped ");
+        }
+
+        private static bool IsConsonant(char c)
+        {
+            return "бвгджзклмнпрстфхцчшщ".Contains(char.ToLowerInvariant(c));
+        }
+
+        private static bool IsAnimateNoun(string word)
+        {
+            string lower = word.ToLowerInvariant();
+            if (animates.Contains(lower)) return true;
+            return lower.EndsWith("ец") || lower.EndsWith("тель") || lower.EndsWith("ник") || lower.EndsWith("арь");
+        }
+
+        private static string DeclinePhraseToAccusative(string phrase)
+        {
+            if (string.IsNullOrEmpty(phrase)) return phrase;
+            
+            // Если фраза содержит HTML-теги или Caves of Qud разметку, пропускаем её склонение во избежание поломок
+            if (phrase.Contains("<") || phrase.Contains("&") || phrase.Contains("^")) return phrase;
+
+            string[] words = phrase.Split(' ');
+            for (int i = 0; i < words.Length; i++)
+            {
+                string word = words[i];
+                if (word.Length < 3) continue;
+
+                // Проверяем женский род прилагательных
+                if (word.EndsWith("ая"))
+                {
+                    words[i] = word.Substring(0, word.Length - 2) + "ую";
+                }
+                else if (word.EndsWith("яя"))
+                {
+                    words[i] = word.Substring(0, word.Length - 2) + "юю";
+                }
+                // Женский род существительных
+                else if (word.EndsWith("а") && !word.EndsWith("ова") && !word.EndsWith("ева"))
+                {
+                    words[i] = word.Substring(0, word.Length - 1) + "у";
+                }
+                else if (word.EndsWith("я"))
+                {
+                    words[i] = word.Substring(0, word.Length - 1) + "ю";
+                }
+                // Мужской род одушевленных существ
+                else if (IsAnimateNoun(word))
+                {
+                    if (word.EndsWith("ь"))
+                    {
+                        words[i] = word.Substring(0, word.Length - 1) + "я";
+                    }
+                    else if (word.EndsWith("й"))
+                    {
+                        words[i] = word.Substring(0, word.Length - 1) + "я";
+                    }
+                    else if (IsConsonant(word[word.Length - 1]))
+                    {
+                        words[i] = word + "а";
+                    }
+                }
+            }
+            return string.Join(" ", words);
         }
     }
 
