@@ -1370,4 +1370,29 @@ namespace RussianLocalization
             }
         }
     }
+
+    // --- ПАТЧИ ДЛЯ КЛАССА ОПИСАНИЙ (DESCRIPTION PART PATCHES) ---
+    [HarmonyPatch(typeof(XRL.World.Parts.Description))]
+    public static class Description_Patches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("get_Short")]
+        public static void get_Short_Postfix(ref string __result)
+        {
+            if (TranslationEngine.Initialized && !string.IsNullOrEmpty(__result))
+            {
+                __result = TranslationEngine.Translate(__result);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("get_Long")]
+        public static void get_Long_Postfix(ref string __result)
+        {
+            if (TranslationEngine.Initialized && !string.IsNullOrEmpty(__result))
+            {
+                __result = TranslationEngine.Translate(__result);
+            }
+        }
+    }
 }
