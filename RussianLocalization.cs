@@ -360,6 +360,21 @@ namespace RussianLocalization
                     continue;
                 }
 
+                // Проверяем цветной амперсанд-тег &
+                if (text[i] == '&' && i < len - 1 && (char.IsLetter(text[i + 1]) || text[i + 1] == '&'))
+                {
+                    if (currentText.Length > 0)
+                    {
+                        result.Append(TranslateText(currentText.ToString()));
+                        currentText.Length = 0;
+                    }
+
+                    result.Append(text[i]);
+                    result.Append(text[i + 1]);
+                    i += 2;
+                    continue;
+                }
+
                 currentText.Append(text[i]);
                 i++;
             }
