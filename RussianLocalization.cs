@@ -579,9 +579,7 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(translatedCore))
             {
-                // Временно отключено для предотвращения появления смешанных строк (Франкенштейнов) (V10.2)
-                // translatedCore = TryWordReplacement(normalizedCore);
-                translatedCore = normalizedCore;
+                translatedCore = TryWordReplacement(normalizedCore);
                 if (ContainsEnglish(translatedCore))
                 {
                     LogUntranslated(trimmedCore);
