@@ -2526,7 +2526,7 @@
   "forest": "лес",
   "honorific": "титул",
   "journeyfriend": "попутчик",
-  "location": "локация",
+  "location": "место",
   "lower": "снижение",
   "meyvn": "знаток",
   "mine.": "мой.",
@@ -7157,5 +7157,17 @@
   "It's you": "Это вы",
   "You have no missile weapons equipped": "У вас не экипировано стрелковое оружие",
   "Willpower": "Воля",
-  "Ego": "Эго"
+  "Ego": "Эго",
+  "the": "",
+  "a": "",
+  "an": "",
+  "to": "",
+  "of": "",
+  "tree": "древо",
+  "Tree": "Древо",
+  "about": "о",
+  "effects": "эффекты",
+  "Effects": "Эффекты",
+  "Locations": "Местах",
+  "Location": "Место"
 }
