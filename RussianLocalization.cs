@@ -241,8 +241,8 @@ namespace RussianLocalization
             catch {}
 
             string defaultPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low",
-                @"Freehold Games\CavesOfQud\Mods\RussianLocalization"
+                UnityEngine.Application.persistentDataPath,
+                Path.Combine("Mods", "RussianLocalization")
             );
             if (Directory.Exists(defaultPath))
             {
