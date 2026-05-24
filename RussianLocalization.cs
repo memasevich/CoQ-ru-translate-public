@@ -21,6 +21,7 @@ namespace RussianLocalization
         public static ConcurrentDictionary<string, string> translationCache = new ConcurrentDictionary<string, string>();
         public static List<string> sortedKeys = new List<string>();
         public static List<string> sortedWordKeys = new List<string>();
+        public static ConcurrentDictionary<string, string> normalizedKeyDictionary = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static object FileLock = new object();
         public static bool Initialized = false;
 
@@ -62,7 +63,14 @@ namespace RussianLocalization
                                                         .Replace('\u202F', ' ')
                                                         .Trim();
                                 if (!string.IsNullOrEmpty(normKey))
+                                {
                                     staticDictionary[normKey] = kvp.Value;
+                                    string sn = SuperNormalize(normKey);
+                                    if (!string.IsNullOrEmpty(sn))
+                                    {
+                                        normalizedKeyDictionary[sn] = normKey;
+                                    }
+                                }
                             }
 
                             sortedKeys.Clear();
@@ -230,6 +238,30 @@ namespace RussianLocalization
                 string result = prefix + exactMatch + suffix;
                 translationCache[text] = result;
                 return result;
+            }
+            else
+            {
+                // Попытка найти нормализованный ключ по всей строке
+                string sn = SuperNormalize(trimmed);
+                string originalKey;
+                if (normalizedKeyDictionary.TryGetValue(sn, out originalKey))
+                {
+                    if (staticDictionary.TryGetValue(originalKey, out exactMatch))
+                    {
+                        int startSpaces = 0;
+                        while (startSpaces < text.Length && char.IsWhiteSpace(text[startSpaces])) startSpaces++;
+
+                        int endSpaces = 0;
+                        while (endSpaces < text.Length && char.IsWhiteSpace(text[text.Length - 1 - endSpaces])) endSpaces++;
+
+                        string prefix = text.Substring(0, startSpaces);
+                        string suffix = text.Substring(text.Length - endSpaces);
+
+                        string result = prefix + exactMatch + suffix;
+                        translationCache[text] = result;
+                        return result;
+                    }
+                }
             }
 
             // Если точного совпадения по всей строке нет, используем разбор разметки для защиты тегов
@@ -417,6 +449,20 @@ namespace RussianLocalization
             }
             else
             {
+                // Попытка найти нормализованный ключ для ядра текста
+                string sn = SuperNormalize(trimmedCore);
+                string originalKey;
+                if (normalizedKeyDictionary.TryGetValue(sn, out originalKey))
+                {
+                    if (staticDictionary.TryGetValue(originalKey, out exactMatch))
+                    {
+                        translatedCore = exactMatch;
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(translatedCore))
+            {
                 translatedCore = TryWordReplacement(normalizedCore);
                 if (ContainsEnglish(translatedCore))
                 {
@@ -519,6 +565,27 @@ namespace RussianLocalization
                 }
             }
             return false;
+        }
+
+        public static string SuperNormalize(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            StringBuilder sb = new StringBuilder(text.Length);
+            bool lastWasSpace = false;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (char.IsWhiteSpace(c))
+                {
+                    if (!lastWasSpace) { sb.Append(' '); lastWasSpace = true; }
+                }
+                else if (!char.IsPunctuation(c))
+                {
+                    sb.Append(char.ToLowerInvariant(c));
+                    lastWasSpace = false;
+                }
+            }
+            return sb.ToString().Trim();
         }
 
         private static void LogUntranslated(string text)
