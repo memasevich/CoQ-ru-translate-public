@@ -29,6 +29,91 @@ namespace RussianLocalization
         private static HashSet<string> loggedStrings = new HashSet<string>();
         private static object LogLock = new object();
 
+        private static readonly System.Text.RegularExpressions.Regex TagRegex = new System.Text.RegularExpressions.Regex(@"<[^>]+>");
+        private static readonly System.Text.RegularExpressions.Regex ModernUIMenuRegex = new System.Text.RegularExpressions.Regex(@"^\[([a-zA-Z0-9]+)\]\s*(.*)$");
+
+        private static readonly System.Text.RegularExpressions.Regex InlineKeyRegex = 
+            new System.Text.RegularExpressions.Regex(@"^<color=[^>]+>([a-zA-Z0-9])</color><color=[^>]+>(.*)</color>$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        private static readonly System.Text.RegularExpressions.Regex ColorBracketKeyRegex = 
+            new System.Text.RegularExpressions.Regex(@"^<color=[^>]+>\[([a-zA-Z0-9])\]</color>\s*(?:<color=[^>]+>)?(.*?)(?:</color>)?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        public static string TryTranslateModernUI(string text, out bool success)
+        {
+            success = false;
+            if (string.IsNullOrEmpty(text)) return text;
+
+            // 1. Проверяем подсветку первой буквы: <color=yellow>e</color><color=cyan>quip (auto)</color>
+            var inlineMatch = InlineKeyRegex.Match(text);
+            if (inlineMatch.Success)
+            {
+                string key = inlineMatch.Groups[1].Value;
+                string rest = inlineMatch.Groups[2].Value;
+                string fullAction = key + rest;
+                
+                string translated = TranslateText(fullAction);
+                if (translated != fullAction)
+                {
+                    success = true;
+                    return string.Format("<color=#CFC041FF>[{0}]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>{1}</color>", key.ToUpper(), translated);
+                }
+            }
+
+            // 2. Проверяем скобки с цветом в начале: <color=#CFC041FF>[E]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>Equip (manual)</color>
+            var colorBracketMatch = ColorBracketKeyRegex.Match(text);
+            if (colorBracketMatch.Success)
+            {
+                string key = colorBracketMatch.Groups[1].Value;
+                string action = colorBracketMatch.Groups[2].Value.Trim();
+                
+                string translated = TranslateText(action);
+                if (translated != action)
+                {
+                    success = true;
+                    return string.Format("<color=#CFC041FF>[{0}]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>{1}</color>", key, translated);
+                }
+            }
+
+            // 3. Проверяем обычные скобки в начале: [E] Equip (manual)
+            var bracketMatch = ModernUIMenuRegex.Match(text);
+            if (bracketMatch.Success)
+            {
+                string key = bracketMatch.Groups[1].Value;
+                string action = bracketMatch.Groups[2].Value.Trim();
+                
+                string translated = TranslateText(action);
+                if (translated != action)
+                {
+                    success = true;
+                    return string.Format("[{0}] {1}", key, translated);
+                }
+            }
+
+            // 4. Дополнительный резервный вариант для строк с тегами цвета
+            if (text.Contains("<color=") && (text.Contains("[") || text.Contains("]")))
+            {
+                string cleanText = TagRegex.Replace(text, "").Trim();
+                var match = ModernUIMenuRegex.Match(cleanText);
+                if (match.Success)
+                {
+                    string key = match.Groups[1].Value;
+                    string action = match.Groups[2].Value.Trim();
+
+                    if (!string.IsNullOrEmpty(action))
+                    {
+                        string translatedAction = TranslateText(action);
+                        if (translatedAction != action)
+                        {
+                            success = true;
+                            return string.Format("<color=#CFC041FF>[{0}]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>{1}</color>", key, translatedAction);
+                        }
+                    }
+                }
+            }
+
+            return text;
+        }
+
         static TranslationEngine()
         {
             Initialize();
@@ -192,6 +277,14 @@ namespace RussianLocalization
         public static string Translate(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
+
+            bool success;
+            string modernUITranslated = TryTranslateModernUI(text, out success);
+            if (success)
+            {
+                return modernUITranslated;
+            }
+
             if (!ContainsEnglish(text)) return text;
 
             // Нормализуем все типы неразрывных и невидимых пробелов в стандартный ASCII пробел
@@ -430,6 +523,14 @@ namespace RussianLocalization
         public static string TranslateText(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
+
+            bool success;
+            string modernUITranslated = TryTranslateModernUI(text, out success);
+            if (success)
+            {
+                return modernUITranslated;
+            }
+
             if (!ContainsEnglish(text)) return text;
 
             string cached;
