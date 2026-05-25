@@ -29,6 +29,10 @@ namespace RussianLocalization
         private static HashSet<string> loggedStrings = new HashSet<string>();
         private static object LogLock = new object();
 
+        // Потокобезопасный сборщик пословных автозамен (для отлова Франкенштейнов)
+        private static HashSet<string> loggedReplacements = new HashSet<string>();
+        private static object ReplacementLogLock = new object();
+
         private static readonly System.Text.RegularExpressions.Regex TagRegex = new System.Text.RegularExpressions.Regex(@"<[^>]+>");
         private static readonly System.Text.RegularExpressions.Regex ModernUIMenuRegex = new System.Text.RegularExpressions.Regex(@"^\[([a-zA-Z0-9]+)\]\s*(.*)$");
 
@@ -580,6 +584,10 @@ namespace RussianLocalization
             if (string.IsNullOrEmpty(translatedCore))
             {
                 translatedCore = TryWordReplacement(normalizedCore);
+                if (translatedCore != normalizedCore)
+                {
+                    LogWordReplacement(normalizedCore, translatedCore);
+                }
                 if (ContainsEnglish(translatedCore))
                 {
                     LogUntranslated(trimmedCore);
@@ -728,6 +736,33 @@ namespace RussianLocalization
                         {
                             string logPath = Path.Combine(modPath, "untranslated.txt");
                             File.AppendAllText(logPath, trimmed + Environment.NewLine, Encoding.UTF8);
+                        }
+                    }
+                }
+            }
+            catch {}
+        }
+
+        private static void LogWordReplacement(string original, string replaced)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(original) || original == replaced) return;
+
+                lock (ReplacementLogLock)
+                {
+                    if (!loggedReplacements.Contains(original))
+                    {
+                        loggedReplacements.Add(original);
+
+                        string modPath = GetModPath();
+                        if (!string.IsNullOrEmpty(modPath))
+                        {
+                            string logPath = Path.Combine(modPath, "word_replacements.txt");
+                            string logEntry = "[Original]: " + original + Environment.NewLine +
+                                              "[Replaced]: " + replaced + Environment.NewLine +
+                                              "--------------------------------------------------" + Environment.NewLine;
+                            File.AppendAllText(logPath, logEntry, Encoding.UTF8);
                         }
                     }
                 }
