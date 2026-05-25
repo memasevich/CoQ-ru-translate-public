@@ -33,6 +33,10 @@ namespace RussianLocalization
         private static HashSet<string> loggedReplacements = new HashSet<string>();
         private static object ReplacementLogLock = new object();
 
+        // Потокобезопасный сборщик вообще всего игрового текста (и русского, и английского)
+        private static HashSet<string> loggedAllTexts = new HashSet<string>();
+        private static object AllTextLogLock = new object();
+
         private static readonly System.Text.RegularExpressions.Regex TagRegex = new System.Text.RegularExpressions.Regex(@"<[^>]+>");
         private static readonly System.Text.RegularExpressions.Regex ModernUIMenuRegex = new System.Text.RegularExpressions.Regex(@"^\[([a-zA-Z0-9]+)\]\s*(.*)$");
 
@@ -281,6 +285,14 @@ namespace RussianLocalization
         public static string Translate(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
+            string result = TranslateInternal(text);
+            LogAllGameplayText(result);
+            return result;
+        }
+
+        private static string TranslateInternal(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
 
             bool success;
             string modernUITranslated = TryTranslateModernUI(text, out success);
@@ -313,7 +325,7 @@ namespace RussianLocalization
             ExtractRussianPrefix(normalized, out rusPrefix, out engPart);
             if (!string.IsNullOrEmpty(rusPrefix) && !string.IsNullOrEmpty(engPart))
             {
-                string translatedEng = Translate(engPart);
+                string translatedEng = TranslateInternal(engPart);
                 string result = rusPrefix + translatedEng;
                 translationCache[text] = result;
                 return result;
@@ -768,6 +780,56 @@ namespace RussianLocalization
                 }
             }
             catch {}
+        }
+
+        private static void LogAllGameplayText(string text)
+        {
+            try
+            {
+                if (IsJunkText(text)) return;
+                string trimmed = text.Trim();
+
+                lock (AllTextLogLock)
+                {
+                    if (!loggedAllTexts.Contains(trimmed))
+                    {
+                        loggedAllTexts.Add(trimmed);
+
+                        string modPath = GetModPath();
+                        if (!string.IsNullOrEmpty(modPath))
+                        {
+                            string logPath = Path.Combine(modPath, "all_gameplay_texts.txt");
+                            File.AppendAllText(logPath, "[TEXT]: " + trimmed + Environment.NewLine, Encoding.UTF8);
+                        }
+                    }
+                }
+            }
+            catch {}
+        }
+
+        private static bool IsJunkText(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return true;
+            string trimmed = text.Trim();
+            if (trimmed.Length <= 1) return true;
+
+            // Если строка состоит только из цифр, знаков препинания, скобок и пробелов - это мусор
+            bool hasLetters = false;
+            for (int i = 0; i < trimmed.Length; i++)
+            {
+                char c = trimmed[i];
+                if (char.IsLetter(c))
+                {
+                    hasLetters = true;
+                    break;
+                }
+            }
+            if (!hasLetters) return true;
+
+            // Проверяем, не является ли строка просто тегом или кодом цвета (например, "<color=#ff0000>")
+            if (trimmed.StartsWith("<") && trimmed.EndsWith(">") && !trimmed.Contains("</color>")) return true;
+
+            return false;
         }
 
         // --- ТРАНСЛИТЕРАЦИЯ КИРИЛЛИЦЫ В ЛАТИНИЦУ (ДЛЯ КЛАССИЧЕСКОГО ASCII-ТЕРМИНАЛА) ---
