@@ -21,6 +21,7 @@ namespace RussianLocalization
         public static ConcurrentDictionary<string, string> translationCache = new ConcurrentDictionary<string, string>();
         public static List<string> sortedKeys = new List<string>();
         public static List<string> sortedWordKeys = new List<string>();
+        public static List<KeyValuePair<System.Text.RegularExpressions.Regex, string>> patternDictionary = new List<KeyValuePair<System.Text.RegularExpressions.Regex, string>>();
         public static ConcurrentDictionary<string, string> normalizedKeyDictionary = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static object FileLock = new object();
         public static bool Initialized = false;
@@ -199,8 +200,33 @@ namespace RussianLocalization
                         }
                     }
 
+                    // 3. Загрузка словаря паттернов (регулярных выражений)
+                    string patternDictPath = Path.Combine(modPath, "pattern_dictionary.json");
+                    if (File.Exists(patternDictPath))
+                    {
+                        string patternJsonText = File.ReadAllText(patternDictPath, Encoding.UTF8);
+                        var patternDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(patternJsonText);
+                        if (patternDict != null)
+                        {
+                            patternDictionary.Clear();
+                            foreach (var kvp in patternDict)
+                            {
+                                if (string.IsNullOrEmpty(kvp.Key)) continue;
+                                try
+                                {
+                                    var regex = new System.Text.RegularExpressions.Regex(kvp.Key, System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                                    patternDictionary.Add(new KeyValuePair<System.Text.RegularExpressions.Regex, string>(regex, kvp.Value));
+                                }
+                                catch (Exception regexEx)
+                                {
+                                    UnityEngine.Debug.LogError("[RussianLocalization] Failed to compile pattern regex '" + kvp.Key + "': " + regexEx.Message);
+                                }
+                            }
+                        }
+                    }
+
                     Initialized = true;
-                    UnityEngine.Debug.Log("[RussianLocalization] Initialized successfully. Loaded " + staticDictionary.Count + " phrases and " + wordDictionary.Count + " words.");
+                    UnityEngine.Debug.Log("[RussianLocalization] Initialized successfully. Loaded " + staticDictionary.Count + " phrases, " + wordDictionary.Count + " words, and " + patternDictionary.Count + " patterns.");
 
                     // Динамический патч для Modern UI (UI Toolkit / UIElements)
                     PatchUIElements();
@@ -286,8 +312,170 @@ namespace RussianLocalization
         {
             if (string.IsNullOrEmpty(text)) return text;
             string result = TranslateInternal(text);
+            if (result != null)
+            {
+                if (result.Contains("]]"))
+                {
+                    result = result.Replace("]]", "]");
+                }
+                if (result.Contains("=now.dayOfYear="))
+                {
+                    result = result.Replace("=now.dayOfYear=", DateTime.Now.DayOfYear.ToString());
+                }
+                if (result.Contains("=now.year="))
+                {
+                    result = result.Replace("=now.year=", DateTime.Now.Year.ToString());
+                }
+            }
             LogAllGameplayText(result);
             return result;
+        }
+
+        public static string TryTranslateFactionReputation(string text, out bool success)
+        {
+            success = false;
+            if (string.IsNullOrEmpty(text)) return text;
+
+            string cleanText = text.Trim();
+            bool hasDot = cleanText.EndsWith(".");
+            if (hasDot)
+            {
+                cleanText = cleanText.Substring(0, cleanText.Length - 1).Trim();
+            }
+
+            // Структурированный массив процедурных суффиксов отношений фракций без точек на конце
+            var templates = new[]
+            {
+                // don't care / doesn't care
+                new { 
+                    Eng = " don't care about you, but aggressive &lt;ones&gt; will attack you", 
+                    Ru = " не обращают на вас внимания, но агрессивные &lt;особи&gt; будут атаковать вас" 
+                },
+                new { 
+                    Eng = " don't care about you, but aggressive &lt;members&gt; will attack you", 
+                    Ru = " не обращают на вас внимания, но агрессивные &lt;представители&gt; будут атаковать вас" 
+                },
+                new { 
+                    Eng = " doesn't care about you, but aggressive &lt;ones&gt; will attack you", 
+                    Ru = " не обращает на вас внимания, но агрессивные &lt;особи&gt; будут атаковать вас" 
+                },
+                new { 
+                    Eng = " doesn't care about you, but aggressive &lt;members&gt; will attack you", 
+                    Ru = " не обращает на вас внимания, но агрессивные &lt;представители&gt; будут атаковать вас" 
+                },
+                // despise / despises
+                new { 
+                    Eng = " despise you. Even docile &lt;ones&gt; will attack you", 
+                    Ru = " презирают вас. Даже миролюбивые &lt;особи&gt; будут атаковать вас" 
+                },
+                new { 
+                    Eng = " despise you. Even docile &lt;members&gt; will attack you", 
+                    Ru = " презирают вас. Даже миролюбивые &lt;представители&gt; будут атаковать вас" 
+                },
+                new { 
+                    Eng = " despises you. Even docile &lt;ones&gt; will attack you", 
+                    Ru = " презирает вас. Даже миролюбивые &lt;особи&gt; будут атаковать вас" 
+                },
+                new { 
+                    Eng = " despises you. Even docile &lt;members&gt; will attack you", 
+                    Ru = " презирает вас. Даже миролюбивые &lt;представители&gt; будут атаковать вас" 
+                },
+                // dislike / dislikes
+                new { 
+                    Eng = " dislike you, but docile &lt;ones&gt; won't attack you", 
+                    Ru = " недолюбливают вас, но миролюбивые &lt;особи&gt; не станут вас атаковать" 
+                },
+                new { 
+                    Eng = " dislike you, but docile &lt;members&gt; won't attack you", 
+                    Ru = " недолюбливают вас, но миролюбивые &lt;представители&gt; не станут вас атаковать" 
+                },
+                new { 
+                    Eng = " dislikes you, but docile &lt;ones&gt; won't attack you", 
+                    Ru = " недолюбливает вас, но миролюбивые &lt;особи&gt; не станут вас атаковать" 
+                },
+                new { 
+                    Eng = " dislikes you, but docile &lt;members&gt; won't attack you", 
+                    Ru = " недолюбливает вас, но миролюбивые &lt;представители&gt; не станут вас атаковать" 
+                },
+                // favor / favors
+                new { 
+                    Eng = " favor you. Aggressive &lt;ones&gt; won't attack you", 
+                    Ru = " благоволят вам. Агрессивные &lt;особи&gt; не станут вас атаковать" 
+                },
+                new { 
+                    Eng = " favor you. Aggressive &lt;members&gt; won't attack you", 
+                    Ru = " благоволят вам. Агрессивные &lt;представители&gt; не станут вас атаковать" 
+                },
+                new { 
+                    Eng = " favors you. Aggressive &lt;ones&gt; won't attack you", 
+                    Ru = " благоволит вам. Агрессивные &lt;особи&gt; не станут вас атаковать" 
+                },
+                new { 
+                    Eng = " favors you. Aggressive &lt;members&gt; won't attack you", 
+                    Ru = " благоволит вам. Агрессивные &lt;представители&gt; не станут вас атаковать" 
+                }
+            };
+
+            foreach (var t in templates)
+            {
+                if (cleanText.EndsWith(t.Eng, StringComparison.OrdinalIgnoreCase))
+                {
+                    string factionPart = cleanText.Substring(0, cleanText.Length - t.Eng.Length).Trim();
+                    string translatedFaction = TranslateText(factionPart);
+                    success = true;
+                    return translatedFaction + t.Ru + (hasDot ? "." : "");
+                }
+
+                // Запасной вариант с обычными скобками < и >
+                string cleanEng = t.Eng.Replace("&lt;", "<").Replace("&gt;", ">");
+                string cleanRu = t.Ru.Replace("&lt;", "<").Replace("&gt;", ">");
+                if (cleanText.EndsWith(cleanEng, StringComparison.OrdinalIgnoreCase))
+                {
+                    string factionPart = cleanText.Substring(0, cleanText.Length - cleanEng.Length).Trim();
+                    string translatedFaction = TranslateText(factionPart);
+                    success = true;
+                    return translatedFaction + cleanRu + (hasDot ? "." : "");
+                }
+            }
+
+            return text;
+        }
+
+        public static string TryTranslatePattern(string text, out bool success)
+        {
+            success = false;
+            if (string.IsNullOrEmpty(text)) return text;
+
+            for (int i = 0; i < patternDictionary.Count; i++)
+            {
+                var rule = patternDictionary[i];
+                var regex = rule.Key;
+                var match = regex.Match(text);
+                if (match.Success)
+                {
+                    string template = rule.Value;
+                    string result = template;
+                    
+                    string[] groupNames = regex.GetGroupNames();
+                    for (int g = 0; g < groupNames.Length; g++)
+                    {
+                        string groupName = groupNames[g];
+                        if (groupName == "0") continue;
+                        
+                        var group = match.Groups[groupName];
+                        if (group.Success)
+                        {
+                            string groupValue = group.Value;
+                            string translatedGroup = TranslateText(groupValue);
+                            result = result.Replace("{" + groupName + "}", translatedGroup);
+                        }
+                    }
+                    
+                    success = true;
+                    return result;
+                }
+            }
+            return text;
         }
 
         private static string TranslateInternal(string text)
@@ -295,6 +483,18 @@ namespace RussianLocalization
             if (string.IsNullOrEmpty(text)) return text;
 
             bool success;
+            string patternTranslated = TryTranslatePattern(text, out success);
+            if (success)
+            {
+                return patternTranslated;
+            }
+
+            string factionTranslated = TryTranslateFactionReputation(text, out success);
+            if (success)
+            {
+                return factionTranslated;
+            }
+
             string modernUITranslated = TryTranslateModernUI(text, out success);
             if (success)
             {
@@ -373,6 +573,39 @@ namespace RussianLocalization
                 }
             }
 
+            // Попытка найти перевод по тексту с удалёнными тегами и нормализованными переносами строк.
+            // Это покрывает диалоги NPC, где <color=...> разрезает фразу, разбивая совпадение со словарём.
+            if (text.Contains("<color=") || text.Contains("\r") || text.Contains("\n"))
+            {
+                string strippedText = TagRegex.Replace(trimmed, "");
+                strippedText = strippedText.Replace("\r", " ").Replace("\n", " ");
+                // Схлопываем множественные пробелы в один
+                while (strippedText.Contains("  "))
+                    strippedText = strippedText.Replace("  ", " ");
+                strippedText = strippedText.Trim();
+
+                if (!string.IsNullOrEmpty(strippedText))
+                {
+                    string strippedExact;
+                    if (staticDictionary.TryGetValue(strippedText, out strippedExact))
+                    {
+                        translationCache[text] = strippedExact;
+                        return strippedExact;
+                    }
+
+                    string strippedSn = SuperNormalize(strippedText);
+                    string strippedOrigKey;
+                    if (normalizedKeyDictionary.TryGetValue(strippedSn, out strippedOrigKey))
+                    {
+                        if (staticDictionary.TryGetValue(strippedOrigKey, out strippedExact))
+                        {
+                            translationCache[text] = strippedExact;
+                            return strippedExact;
+                        }
+                    }
+                }
+            }
+
             // Если точного совпадения по всей строке нет, используем разбор разметки для защиты тегов
             string processedText = TranslateMarkup(normalized);
             if (ContainsEnglish(processedText))
@@ -439,6 +672,33 @@ namespace RussianLocalization
                         result.Append("{{" + content + "}}");
                     }
                     continue;
+                }
+
+                // Проверяем XML RTF-тег &lt;
+                if (i < len - 3 && text[i] == '&' && text[i + 1] == 'l' && text[i + 2] == 't' && text[i + 3] == ';')
+                {
+                    int gtIdx = text.IndexOf("&gt;", i + 4);
+                    if (gtIdx != -1)
+                    {
+                        if (currentText.Length > 0)
+                        {
+                            result.Append(TranslateText(currentText.ToString()));
+                            currentText.Length = 0;
+                        }
+
+                        result.Append("&lt;");
+                        i += 4; // пропускаем &lt;
+
+                        while (i < gtIdx)
+                        {
+                            result.Append(text[i]);
+                            i++;
+                        }
+
+                        result.Append("&gt;");
+                        i += 4; // пропускаем &gt;
+                        continue;
+                    }
                 }
 
                 // Проверяем Unity RTF-тег <
@@ -606,6 +866,23 @@ namespace RussianLocalization
                 }
             }
 
+            if (!string.IsNullOrEmpty(suffix) && !string.IsNullOrEmpty(translatedCore))
+            {
+                char lastCoreChar = translatedCore[translatedCore.Length - 1];
+                if (lastCoreChar == '?' || lastCoreChar == '!' || lastCoreChar == '.')
+                {
+                    int sIdx = 0;
+                    while (sIdx < suffix.Length && suffix[sIdx] == lastCoreChar)
+                    {
+                        sIdx++;
+                    }
+                    if (sIdx > 0)
+                    {
+                        suffix = suffix.Substring(sIdx);
+                    }
+                }
+            }
+
             string result = prefix + translatedCore + suffix;
             translationCache[text] = result;
             return result;
@@ -724,6 +1001,39 @@ namespace RussianLocalization
             return sb.ToString().Trim();
         }
 
+        private static void AppendToLogFile(string filename, string content)
+        {
+            try
+            {
+                string modPath = GetModPath();
+                if (!string.IsNullOrEmpty(modPath))
+                {
+                    string logPath = Path.Combine(modPath, filename);
+                    File.AppendAllText(logPath, content, Encoding.UTF8);
+                }
+            }
+            catch {}
+
+            // Пишем в Документы пользователя ТОЛЬКО all_gameplay_texts.txt
+            if (filename != "all_gameplay_texts.txt") return;
+
+            try
+            {
+                string docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                if (!string.IsNullOrEmpty(docsPath))
+                {
+                    string targetFolder = Path.Combine(docsPath, "CavesOfQud_RU_Logs");
+                    if (!Directory.Exists(targetFolder))
+                    {
+                        Directory.CreateDirectory(targetFolder);
+                    }
+                    string logPath = Path.Combine(targetFolder, filename);
+                    File.AppendAllText(logPath, content, Encoding.UTF8);
+                }
+            }
+            catch {}
+        }
+
         private static void LogUntranslated(string text)
         {
             try
@@ -741,14 +1051,7 @@ namespace RussianLocalization
                     if (!loggedStrings.Contains(trimmed))
                     {
                         loggedStrings.Add(trimmed);
-
-                        // Записываем в файл untranslated.txt в папке мода
-                        string modPath = GetModPath();
-                        if (!string.IsNullOrEmpty(modPath))
-                        {
-                            string logPath = Path.Combine(modPath, "untranslated.txt");
-                            File.AppendAllText(logPath, trimmed + Environment.NewLine, Encoding.UTF8);
-                        }
+                        AppendToLogFile("untranslated.txt", trimmed + Environment.NewLine);
                     }
                 }
             }
@@ -766,16 +1069,10 @@ namespace RussianLocalization
                     if (!loggedReplacements.Contains(original))
                     {
                         loggedReplacements.Add(original);
-
-                        string modPath = GetModPath();
-                        if (!string.IsNullOrEmpty(modPath))
-                        {
-                            string logPath = Path.Combine(modPath, "word_replacements.txt");
-                            string logEntry = "[Original]: " + original + Environment.NewLine +
-                                              "[Replaced]: " + replaced + Environment.NewLine +
-                                              "--------------------------------------------------" + Environment.NewLine;
-                            File.AppendAllText(logPath, logEntry, Encoding.UTF8);
-                        }
+                        string logEntry = "[Original]: " + original + Environment.NewLine +
+                                          "[Replaced]: " + replaced + Environment.NewLine +
+                                          "--------------------------------------------------" + Environment.NewLine;
+                        AppendToLogFile("word_replacements.txt", logEntry);
                     }
                 }
             }
@@ -794,13 +1091,7 @@ namespace RussianLocalization
                     if (!loggedAllTexts.Contains(trimmed))
                     {
                         loggedAllTexts.Add(trimmed);
-
-                        string modPath = GetModPath();
-                        if (!string.IsNullOrEmpty(modPath))
-                        {
-                            string logPath = Path.Combine(modPath, "all_gameplay_texts.txt");
-                            File.AppendAllText(logPath, "[TEXT]: " + trimmed + Environment.NewLine, Encoding.UTF8);
-                        }
+                        AppendToLogFile("all_gameplay_texts.txt", "[TEXT]: " + trimmed + Environment.NewLine);
                     }
                 }
             }
