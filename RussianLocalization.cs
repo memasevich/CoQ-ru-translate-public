@@ -80,19 +80,13 @@ namespace RussianLocalization
 
         private static readonly System.Text.RegularExpressions.Regex TagRegex = new System.Text.RegularExpressions.Regex(@"<[^>]+>");
 
-        private static readonly System.Text.RegularExpressions.Regex ModernUIMenuRegex = new System.Text.RegularExpressions.Regex(@"^\[([a-zA-Z0-9]+)\]\s*(.*)$");
-
-
+        private static readonly System.Text.RegularExpressions.Regex ModernUIMenuRegex = new System.Text.RegularExpressions.Regex(@"^\[([^\]]+)\]\s*(.*)$");
 
         private static readonly System.Text.RegularExpressions.Regex InlineKeyRegex = 
-
-            new System.Text.RegularExpressions.Regex(@"^<color=[^>]+>([a-zA-Z0-9])</color><color=[^>]+>(.*)</color>$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-
+            new System.Text.RegularExpressions.Regex(@"^<color=[^>]+>([^<]+)</color><color=[^>]+>(.*)</color>$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         private static readonly System.Text.RegularExpressions.Regex ColorBracketKeyRegex = 
-
-            new System.Text.RegularExpressions.Regex(@"^<color=[^>]+>\[([a-zA-Z0-9])\]</color>\s*(?:<color=[^>]+>)?(.*?)(?:</color>)?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            new System.Text.RegularExpressions.Regex(@"^<color=[^>]+>\[([^\]]+)\]</color>\s*(?:<color=[^>]+>)?(.*?)(?:</color>)?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
 
 
