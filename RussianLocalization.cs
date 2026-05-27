@@ -664,7 +664,7 @@ namespace RussianLocalization
 
 
 
-                private static readonly System.Text.RegularExpressions.Regex FactionRegex = new System.Text.RegularExpressions.Regex(@"^<color=(?P<c1>#[0-9A-Fa-f]+)>(?P<faction>.*?)</color><color=(?P<c2>#[0-9A-Fa-f]+)>(?P<relation>.*?)</color>$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                private static readonly System.Text.RegularExpressions.Regex FactionRegex = new System.Text.RegularExpressions.Regex(@"^<color=(?<c1>#[0-9A-Fa-f]+)>(?<faction>.*?)</color><color=(?<c2>#[0-9A-Fa-f]+)>(?<relation>.*?)</color>$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         public static string TranslateRelationText(string relation)
         {
