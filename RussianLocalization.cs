@@ -1049,10 +1049,70 @@ namespace RussianLocalization
 
 
         private static string TranslateInternal(string text)
-
         {
-
             if (string.IsNullOrEmpty(text)) return text;
+
+            // 1. Рекурсивный разбор цветовых блоков (color blocks)
+            var colorBlockPattern = new System.Text.RegularExpressions.Regex(
+                @"(?<pref><color=[^>]+>)(?<content>.*?)(?<suff></color>)", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+
+            var colorMatches = colorBlockPattern.Matches(text);
+            if (colorMatches.Count > 0 && (colorMatches.Count > 1 || colorMatches[0].Length != text.Length))
+            {
+                var sb = new System.Text.StringBuilder(text.Length);
+                int lastIdx = 0;
+                for (int i = 0; i < colorMatches.Count; i++)
+                {
+                    var m = colorMatches[i];
+                    if (m.Index > lastIdx)
+                    {
+                        string between = text.Substring(lastIdx, m.Index - lastIdx);
+                        sb.Append(TranslateInternal(between));
+                    }
+
+                    string pref = m.Groups["pref"].Value;
+                    string content = m.Groups["content"].Value;
+                    string suff = m.Groups["suff"].Value;
+
+                    sb.Append(pref);
+                    sb.Append(TranslateInternal(content));
+                    sb.Append(suff);
+
+                    lastIdx = m.Index + m.Length;
+                }
+                if (lastIdx < text.Length)
+                {
+                    string rest = text.Substring(lastIdx);
+                    sb.Append(TranslateInternal(rest));
+                }
+                return sb.ToString();
+            }
+            else if (colorMatches.Count == 1 && colorMatches[0].Length == text.Length)
+            {
+                var m = colorMatches[0];
+                string pref = m.Groups["pref"].Value;
+                string content = m.Groups["content"].Value;
+                string suff = m.Groups["suff"].Value;
+                return pref + TranslateInternal(content) + suff;
+            }
+
+            // 2. Построчный перевод при наличии \n (для сохранения форматирования и каст)
+            if (text.Contains("\n"))
+            {
+                string[] lines = text.Split('\n');
+                string[] translatedLines = new string[lines.Length];
+                bool anyChanged = false;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    translatedLines[i] = TranslateInternal(lines[i]);
+                    if (translatedLines[i] != lines[i]) anyChanged = true;
+                }
+                if (anyChanged)
+                {
+                    return string.Join("\n", translatedLines);
+                }
+            }
 
 
 
