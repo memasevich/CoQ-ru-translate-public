@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using System.IO;
 
@@ -668,10 +668,12 @@ namespace RussianLocalization
 
         public static string TranslateRelationText(string relation)
         {
+            if (string.IsNullOrEmpty(relation)) return relation;
             string clean = relation.Trim();
             bool hasDot = clean.EndsWith(".");
             if (hasDot) clean = clean.Substring(0, clean.Length - 1).Trim();
 
+            // 1. Проверяем простые статические отношения
             var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
                 { "don't care about you, but aggressive ones will attack you", "не обращают на вас внимания, но агрессивные особи будут атаковать вас" },
@@ -690,12 +692,7 @@ namespace RussianLocalization
                 { "favor you. Aggressive members won't attack you", "благоволят вам. Агрессивные представители не станут атаковать вас" },
                 { "favors you. Aggressive ones won't attack you", "благоволит вам. Агрессивные особи не станут атаковать вас" },
                 { "favors you. Aggressive members won't attack you", "благоволит вам. Агрессивные представители не станут атаковать вас" },
-                { "are interested in hearing gossip that's about them", "заинтересованы в прослушивании слухов, которые их касаются" },
-                { "are interested in trading secrets about sultans they admire or despise. They're also interested in hearing gossip that's about them", "заинтересованы в обмене секретами о султанах, которых они уважают или презирают. Им также интересно слушать слухи, которые их касаются" },
-                { "are interested in sharing secrets about the locations of water weeps", "заинтересованы в обмене секретами о местонахождении источников чистой воды" },
-                { "are interested in learning about the locations of all settlements and gossip that's about them", "заинтересованы в получении информации о местонахождении всех поселений и слухах, которые их касаются" },
-                { "are interested in trading secrets about the locations of fish lairs, the locations of frog lairs, and sultans they admire or despise. They're also interested in hearing gossip that's about them", "заинтересованы в обмене секретами о местонахождении рыбьих логовищ, лягушачьих логовищ и султанах, которых они уважают или презирают. Им также интересно слушать слухи, которые их касаются" },
-                { "are interested in trading secrets about all underground locations and sultans they admire or despise. They're also interested in hearing gossip that's about them", "заинтересованы в обмене секретами обо всех подземных локациях и султанах, которых они уважают или презирают. Им также интересно слушать слухи, которые их касаются" }
+                { "are interested in hearing gossip that's about them", "заинтересованы в прослушивании слухов, которые их касаются" }
             };
 
             string trans;
@@ -703,7 +700,146 @@ namespace RussianLocalization
             {
                 return trans + (hasDot ? "." : "");
             }
-            return relation;
+
+            // 2. Динамический разбор сложных интересов с перечислением тем
+            var matchPref = System.Text.RegularExpressions.Regex.Match(clean, 
+                @"^(?<subj>are|is)\s+interested\s+in\s+(?<verb>trading\s+secrets\s+about|sharing\s+secrets\s+about|learning\s+about|sharing\s+secrets\s+of)\s+(?<rest>.*)$", 
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            if (matchPref.Success)
+            {
+                string subj = matchPref.Groups["subj"].Value.ToLower();
+                string verb = matchPref.Groups["verb"].Value.ToLower();
+                string rest = matchPref.Groups["rest"].Value.Trim();
+
+                bool hasGossip = false;
+                string gossipSuffix = "";
+
+                // Проверяем окончание со слухами вариант 1: . They're also interested in hearing gossip that's about them
+                var gossipPattern1 = new System.Text.RegularExpressions.Regex(@"\.\s*They\'re\s+also\s+interested\s+in\s+(?:hearing\s+)?gossip\s+that\'s\s+about\s+them$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (gossipPattern1.IsMatch(rest))
+                {
+                    hasGossip = true;
+                    rest = gossipPattern1.Replace(rest, "").Trim();
+                    gossipSuffix = ". Им также интересно слушать слухи, которые их касаются";
+                }
+                else
+                {
+                    // Вариант 2: , and gossip that's about them
+                    var gossipPattern2 = new System.Text.RegularExpressions.Regex(@",\s*and\s+(?:hearing\s+)?gossip\s+that\'s\s+about\s+them$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    if (gossipPattern2.IsMatch(rest))
+                    {
+                        hasGossip = true;
+                        rest = gossipPattern2.Replace(rest, "").Trim();
+                        gossipSuffix = " и слухах, которые их касаются";
+                    }
+                }
+
+                // Префикс на русском
+                string ruVerb = "";
+                if (subj == "are")
+                {
+                    if (verb.Contains("trading") || verb.Contains("sharing"))
+                    {
+                        ruVerb = "заинтересованы в обмене секретами о ";
+                    }
+                    else
+                    {
+                        ruVerb = "заинтересованы в получении сведений о ";
+                    }
+                }
+                else // is
+                {
+                    if (verb.Contains("trading") || verb.Contains("sharing"))
+                    {
+                        ruVerb = "интересуется обменом секретами о ";
+                    }
+                    else
+                    {
+                        ruVerb = "интересуется получением сведений о ";
+                    }
+                }
+
+                // Разбор списка тем с учетом союзов and / or
+                bool isOr = false;
+                var themes = new List<string>();
+
+                if (rest.Contains(","))
+                {
+                    string[] parts;
+                    if (System.Text.RegularExpressions.Regex.IsMatch(rest, @",\s*or\s+", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    {
+                        isOr = true;
+                        parts = System.Text.RegularExpressions.Regex.Split(rest, @",\s*or\s+", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    }
+                    else
+                    {
+                        parts = System.Text.RegularExpressions.Regex.Split(rest, @",\s*and\s+", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    }
+
+                    if (parts.Length > 0)
+                    {
+                        string[] subThemes = parts[0].Split(',');
+                        foreach (var st in subThemes)
+                        {
+                            string tTrim = st.Trim();
+                            if (!string.IsNullOrEmpty(tTrim)) themes.Add(tTrim);
+                        }
+                    }
+                    if (parts.Length > 1)
+                    {
+                        string tTrim = parts[1].Trim();
+                        if (!string.IsNullOrEmpty(tTrim)) themes.Add(tTrim);
+                    }
+                }
+                else
+                {
+                    string[] parts;
+                    if (System.Text.RegularExpressions.Regex.IsMatch(rest, @"\s+or\s+", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    {
+                        isOr = true;
+                        parts = System.Text.RegularExpressions.Regex.Split(rest, @"\s+or\s+", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    }
+                    else
+                    {
+                        parts = System.Text.RegularExpressions.Regex.Split(rest, @"\s+and\s+", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    }
+
+                    foreach (var pt in parts)
+                    {
+                        string tTrim = pt.Trim();
+                        if (!string.IsNullOrEmpty(tTrim)) themes.Add(tTrim);
+                    }
+                }
+
+                string conj = isOr ? " или " : " и ";
+                var translatedThemes = new List<string>();
+                foreach (var t in themes)
+                {
+                    string transTheme = TranslateText(t);
+                    translatedThemes.Add(transTheme);
+                }
+
+                string ruThemes = "";
+                if (translatedThemes.Count == 1)
+                {
+                    ruThemes = translatedThemes[0];
+                }
+                else if (translatedThemes.Count > 1)
+                {
+                    var firstParts = translatedThemes.GetRange(0, translatedThemes.Count - 1);
+                    ruThemes = string.Join(", ", firstParts.ToArray()) + conj + translatedThemes[translatedThemes.Count - 1];
+                }
+
+                string finalTranslation = ruVerb + ruThemes + gossipSuffix;
+                if (hasDot && !finalTranslation.EndsWith("."))
+                {
+                    finalTranslation += ".";
+                }
+                return finalTranslation;
+            }
+
+            return relation + (hasDot ? "." : "");
         }
 
         public static string TryTranslateFactionReputation(string text, out bool success)
@@ -711,8 +847,13 @@ namespace RussianLocalization
             success = false;
             if (string.IsNullOrEmpty(text)) return text;
 
-            // Очищаем от физических переносов строк и лишних пробелов перед сопоставлением
-            string normalized = text.Replace("\r", " ").Replace("\n", " ");
+            // 1. Очищаем стыковочные теги цвета на переносах строк
+            string normalized = System.Text.RegularExpressions.Regex.Replace(text, @"[\r\n]+</color>\s*<color=#[0-9A-Fa-f]+>", " ");
+
+            // 2. Заменяем оставшиеся \n и \r на пробелы
+            normalized = normalized.Replace("\r", " ").Replace("\n", " ");
+
+            // 3. Сжимаем пробелы
             while (normalized.Contains("  "))
             {
                 normalized = normalized.Replace("  ", " ");
@@ -733,12 +874,11 @@ namespace RussianLocalization
                 if (translatedRelation != relation || translatedFaction != faction)
                 {
                     success = true;
-                    // Возвращаем цельную переведенную строку, игра сама отформатирует её по ширине экрана
                     return string.Format("<color={0}>{1}</color><color={2}> {3}</color>", c1, translatedFaction, c2, translatedRelation);
                 }
             }
 
-            // Старый алгоритм сопоставления как резервный вариант
+            // Резервный пошаблонный поиск отношений
             string cleanText = text.Trim();
             bool hasDot = cleanText.EndsWith(".");
             if (hasDot)
