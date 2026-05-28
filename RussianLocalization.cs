@@ -124,6 +124,16 @@ namespace RussianLocalization
 
                     success = true;
 
+                    // Если в словаре перевод уже содержит скобки (например, "[e] снарядить (авто)"), возвращаем его как есть
+
+                    if (translated.Contains("[") && translated.Contains("]"))
+
+                    {
+
+                        return translated;
+
+                    }
+
                     return string.Format("<color=#CFC041FF>[{0}]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>{1}</color>", key.ToUpper(), translated);
 
                 }
@@ -154,6 +164,16 @@ namespace RussianLocalization
 
                     success = true;
 
+                    // Если в словаре перевод уже содержит скобки, возвращаем его как есть
+
+                    if (translated.Contains("[") && translated.Contains("]"))
+
+                    {
+
+                        return translated;
+
+                    }
+
                     return string.Format("<color=#CFC041FF>[{0}]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>{1}</color>", key, translated);
 
                 }
@@ -183,6 +203,16 @@ namespace RussianLocalization
                 {
 
                     success = true;
+
+                    // Если в словаре перевод уже содержит скобки, возвращаем его как есть
+
+                    if (translated.Contains("[") && translated.Contains("]"))
+
+                    {
+
+                        return translated;
+
+                    }
 
                     return string.Format("[{0}] {1}", key, translated);
 
@@ -223,6 +253,16 @@ namespace RussianLocalization
                         {
 
                             success = true;
+
+                            // Если в словаре перевод уже содержит скобки, возвращаем его как есть
+
+                            if (translatedAction.Contains("[") && translatedAction.Contains("]"))
+
+                            {
+
+                                return translatedAction;
+
+                            }
 
                             return string.Format("<color=#CFC041FF>[{0}]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>{1}</color>", key, translatedAction);
 
