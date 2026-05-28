@@ -658,7 +658,11 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(text)) return text;
 
+
+
             string result = TranslateInternal(text);
+
+
 
             if (result != null)
 
@@ -672,6 +676,58 @@ namespace RussianLocalization
 
                 }
 
+
+
+                // Устраняем дублирование хоткеев в скобках (например, [L] [L] посмотреть -> [L] посмотреть)
+                result = System.Text.RegularExpressions.Regex.Replace(result, 
+                    @"((?:<color=[^>]+>)?\s*\[([a-zA-Z])\]\s*(?:</color>)?)\s*(?:<color=[^>]+>)?\s*(?:</color>)?\s*(?:<color=[^>]+>)?\s*\[\2\]\s*(?:</color>)?", 
+                    "$1", 
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                // Устраняем дублирование открывающих скобок с закрывающими: [[a] -> [a]
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}([^\[\]\n]{1,20})\]", "[$1]");
+
+                // Устраняем дублирование открывающих скобок без закрывающих (только для клавиш и цветовых амперсандов)
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}([a-zA-Z])", "[$1");
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}\s*(&\s*[a-zA-Z])", "[$1");
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}(Esc|Tab|Enter|Space|Backspace|Num \d)", "[$1");
+
+
+
+                // Устраняем дублирование закрывающих скобок: [a]] -> [a]
+
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[([^\[\]\n]{1,20})\]{2,}", "[$1]");
+
+
+
+                // Удаление дублирующих букв в НАЧАЛЕ слова (например, [r] rпереименовать -> [r] переименовать)
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"\b([a-zA-Z])\b(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)([а-яА-ЯёЁ])", "$3$4$5$6$7");
+
+                // Удаление дублирующих букв в КОНЦЕ слова (например, атаковать k -> атаковать)
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"([а-яА-ЯёЁ])(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)\b([a-zA-Z])\b(\s*)(</color>)?", "$1$2$3$4$5$6$8$9");
+
+
+
+                // Восстановление оригинальных латинских тегов цвета Caves of Qud при случайной транслитерации символа цвета
+
+                result = result.Replace("&у", "&y").Replace("&У", "&Y")
+
+                               .Replace("&р", "&r").Replace("&Р", "&R")
+
+                               .Replace("&с", "&c").Replace("&С", "&C")
+
+                               .Replace("&в", "&w").Replace("&В", "&W")
+
+                               .Replace("&м", "&m").Replace("&М", "&M")
+
+                               .Replace("&г", "&g").Replace("&Г", "&G")
+
+                               .Replace("&б", "&b").Replace("&Б", "&B")
+
+                               .Replace("&д", "&d").Replace("&Д", "&D");
+
+
+
                 if (result.Contains("=now.dayOfYear="))
 
                 {
@@ -679,6 +735,8 @@ namespace RussianLocalization
                     result = result.Replace("=now.dayOfYear=", DateTime.Now.DayOfYear.ToString());
 
                 }
+
+
 
                 if (result.Contains("=now.year="))
 
@@ -690,7 +748,11 @@ namespace RussianLocalization
 
             }
 
+
+
             LogAllGameplayText(result);
+
+
 
             return result;
 
@@ -1092,6 +1154,9 @@ namespace RussianLocalization
         {
             if (string.IsNullOrEmpty(text)) return text;
 
+            // Очищаем \r для предотвращения поломки ключей при переносах строк в Windows
+            text = text.Replace("\r", "");
+
             // 1. Рекурсивный разбор цветовых блоков (color blocks)
             var colorBlockPattern = new System.Text.RegularExpressions.Regex(
                 @"(?<pref><color=[^>]+>)(?<content>.*?)(?<suff></color>)", 
@@ -1289,51 +1354,49 @@ namespace RussianLocalization
             }
 
             else
-
             {
-
                 // Попытка найти нормализованный ключ по всей строке
-
                 string sn = SuperNormalize(trimmed);
-
-                string originalKey;
-
-                if (normalizedKeyDictionary.TryGetValue(sn, out originalKey))
-
+                
+                // ЗАЩИТА: Если оригинальный trimmed текст не в скобках, 
+                // но его супер-нормализованная форма - это одиночная латинская буква или известное название клавиши,
+                // то мы запрещаем перевод через normalizedKeyDictionary, так как это ASCII-арт, тайл или граффити.
+                bool isKeyName = sn.Length == 1 || 
+                                 sn == "esc" || 
+                                 sn == "tab" || 
+                                 sn == "enter" || 
+                                 sn == "space" || 
+                                 sn == "backspace" || 
+                                 sn == "insert" || 
+                                 sn == "delete" || 
+                                 sn == "up" || 
+                                 sn == "down" || 
+                                 sn == "left" || 
+                                 sn == "right";
+                bool hasBrackets = trimmed.StartsWith("[") && trimmed.EndsWith("]");
+                
+                if (!isKeyName || hasBrackets)
                 {
-
-                    if (staticDictionary.TryGetValue(originalKey, out exactMatch))
-
+                    string originalKey;
+                    if (normalizedKeyDictionary.TryGetValue(sn, out originalKey))
                     {
+                        if (staticDictionary.TryGetValue(originalKey, out exactMatch))
+                        {
+                            int startSpaces = 0;
+                            while (startSpaces < text.Length && char.IsWhiteSpace(text[startSpaces])) startSpaces++;
 
-                        int startSpaces = 0;
+                            int endSpaces = 0;
+                            while (endSpaces < text.Length && char.IsWhiteSpace(text[text.Length - 1 - endSpaces])) endSpaces++;
 
-                        while (startSpaces < text.Length && char.IsWhiteSpace(text[startSpaces])) startSpaces++;
+                            string prefix = text.Substring(0, startSpaces);
+                            string suffix = text.Substring(text.Length - endSpaces);
 
-
-
-                        int endSpaces = 0;
-
-                        while (endSpaces < text.Length && char.IsWhiteSpace(text[text.Length - 1 - endSpaces])) endSpaces++;
-
-
-
-                        string prefix = text.Substring(0, startSpaces);
-
-                        string suffix = text.Substring(text.Length - endSpaces);
-
-
-
-                        string result = prefix + exactMatch + suffix;
-
-                        translationCache[text] = result;
-
-                        return result;
-
+                            string result = prefix + exactMatch + suffix;
+                            translationCache[text] = result;
+                            return result;
+                        }
                     }
-
                 }
-
             }
 
 
@@ -1810,6 +1873,20 @@ namespace RussianLocalization
 
 
 
+            // Защита для одиночных латинских букв (ASCII-тайлы, буквы на стенах, граффити)
+
+            // Предотвращает их ошибочную супер-нормализацию и перевод в скобки (например, G -> [G])
+
+            if (text.Length == 1 && ((text[0] >= 'a' && text[0] <= 'z') || (text[0] >= 'A' && text[0] <= 'Z')))
+
+            {
+
+                return text;
+
+            }
+
+
+
             string cached;
 
             if (translationCache.TryGetValue(text, out cached))
@@ -1871,29 +1948,35 @@ namespace RussianLocalization
             }
 
             else
-
             {
-
                 // Попытка найти нормализованный ключ для ядра текста
-
                 string sn = SuperNormalize(trimmedCore);
-
-                string originalKey;
-
-                if (normalizedKeyDictionary.TryGetValue(sn, out originalKey))
-
+                
+                bool isKeyName = sn.Length == 1 || 
+                                 sn == "esc" || 
+                                 sn == "tab" || 
+                                 sn == "enter" || 
+                                 sn == "space" || 
+                                 sn == "backspace" || 
+                                 sn == "insert" || 
+                                 sn == "delete" || 
+                                 sn == "up" || 
+                                 sn == "down" || 
+                                 sn == "left" || 
+                                 sn == "right";
+                bool hasBrackets = trimmedCore.StartsWith("[") && trimmedCore.EndsWith("]");
+                
+                if (!isKeyName || hasBrackets)
                 {
-
-                    if (staticDictionary.TryGetValue(originalKey, out exactMatch))
-
+                    string originalKey;
+                    if (normalizedKeyDictionary.TryGetValue(sn, out originalKey))
                     {
-
-                        translatedCore = exactMatch;
-
+                        if (staticDictionary.TryGetValue(originalKey, out exactMatch))
+                        {
+                            translatedCore = exactMatch;
+                        }
                     }
-
                 }
-
             }
 
 
