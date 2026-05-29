@@ -422,6 +422,16 @@
   "^(?<pref>.*?)ACTIVE Эффекты:(?<suff>.*?)$": "{pref}АКТИВНЫЕ Эффекты:{suff}",
   "^(?<pref>.*?)Last saved: (?<date>.*?)$": "{pref}Последнее сохранение: {date}",
   "^(?<pref>.*?)Последнее сохранение: (?<day>.*?), (?<d>\\d+) (?<m>.*?) (?<y>\\d+) at (?<t>.*?)$": "{pref}Последнее сохранение: {day}, {d} {m} {y} в {t}",
-  "^(?<pref>.*?)p(?<c1>.*?)a(?<c2>.*?)i(?<c3>.*?)n(?<c4>.*?)t(?<c5>.*?)e(?<c6>.*?)d(?<suff>.*?)$": "{pref}расписная{suff}",
-  "^(?<pref>.*?)e(?<c1>.*?)n(?<c2>.*?)g(?<c3>.*?)r(?<c4>.*?)a(?<c5>.*?)v(?<c6>.*?)e(?<c7>.*?)d(?<suff>.*?)$": "{pref}гравированная{suff}"
+  "^(?<pref>.*?)The villagers of (?<town>.*?)(?<suff>(?:</color>)?.*?)$": "{pref}Жители поселения {town}{suff}",
+  "^(?<pref>.*?)The Cult of the (?<cult>.*?)(?<suff>(?:</color>)?.*?)$": "{pref}Культ: {cult}{suff}",
+  "^(?<pref>.*?)The (?<tribe>.*?) tribe(?<suff>(?:</color>)?.*?)$": "{pref}Племя {tribe}{suff}",
+  "^(?<pref>.*?) заинтер(?<mid>.*?) в (?<action>.*?) о(?<suff>.*?)$": "{pref} заинтер{mid} в {action} о{suff}",
+  "^(?<pref>.*?)They're also interested in (?<action>.*?)(?<suff>.*?)$": "{pref}Они также заинтересованы в {action}{suff}",
+  "^(?<pref>.*?)Interested in (?<action>.*?)(?<suff>.*?)$": "{pref}Заинтересованы в {action}{suff}",
+  "^(?<pref>.*?)interested in hearing (?<topic>.*?)(?<suff>.*?)$": "{pref}заинтересованы в получении {topic}{topic}{suff}",
+  "^(?<pref>.*?)Ваш (?<attr>.*?) determines (?<desc>.*?)(?<suff>\\.?)$": "{pref}Ваш {attr} определяет {desc}{suff}",
+  "^(?<pref>.*?)Ваш (?<attr>.*?) measures (?<desc>.*?)(?<suff>\\.?)$": "{pref}Ваш {attr} измеряет {desc}{suff}",
+  "^(?<pref>.*?)You wade through бассейн of (?<liquid>.*?)\\.(?<suff>.*?)$": "{pref}Вы идете вброд через бассейн с: {liquid}.{suff}",
+  "^(?<pref>.*?)You emit a ray of frost from your (?<part>.*?)\\.(?<suff>.*?)$": "{pref}Вы выпускаете ледяной луч из ваших {part}.{suff}",
+  "^(?<pref>.*?)You make an (?<atk>.*?) attack against an (?<target>.*?) and they start (?<eff>.*?)\\.(?<suff>.*?)$": "{pref}Вы проводите атаку ({atk}) против {target}, и у цели начинается {eff}.{suff}"
 }
