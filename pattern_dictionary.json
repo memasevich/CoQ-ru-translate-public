@@ -375,5 +375,9 @@
   "^(?<pronoun>He|She|It|They) has devoured the infant child\\.$": "{pronoun} пожирает младенца.",
   "^(?<pref><color=[^>]+>)1\\.0\\.4\\s*$": "{pref}Переведено memasevich - 1.0.4 ",
   "^(?<pref><color=[^>]+>.*?)1\\.0\\.4(?<suff>.*?)$": "{pref}Переведено memasevich - 1.0.4{suff}",
-  "^1\\.0\\.4(?<suff>.*?)$": "Переведено memasevich - 1.0.4{suff}"
+  "^1\\.0\\.4(?<suff>.*?)$": "Переведено memasevich - 1.0.4{suff}",
+  "^(?<pref>.*?)build (?<ver>\\d+\\.\\d+\\.\\d+\\.\\d+)(?<suff>.*?)$": "{pref}сборка {ver}{suff}",
+  "^(?<pronoun>He|She|It|They) has been eaten by the (?<enemy>.*?)\\.$": "{pronoun} был съеден существом: {enemy}.",
+  "^(?<pronoun>You|you) were killed by (?<enemy>.*?)\\.$": "Вы были убиты существом: {enemy}.",
+  "^(?<dmg>[-+]\\d+) to hit in melee combat\\.$": "{dmg} к попаданию в ближнем бою."
 }
