@@ -379,5 +379,11 @@
   "^(?<pref>.*?)build (?<ver>\\d+\\.\\d+\\.\\d+\\.\\d+)(?<suff>.*?)$": "{pref}сборка {ver}{suff}",
   "^(?<pronoun>He|She|It|They) has been eaten by the (?<enemy>.*?)\\.$": "{pronoun} был съеден существом: {enemy}.",
   "^(?<pronoun>You|you) were killed by (?<enemy>.*?)\\.$": "Вы были убиты существом: {enemy}.",
-  "^(?<dmg>[-+]\\d+) to hit in melee combat\\.$": "{dmg} к попаданию в ближнем бою."
+  "^(?<dmg>[-+]\\d+) to hit in melee combat\\.$": "{dmg} к попаданию в ближнем бою.",
+  "^(?<pref>.*?)Your (?<item>.*?) was unequipped\\.(?<suff>.*?)$": "{pref}Снаряжение снято: {item}.{suff}",
+  "^(?<pref>.*?)Your (?<item>.*?) is unequipped\\.(?<suff>.*?)$": "{pref}Снаряжение снято: {item}.{suff}",
+  "^(?<pref>.*?)(?<pronoun>You|you) equip the (?<item>.*?)\\.(?<suff>.*?)$": "{pref}Вы надеваете: {item}.{suff}",
+  "^(?<pref>.*?)(?<pronoun>You|you) unequip (?<your>your) (?<item>.*?)\\.(?<suff>.*?)$": "{pref}Вы снимаете: {item}.{suff}",
+  "^(?<pref>.*?)(?<pronoun>You|you) equip (?<your>your) (?<item>.*?)\\.(?<suff>.*?)$": "{pref}Вы надеваете: {item}.{suff}",
+  "^(?<pref>.*?)(?<pronoun>You|you) unequip the (?<item>.*?)\\.(?<suff>.*?)$": "{pref}Вы снимаете: {item}.{suff}"
 }
