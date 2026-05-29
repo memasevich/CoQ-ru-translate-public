@@ -372,5 +372,8 @@
   "^(?<subj>You|you) enter a blood frenzy, and for (?<r>\\d+) rounds (?<your>your) chance to (?<eff>.*?) with (?<w>.*?) attacks is (?<p>\\d+)%\\. To use (?<s1>.*?), (?<s2>.*?) must be off cooldown, and using (?<s3>.*?) puts (?<s4>.*?) on cooldown\\.$": "{subj} впадаете в кровавое безумие, и на {r} раундов ваш шанс на эффект «{eff}» при атаках ({w}) становится {p}%. Чтобы использовать {s1}, навык {s2} должен быть готов, а использование {s3} отправит {s4} на перезарядку.",
   "^For the next (?<r>\\d+) rounds, (?<your>your) chance to (?<eff>.*?) with (?<w>.*?) attacks is (?<p>\\d+)% and (?<s1>.*?) has no cooldown\\. To use (?<s2>.*?), (?<s3>.*?) must be off cooldown, and using (?<s4>.*?) puts (?<s5>.*?) on cooldown\\.$": "В течение следующих {r} раундов ваш шанс на эффект «{eff}» при атаках ({w}) становится {p}%, а {s1} не требует перезарядки. Чтобы использовать {s2}, навык {s3} должен быть готов, а использование {s4} отправит {s5} на перезарядку.",
   "^\\{\\{rules\\|Swarmer: This creature receives \\+(?<h>\\d+) to hit in melee and \\+(?<p>\\d+) to penetration rolls for each other hostile swarmer beyond the first who is in another square adjacent to (?<pronoun>his|her|its|their) target\\. \\(currently \\+(?<c>\\d+)\\)\\}\\}$": "{{rules|Стая: Это существо получает +{h} к попаданию в ближнем бою и +{p} к бронепробитию за каждого другого враждебного члена стаи (кроме первого), находящегося в соседней клетке с целью. (сейчас: +{c})}}",
-  "^(?<pronoun>He|She|It|They) has devoured the infant child\\.$": "{pronoun} пожирает младенца."
+  "^(?<pronoun>He|She|It|They) has devoured the infant child\\.$": "{pronoun} пожирает младенца.",
+  "^(?<pref><color=[^>]+>)1\\.0\\.4\\s*$": "{pref}Переведено memasevich - 1.0.4 ",
+  "^(?<pref><color=[^>]+>.*?)1\\.0\\.4(?<suff>.*?)$": "{pref}Переведено memasevich - 1.0.4{suff}",
+  "^1\\.0\\.4(?<suff>.*?)$": "Переведено memasevich - 1.0.4{suff}"
 }
