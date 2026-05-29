@@ -394,5 +394,11 @@
   "^(?<pref>.*?)The most advanced artifact in your possession was (?<item>.*?)\\.(?<suff>.*?)$": "{pref}Самым продвинутым артефактом в вашем владении был: {item}.{suff}",
   "^(?<pref>.*?)You have lost sight of the (?<enemy>.*?)\\.(?<suff>.*?)$": "{pref}Вы потеряли из виду существо: {enemy}.{suff}",
   "^(?<pref>.*?)The (?<enemy>.*?) takes (?<dmg>\\d+) damage from (?<your>your) (?<eff>.*?) effect!(?<suff>.*?)$": "{pref}{enemy} получает {dmg} ед. урона от вашего эффекта: {eff}!{suff}",
-  "^(?<pref>.*?)You pour fresh water from (?<your>your) (?<item>.*?) over yourself\\.(?<suff>.*?)$": "{pref}Вы обливаете себя свежей водой из: {item}.{suff}"
+  "^(?<pref>.*?)You pour fresh water from (?<your>your) (?<item>.*?) over yourself\\.(?<suff>.*?)$": "{pref}Вы обливаете себя свежей водой из: {item}.{suff}",
+  "^(?<pref>.*?)The villagers of (?<town>.*?)$": "{pref}Жители поселения {town}",
+  "^(?<pref>.*?)The Cult of the (?<cult>.*?)$": "{pref}Культ: {cult}",
+  "^(?<pref>.*?)(?<pronoun>You|you) pass by (?<item>.*?)\\.(?<suff>.*?)$": "{pref}Вы проходите мимо: {item}.{suff}",
+  "^(?<pref>.*?)(?<pronoun>You|you) hit (?<roll>.*?) for (?<dmg>\\d+) damage with (?<your>your) (?<weapon>.*?)! \\[(?<dice>.*?)\\](?<suff>.*?)$": "{pref}Вы наносите удар {roll} на {dmg} ед. урона вашим оружием: {weapon}! [{dice}]{suff}",
+  "^(?<pref>.*?)They're also interested in(?<suff>.*?)$": "{pref}Они также заинтересованы в{suff}",
+  "^(?<pref>.*?)are interested in learning about the locations of(?<suff>.*?)$": "{pref}заинтересованы в получении информации о расположении{suff}"
 }
