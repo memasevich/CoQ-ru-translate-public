@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 using System.IO;
 
@@ -1981,6 +1981,38 @@ namespace RussianLocalization
 
 
 
+            
+            if (string.IsNullOrEmpty(translatedCore))
+            {
+                // Shadow Matching: Теневое сопоставление для боевого лога и предметов
+                // Отсекаем хвосты вроде "! [18]", "(unburnt)", " x5"
+                var shadowRegex = new System.Text.RegularExpressions.Regex(@"(?<core>.+?)(?<deco>\s*(?:!|\.|\?)*\s*(?:\[?\d+(?:\s+vs\s+\d+)?\]?|\(unburnt\)|x\d+)(?:!|\.|\?)*)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                var shadowMatch = shadowRegex.Match(trimmedCore);
+                if (shadowMatch.Success)
+                {
+                    string shadowCore = shadowMatch.Groups["core"].Value.Trim();
+                    string decoration = shadowMatch.Groups["deco"].Value;
+                    string translatedShadowCore;
+                    if (staticDictionary.TryGetValue(shadowCore, out translatedShadowCore))
+                    {
+                        translatedCore = translatedShadowCore + decoration;
+                    }
+                    else
+                    {
+                        // Попытка супер-нормализации для ядра тени
+                        string ssn = SuperNormalize(shadowCore);
+                        string origKey;
+                        if (normalizedKeyDictionary.TryGetValue(ssn, out origKey))
+                        {
+                            if (staticDictionary.TryGetValue(origKey, out translatedShadowCore))
+                            {
+                                translatedCore = translatedShadowCore + decoration;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (string.IsNullOrEmpty(translatedCore))
 
             {
@@ -2984,7 +3016,7 @@ namespace RussianLocalization
 
                 {
 
-                    hasCyrillic = font.HasCharacter('а') || font.HasCharacter((char)1072);
+                    hasCyrillic = font.HasCharacter('\u0430') || font.HasCharacter((char)1072);
 
                 }
 
@@ -3839,5 +3871,3 @@ namespace RussianLocalization
     }
 
 }
-
-`n    }`n}

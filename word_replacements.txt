@@ -1,0 +1,2415 @@
+﻿[Original]: RANK 1/10
+[Replaced]: Ранг 1/10
+--------------------------------------------------
+[Original]: Emits a 9-square ray
+[Replaced]: Emits a 9-square луч
+--------------------------------------------------
+[Original]: in the direction of your choice
+[Replaced]: in   direction   your choice
+--------------------------------------------------
+[Original]: determines the potency
+[Replaced]: determines   potency
+--------------------------------------------------
+[Original]: mental mutations, your ability to haggle with merchants, and your ability to dominate the wills of other living creatures
+[Replaced]: mental mutations, your ability to haggle with merchants, и your ability to dominate   wills   other living creatures
+--------------------------------------------------
+[Original]: modifies the cooldowns
+[Replaced]: modifies   cooldowns
+--------------------------------------------------
+[Original]: vellum are bound into a codex
+[Replaced]: vellum   bound into a codex
+--------------------------------------------------
+[Original]: is wrapped in oil-sodden cloth
+[Replaced]:   wrapped in масло-sodden cloth
+--------------------------------------------------
+[Original]: ∙ Travel to the historical site
+[Replaced]: ∙ Travel to   historical сайт
+--------------------------------------------------
+[Original]: Saloons of Nalil
+[Replaced]: Saloons   Nalil
+--------------------------------------------------
+[Original]: Visit the Saloons
+[Replaced]: Visit   Saloons
+--------------------------------------------------
+[Original]: are
+[Replaced]:  
+--------------------------------------------------
+[Original]: trading secrets about the
+[Replaced]: trading secrets about  
+--------------------------------------------------
+[Original]: water weeps, the locations of cat lairs, and
+[Replaced]: water weeps,   locations   cat lairs, и
+--------------------------------------------------
+[Original]: sharing secrets about the locations
+[Replaced]: sharing secrets about   locations
+--------------------------------------------------
+[Original]: the locations of other ape lairs
+[Replaced]:   locations   other обезьяна lairs
+--------------------------------------------------
+[Original]: Oboroqoru's lair, and sultans they admire or despise
+[Replaced]: Oboroqoru's lair, и sultans they admire or despise
+--------------------------------------------------
+[Original]: the locations of other ape lairs, sultans
+[Replaced]:   locations   other обезьяна lairs, sultans
+--------------------------------------------------
+[Original]: they admire or despise, and gossip that's about them
+[Replaced]: they admire or despise, и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs, the locations of haberdashers
+[Replaced]: насекомое lairs,   locations   haberdashers
+--------------------------------------------------
+[Original]: workshops, and sultans they admire or despise. They're
+[Replaced]: workshops, и sultans they admire or despise. They're
+--------------------------------------------------
+[Original]: other baboon lairs, all sorts of gossip, and
+[Replaced]: other бабуин lairs, all sorts   gossip, и
+--------------------------------------------------
+[Original]: technology and the locations
+[Replaced]: technology и   locations
+--------------------------------------------------
+[Original]: ichor merchants' distilleries and the
+[Replaced]: ichor merchants' distilleries и  
+--------------------------------------------------
+[Original]: The Bedroll-in-Citrine
+[Replaced]:   Bedroll-in-Citrine
+--------------------------------------------------
+[Original]: is
+[Replaced]:  
+--------------------------------------------------
+[Original]: trading secrets about all sorts of
+[Replaced]: trading secrets about all sorts  
+--------------------------------------------------
+[Original]: The Cabal
+[Replaced]:   Cabal
+--------------------------------------------------
+[Original]: humanoid settlements, the locations of
+[Replaced]: humanoid settlements,   locations  
+--------------------------------------------------
+[Original]: humanoid lairs, and sultans they admire or despise
+[Replaced]: humanoid lairs, и sultans they admire or despise
+--------------------------------------------------
+[Original]: you pet them. You
+[Replaced]: you погладить them. You
+--------------------------------------------------
+[Original]: trading secrets about the locations
+[Replaced]: trading secrets about   locations
+--------------------------------------------------
+[Original]: of all settlements
+[Replaced]:   all settlements
+--------------------------------------------------
+[Original]: oddities, the darkling star, and gossip
+[Replaced]: oddities,   darkling звезда, и gossip
+--------------------------------------------------
+[Original]: about the locations
+[Replaced]: about   locations
+--------------------------------------------------
+[Original]: settlements and locations
+[Replaced]: settlements и locations
+--------------------------------------------------
+[Original]: in the jungle
+[Replaced]: in   jungle
+--------------------------------------------------
+[Original]: learning about the
+[Replaced]: learning about  
+--------------------------------------------------
+[Original]: goatfolk settlements and gossip that's about
+[Replaced]: козлолюды settlements и gossip that's about
+--------------------------------------------------
+[Original]: merchants and all sorts
+[Replaced]: merchants и all sorts
+--------------------------------------------------
+[Original]: of gossip
+[Replaced]:   gossip
+--------------------------------------------------
+[Original]: dromad merchants, the locations of
+[Replaced]: дромады merchants,   locations  
+--------------------------------------------------
+[Original]: The Cult of Yyram
+[Replaced]:   Cult   Yyram
+--------------------------------------------------
+[Original]: the sultan they worship
+[Replaced]:   sultan they worship
+--------------------------------------------------
+[Original]: The Cult
+[Replaced]:   Cult
+--------------------------------------------------
+[Original]: about the sultan they worship
+[Replaced]: about   sultan they worship
+--------------------------------------------------
+[Original]: The denizens
+[Replaced]:   denizens
+--------------------------------------------------
+[Original]: in the Palladium Reef
+[Replaced]: in   Palladium Reef
+--------------------------------------------------
+[Original]: about technology, the locations
+[Replaced]: about technology,   locations
+--------------------------------------------------
+[Original]: the locations
+[Replaced]:   locations
+--------------------------------------------------
+[Original]: of all settlements, the locations
+[Replaced]:   all settlements,   locations
+--------------------------------------------------
+[Original]: sites, and
+[Replaced]: sites, и
+--------------------------------------------------
+[Original]: you pet them. You are
+[Replaced]: you погладить them. You  
+--------------------------------------------------
+[Original]: of humanoid settlements and sultans they admire or
+[Replaced]:   humanoid settlements и sultans they admire or
+--------------------------------------------------
+[Original]: other dromad merchants and locations in
+[Replaced]: other дромады merchants и locations in
+--------------------------------------------------
+[Original]: humanoid merchants, the locations of
+[Replaced]: humanoid merchants,   locations  
+--------------------------------------------------
+[Original]: despise, and gossip that's about them
+[Replaced]: despise, и gossip that's about them
+--------------------------------------------------
+[Original]: in the flower fields
+[Replaced]: in   цветок fields
+--------------------------------------------------
+[Original]: insect lairs and sultans they admire or
+[Replaced]: насекомое lairs и sultans they admire or
+--------------------------------------------------
+[Original]: sharing secrets about the
+[Replaced]: sharing secrets about  
+--------------------------------------------------
+[Original]: fungus forests
+[Replaced]: грибок forests
+--------------------------------------------------
+[Original]: water weeps, the locations of wine weeps
+[Replaced]: water weeps,   locations   вино weeps
+--------------------------------------------------
+[Original]: and the locations
+[Replaced]: и   locations
+--------------------------------------------------
+[Original]: Girsh lairs and the locations of
+[Replaced]: Girsh lairs и   locations  
+--------------------------------------------------
+[Original]: Girsh lairs and gossip that's about them
+[Replaced]: Girsh lairs и gossip that's about them
+--------------------------------------------------
+[Original]: The hindren
+[Replaced]:   hindren
+--------------------------------------------------
+[Original]: locations in the flower fields, the location
+[Replaced]: locations in   цветок fields,   location
+--------------------------------------------------
+[Original]: flower lairs and locations in the flower
+[Replaced]: цветок lairs и locations in   цветок
+--------------------------------------------------
+[Original]: technology, the locations
+[Replaced]: technology,   locations
+--------------------------------------------------
+[Original]: the locations of
+[Replaced]:   locations  
+--------------------------------------------------
+[Original]: historic sites, the locations
+[Replaced]: historic sites,   locations
+--------------------------------------------------
+[Original]: workshops, and
+[Replaced]: workshops, и
+--------------------------------------------------
+[Original]: robot lairs. They're also interested in
+[Replaced]: робот lairs. They're also interested in
+--------------------------------------------------
+[Original]: merchants and all sorts of
+[Replaced]: merchants и all sorts  
+--------------------------------------------------
+[Original]: salt weeps, the locations of slime bogs, the
+[Replaced]: salt weeps,   locations   slime bogs,  
+--------------------------------------------------
+[Original]: bird lairs, and sultans they admire or
+[Replaced]: птица lairs, и sultans they admire or
+--------------------------------------------------
+[Original]: learning about the locations
+[Replaced]: learning about   locations
+--------------------------------------------------
+[Original]: of rust bogs, technology, and gossip that's about them
+[Replaced]:   rust bogs, technology, и gossip that's about them
+--------------------------------------------------
+[Original]: locations in the jungle, the locations of
+[Replaced]: locations in   jungle,   locations  
+--------------------------------------------------
+[Original]: slime bogs, all weep locations, and sultans
+[Replaced]: slime bogs, all weep locations, и sultans
+--------------------------------------------------
+[Original]: all settlements and all sorts of gossip
+[Replaced]: all settlements и all sorts   gossip
+--------------------------------------------------
+[Original]: the resources necessary for
+[Replaced]:   resources necessary для
+--------------------------------------------------
+[Original]: building new societies: the locations
+[Replaced]: building новый societies:   locations
+--------------------------------------------------
+[Original]: becoming nooks and the locations of
+[Replaced]: becoming nooks и   locations  
+--------------------------------------------------
+[Original]: ruins, the locations of historic sites
+[Replaced]: ruins,   locations   historic sites
+--------------------------------------------------
+[Original]: and all sultans
+[Replaced]: и all sultans
+--------------------------------------------------
+[Original]: The Seekers
+[Replaced]:   Seekers
+--------------------------------------------------
+[Original]: secrets about the darkling star and sultans they admire or
+[Replaced]: secrets about   darkling звезда и sultans they admire or
+--------------------------------------------------
+[Original]: Stopsvalinn and the locations of their forts
+[Replaced]: Stopsvalinn и   locations   their forts
+--------------------------------------------------
+[Original]: pig farms, the locations
+[Replaced]: pig farms,   locations
+--------------------------------------------------
+[Original]: farms, and gossip that's
+[Replaced]: farms, и gossip that's
+--------------------------------------------------
+[Original]: and gossip that's about them
+[Replaced]: и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs and the locations of lava
+[Replaced]: насекомое lairs и   locations   лава
+--------------------------------------------------
+[Original]: gel weeps and sultans they admire or despise
+[Replaced]: gel weeps и sultans they admire or despise
+--------------------------------------------------
+[Original]: sites, locations in the
+[Replaced]: sites, locations in  
+--------------------------------------------------
+[Original]: banana grove, and all sultans
+[Replaced]: banana grove, и all sultans
+--------------------------------------------------
+[Original]: farms, the locations of pig
+[Replaced]: farms,   locations   pig
+--------------------------------------------------
+[Original]: snapjaw forts, locations in the salt
+[Replaced]: snapjaw forts, locations in   salt
+--------------------------------------------------
+[Original]: secrets about locations in the jungle and the locations of
+[Replaced]: secrets about locations in   jungle и   locations  
+--------------------------------------------------
+[Original]: fish lairs and the locations of frog lairs
+[Replaced]: рыбы lairs и   locations   frog lairs
+--------------------------------------------------
+[Original]: scuttle down a dark shaft at the edge of a sunken trade path
+[Replaced]: scuttle down a dark shaft at   edge   a sunken trade path
+--------------------------------------------------
+[Original]: You equip the
+[Replaced]: You equip  
+--------------------------------------------------
+[Original]: for 1 damage with your
+[Replaced]: для 1 damage with your
+--------------------------------------------------
+[Original]: bite! [7 vs 7
+[Replaced]: укус! [7 vs 7
+--------------------------------------------------
+[Original]: for 2 damage with your
+[Replaced]: для 2 damage with your
+--------------------------------------------------
+[Original]: The snapjaw scavenger dies
+[Replaced]:   snapjaw scavenger dies
+--------------------------------------------------
+[Original]: You stop moving because there is a bear in your way
+[Replaced]: You stop moving because there   a bear in your way
+--------------------------------------------------
+[Original]: bite! [2 vs 7
+[Replaced]: укус! [2 vs 7
+--------------------------------------------------
+[Original]: The bear hits
+[Replaced]:   bear бьет
+--------------------------------------------------
+[Original]: for 4 damage with her bite. [18
+[Replaced]: для 4 damage with her укус. [18
+--------------------------------------------------
+[Original]: The bear dies
+[Replaced]:   bear dies
+--------------------------------------------------
+[Original]: You identify the odd trinket as a
+[Replaced]: You identify   odd trinket as a
+--------------------------------------------------
+[Original]: an iron battle axe
+[Replaced]: an железный battle топор
+--------------------------------------------------
+[Original]: from the north
+[Replaced]: from   north
+--------------------------------------------------
+[Original]: waterskin from the north
+[Replaced]: waterskin from   north
+--------------------------------------------------
+[Original]: You toss some stamped fish meat, a sprinkle
+[Replaced]: You toss some stamped рыбы meat, a sprinkle
+--------------------------------------------------
+[Original]: a dash of crowned fulcrete flake, and a crust of bread into a pot and stir
+[Replaced]: a dash   crowned fulcrete flake, и a crust   bread into a pot и stir
+--------------------------------------------------
+[Original]: The clockwork beetle and pariah to its people takes the
+[Replaced]:   clockwork beetle и pariah to its people takes  
+--------------------------------------------------
+[Original]: Qud, surface, Harvest Dawn
+[Replaced]: Куд, surface, Harvest Dawn
+--------------------------------------------------
+[Original]: Joppa, Beetle Moon Zenith
+[Replaced]: Joppa, Beetle Луна Zenith
+--------------------------------------------------
+[Original]: bent metal sheet from the east
+[Replaced]: bent metal sheet from   восток
+--------------------------------------------------
+[Original]: fractured microchip from the south
+[Replaced]: fractured microchip from   south
+--------------------------------------------------
+[Original]: bent metal sheet from the west
+[Replaced]: bent metal sheet from   запад
+--------------------------------------------------
+[Original]: wet watervine farmer
+[Replaced]: wet влагопаутинник farmer
+--------------------------------------------------
+[Original]: and a bridge
+[Replaced]: и a bridge
+--------------------------------------------------
+[Original]: You note the location
+[Replaced]: You note   location
+--------------------------------------------------
+[Original]: Saloons of Nalil in the
+[Replaced]: Saloons   Nalil in  
+--------------------------------------------------
+[Original]: axe
+[Replaced]: топор
+--------------------------------------------------
+[Original]: opponent. If you hit and penetrate, you dismember one of their limbs at random
+[Replaced]: opponent. If you hit и penetrate, you dismember one   their limbs at random
+--------------------------------------------------
+[Original]: a door
+[Replaced]: a дверь
+--------------------------------------------------
+[Original]: Live and drink. Come in- come sit 'neath the cool shade, 'cross a pillow
+[Replaced]: Live и drink. Come in- come sit 'neath   cool shade, 'cross a pillow
+--------------------------------------------------
+[Original]: freshwater, too, and quench your thirst
+[Replaced]: freshwater, too, и quench your thirst
+--------------------------------------------------
+[Original]: this? The oasis-hamlet. 'Neath the shelf
+[Replaced]: this?   oasis-hamlet. 'Neath   shelf
+--------------------------------------------------
+[Original]: world. A million breaths of
+[Replaced]: world. A million breaths  
+--------------------------------------------------
+[Original]: salt the wind heaves over the Great Salt Desert Moghra'yi. And to the east
+[Replaced]: salt   ветер heaves over   Great Salt Desert Moghra'yi. И to   восток
+--------------------------------------------------
+[Original]: the rotting jungles
+[Replaced]:   rotting jungles
+--------------------------------------------------
+[Original]: groves. And broken against the mounts
+[Replaced]: groves. И broken against   mounts
+--------------------------------------------------
+[Original]: north, they are, in the shadow of
+[Replaced]: north, they  , in   shadow  
+--------------------------------------------------
+[Original]: mm, adventurous ones set off for their own splinter
+[Replaced]: mm, adventurous ones set off для their own splinter
+--------------------------------------------------
+[Original]: here? Speak to my daughter through the east door, for herbs. And sitting Tam
+[Replaced]: here? Speak to my daughter through   восток дверь, для herbs. И sitting Tam
+--------------------------------------------------
+[Original]: in the southeast has all manner
+[Replaced]: in   southeast has all manner
+--------------------------------------------------
+[Original]: o' there, by the southern watervine patch
+[Replaced]: o' there, by   southern влагопаутинник patch
+--------------------------------------------------
+[Original]: metal, to the southwest
+[Replaced]: metal, to   southwest
+--------------------------------------------------
+[Original]: Witchwood for pain, bandages for bleeding, yuckwheat and honey for when your
+[Replaced]: Witchwood для pain, bandages для bleeding, yuckwheat и honey для when your
+--------------------------------------------------
+[Original]: Elder and all. Spent some years
+[Replaced]: Elder и all. Spent some years
+--------------------------------------------------
+[Original]: Fates forfend. I would hardly like to lead a village and run a shop at the
+[Replaced]: Fates forfend. I would hardly like to свинцовый a village и run a shop at  
+--------------------------------------------------
+[Original]: Ahh, there is a new face. I am Nima Ruda, town apothecary. If your feet point
+[Replaced]: Ahh, there   a новый лицо. I am Nima Ruda, town apothecary. If your ступни point
+--------------------------------------------------
+[Original]: to Qud, you’ll need some
+[Replaced]: to Куд, you’ll need some
+--------------------------------------------------
+[Original]: Find Argyve, in his workshop to the west, or Mehmet, by the watervine patch to
+[Replaced]: Find Argyve, in his workshop to   запад, or Mehmet, by   влагопаутинник patch to
+--------------------------------------------------
+[Original]: the south
+[Replaced]:   south
+--------------------------------------------------
+[Original]: and ground
+[Replaced]: и ground
+--------------------------------------------------
+[Original]: Here are several stripped trunks
+[Replaced]: Here   several stripped trunks
+--------------------------------------------------
+[Original]: a watervine
+[Replaced]: a влагопаутинник
+--------------------------------------------------
+[Original]: Watervine farm in the lap
+[Replaced]: Влагопаутинник farm in   lap
+--------------------------------------------------
+[Original]: marsh. You've sucked the moisture out a
+[Replaced]: marsh. You've sucked   moisture out a
+--------------------------------------------------
+[Original]: vinewafer, yea? We tend the plant here
+[Replaced]: vinewafer, yea? We tend   plant here
+--------------------------------------------------
+[Original]: Somethin' is eating our watervine, 'round Beetle Moon. Q-ruun says he saw a
+[Replaced]: Somethin'   eating our влагопаутинник, 'round Beetle Луна. Q-ruun говорит he saw a
+--------------------------------------------------
+[Original]: creature, spider-like, slinking in the brine. But no cave spider would dare
+[Replaced]: creature, spider-like, slinking in   brine. But no cave spider would dare
+--------------------------------------------------
+[Original]: fleck in the pool. Shale, like we find in the soil by
+[Replaced]: fleck in   бассейн. Shale, like we find in   soil by
+--------------------------------------------------
+[Original]: Kill the vermin and bring one's corpse back, for seein' what it is. Elder will
+[Replaced]: Kill   vermin и bring one's corpse back, для seein' what it  . Elder will
+--------------------------------------------------
+[Original]: Tam, dromad merchant
+[Replaced]: Tam, дромады merchant
+--------------------------------------------------
+[Original]: are you
+[Replaced]:   you
+--------------------------------------------------
+[Original]: I am dromad, human friend. Some say saltstrider. Do you know this
+[Replaced]: I am дромады, human friend. Some say saltstrider. Do you know this
+--------------------------------------------------
+[Original]: My people have walked the salt for thousands
+[Replaced]: My people have walked   salt для thousands
+--------------------------------------------------
+[Original]: that lives and thinks. From Pale Sea to the marsh
+[Replaced]: that lives и thinks. From Pale Sea to   marsh
+--------------------------------------------------
+[Original]: and under the
+[Replaced]: и under  
+--------------------------------------------------
+[Original]: I walked Moghra'yi in the caravans
+[Replaced]: I walked Moghra'yi in   caravans
+--------------------------------------------------
+[Original]: brethren and the saltback, but upon
+[Replaced]: brethren и   saltback, but upon
+--------------------------------------------------
+[Original]: a sign
+[Replaced]: a знак
+--------------------------------------------------
+[Original]: the p-density
+[Replaced]:   p-density
+--------------------------------------------------
+[Original]: Must you bother me? What are you, some sort
+[Replaced]: Must you bother me? What   you, some sort
+--------------------------------------------------
+[Original]: There are caves everywhere, you dolt! Scoop the surface
+[Replaced]: There   caves everywhere, you dolt! Scoop   surface
+--------------------------------------------------
+[Original]: marsh, or head
+[Replaced]: marsh, or голова
+--------------------------------------------------
+[Original]: You have finished the step
+[Replaced]: You have finished   step
+--------------------------------------------------
+[Original]: brinestalk wall with gearbox
+[Replaced]: brinestalk стена with gearbox
+--------------------------------------------------
+[Original]: You make some progress understanding the bizarre contraption
+[Replaced]: You make some progress understanding   bizarre contraption
+--------------------------------------------------
+[Original]: High Salt Sun 24th
+[Replaced]: Высокий Salt Sun 24th
+--------------------------------------------------
+[Original]: The tatters
+[Replaced]:   tatters
+--------------------------------------------------
+[Original]: sweat-stained kufiya thrash in the wind from where they hang about the farmer's neck. Clasped in his gnarled, brown hand is a curved vinereaper of iron with which he culls moisture-swollen wafers from the viridian plant called watervine
+[Replaced]: sweat-stained kufiya thrash in   ветер from where they hang about   farmer's neck. Clasped in his gnarled, brown hand   a curved vinereaper   железный with which he culls moisture-swollen wafers from   viridian plant called влагопаутинник
+--------------------------------------------------
+[Original]: sturdy woven tunic, wide-brimmed hat, iron vinereaper, sandals
+[Replaced]: sturdy woven tunic, wide-brimmed hat, железный vinereaper, сандалии
+--------------------------------------------------
+[Original]: Big Yrame shifts her weight between hind and forelegs. She shakes a storm
+[Replaced]: Big Yrame shifts her weight between hind и forelegs. She shakes a storm
+--------------------------------------------------
+[Original]: dander from the tines of her great horns, and she blows a halo of freezing air from her rime-veined hands
+[Replaced]: dander from   tines   her great horns, и she blows a halo   freezing air from her rime-veined hands
+--------------------------------------------------
+[Original]: C|the villagers of Joppa
+[Replaced]: C|  villagers   Joppa
+--------------------------------------------------
+[Original]: Sharp jade eyes are crow-worn to late middle age and her lips are scarred with gas burns. Climbing over her back and neck are the jeweled segments
+[Replaced]: Sharp jade eyes   crow-worn to late middle age и her lips   scarred with газ burns. Climbing over her back и neck     jeweled segments
+--------------------------------------------------
+[Original]: great spiral tail and stinger; a bead of smoking gut juice gleams on the tip
+[Replaced]: great spiral tail и stinger; a bead   smoking gut juice gleams on   tip
+--------------------------------------------------
+[Original]: leather apron, wide-brimmed hat, weird artifact, sandals
+[Replaced]: leather apron, wide-brimmed hat, weird artifact, сандалии
+--------------------------------------------------
+[Original]: A warm smile spreads over an old face freckled by time and a million crumbs
+[Replaced]: A warm smile spreads over an старый лицо freckled by time и a million crumbs
+--------------------------------------------------
+[Original]: He shrinks under a hunched back and drums the ground beneath him with a short and barb-crowned tail. A second pair of arms rise over the slump of his shoulders, where hands meet and fingers lace to form another face, this one vacant and prehistoric, no mouth and eyes desert-white
+[Replaced]: He shrinks under a hunched back и drums   ground beneath him with a short и barb-crowned tail. A second pair   arms rise over   slump   his shoulders, where hands meet и fingers lace to form another лицо, this one vacant и prehistoric, no mouth и eyes desert-white
+--------------------------------------------------
+[Original]: C|the Consortium of Phyta
+[Replaced]: C|  Consortium   Phyta
+--------------------------------------------------
+[Original]: black robes, spectacles, walking stick, sandals
+[Replaced]: black robes, spectacles, walking stick, сандалии
+--------------------------------------------------
+[Original]: One star-ribboned night, a ray cat crossed the marshy loam and wandered into Joppa. The watervine farmers, wakened by the joyful cries
+[Replaced]: One звезда-ribboned night, a луч cat crossed   marshy loam и wandered into Joppa.   влагопаутинник farmers, wakened by   joyful cries
+--------------------------------------------------
+[Original]: small girl, gathered around to revel at the favorable omen and extol the generosity of the Beetle Moon. Since then, Ctesiphus has spent his days curled under the shade of brinestalk huts and sauntering over dirt paths. So long as he's approached with care, he welcomes the hands of friends and strangers alike
+[Replaced]: small girl, gathered around to revel at   favorable omen и extol   generosity     Beetle Луна. Since then, Ctesiphus has spent his days curled under   shade   brinestalk huts и sauntering over dirt paths. So long as he's approached with care, he welcomes   hands   friends и strangers alike
+--------------------------------------------------
+[Original]: He is a wind-carved man with the posture
+[Replaced]: He   a ветер-carved man with   posture
+--------------------------------------------------
+[Original]: vinereaper; his spine is bent to point the bright turquoise of his eyes at the tilling angle, his hips are pushed odd-forward with the slumping ease of a stance much more relaxed than his. If it weren't for the salt on his brow and the scarred knuckles, he would seem a marble Saad perched under a crumbling tomb
+[Replaced]: vinereaper; his spine   bent to point   bright turquoise   his eyes at   tilling angle, his hips   pushed odd-forward with   slumping ease   a stance much more relaxed than his. If it weren't для   salt on his brow и   scarred knuckles, he would seem a marble Saad perched under a crumbling tomb
+--------------------------------------------------
+[Original]: Disliked by {{C|the Bedroll-in-Citrine Church}} for digging up the remains
+[Replaced]: Disliked by {{C|  Bedroll-in-Citrine Church}} для digging up   remains
+--------------------------------------------------
+[Original]: woven tunic, wide-brimmed hat, iron vinereaper, sandals
+[Replaced]: woven tunic, wide-brimmed hat, железный vinereaper, сандалии
+--------------------------------------------------
+[Original]: RANK 1/10
+[Replaced]: Ранг 1/10
+--------------------------------------------------
+[Original]: Emits a 9-square ray
+[Replaced]: Emits a 9-square луч
+--------------------------------------------------
+[Original]: in the direction of your choice
+[Replaced]: in   direction   your choice
+--------------------------------------------------
+[Original]: modifies the cooldowns
+[Replaced]: modifies   cooldowns
+--------------------------------------------------
+[Original]: determines the potency
+[Replaced]: determines   potency
+--------------------------------------------------
+[Original]: mental mutations, your ability to haggle with merchants, and your ability to dominate the wills of other living creatures
+[Replaced]: mental mutations, your ability to haggle with merchants, и your ability to dominate   wills   other living creatures
+--------------------------------------------------
+[Original]: are
+[Replaced]:  
+--------------------------------------------------
+[Original]: water weeps, the locations of cat lairs, and
+[Replaced]: water weeps,   locations   cat lairs, и
+--------------------------------------------------
+[Original]: sharing secrets about the locations
+[Replaced]: sharing secrets about   locations
+--------------------------------------------------
+[Original]: Oboroqoru's lair, and sultans they admire or despise
+[Replaced]: Oboroqoru's lair, и sultans they admire or despise
+--------------------------------------------------
+[Original]: the locations of other ape lairs, sultans
+[Replaced]:   locations   other обезьяна lairs, sultans
+--------------------------------------------------
+[Original]: they admire or despise, and gossip that's about them
+[Replaced]: they admire or despise, и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs, the locations of haberdashers
+[Replaced]: насекомое lairs,   locations   haberdashers
+--------------------------------------------------
+[Original]: other baboon lairs, all sorts of gossip, and
+[Replaced]: other бабуин lairs, all sorts   gossip, и
+--------------------------------------------------
+[Original]: technology and the locations
+[Replaced]: technology и   locations
+--------------------------------------------------
+[Original]: ichor merchants' distilleries and the
+[Replaced]: ichor merchants' distilleries и  
+--------------------------------------------------
+[Original]: The Bedroll-in-Citrine
+[Replaced]:   Bedroll-in-Citrine
+--------------------------------------------------
+[Original]: is
+[Replaced]:  
+--------------------------------------------------
+[Original]: trading secrets about all sorts of
+[Replaced]: trading secrets about all sorts  
+--------------------------------------------------
+[Original]: The Cabal
+[Replaced]:   Cabal
+--------------------------------------------------
+[Original]: humanoid settlements, the locations of
+[Replaced]: humanoid settlements,   locations  
+--------------------------------------------------
+[Original]: you pet them. You
+[Replaced]: you погладить them. You
+--------------------------------------------------
+[Original]: trading secrets about the locations
+[Replaced]: trading secrets about   locations
+--------------------------------------------------
+[Original]: of all settlements
+[Replaced]:   all settlements
+--------------------------------------------------
+[Original]: oddities, the darkling star, and gossip
+[Replaced]: oddities,   darkling звезда, и gossip
+--------------------------------------------------
+[Original]: settlements and locations
+[Replaced]: settlements и locations
+--------------------------------------------------
+[Original]: in the jungle
+[Replaced]: in   jungle
+--------------------------------------------------
+[Original]: goatfolk settlements and gossip that's about
+[Replaced]: козлолюды settlements и gossip that's about
+--------------------------------------------------
+[Original]: merchants and all sorts
+[Replaced]: merchants и all sorts
+--------------------------------------------------
+[Original]: of gossip
+[Replaced]:   gossip
+--------------------------------------------------
+[Original]: dromad merchants, the locations of
+[Replaced]: дромады merchants,   locations  
+--------------------------------------------------
+[Original]: underground locations and sultans they admire or despise
+[Replaced]: underground locations и sultans they admire or despise
+--------------------------------------------------
+[Original]: The Cult of Yyram
+[Replaced]:   Cult   Yyram
+--------------------------------------------------
+[Original]: the sultan they worship
+[Replaced]:   sultan they worship
+--------------------------------------------------
+[Original]: The Cult
+[Replaced]:   Cult
+--------------------------------------------------
+[Original]: about the sultan they worship
+[Replaced]: about   sultan they worship
+--------------------------------------------------
+[Original]: The denizens
+[Replaced]:   denizens
+--------------------------------------------------
+[Original]: in the Palladium Reef
+[Replaced]: in   Palladium Reef
+--------------------------------------------------
+[Original]: about technology, the locations
+[Replaced]: about technology,   locations
+--------------------------------------------------
+[Original]: the locations
+[Replaced]:   locations
+--------------------------------------------------
+[Original]: of all settlements, the locations
+[Replaced]:   all settlements,   locations
+--------------------------------------------------
+[Original]: sites, and
+[Replaced]: sites, и
+--------------------------------------------------
+[Original]: you pet them. You are
+[Replaced]: you погладить them. You  
+--------------------------------------------------
+[Original]: other dromad merchants and locations in
+[Replaced]: other дромады merchants и locations in
+--------------------------------------------------
+[Original]: humanoid merchants, the locations of
+[Replaced]: humanoid merchants,   locations  
+--------------------------------------------------
+[Original]: despise, and gossip that's about them
+[Replaced]: despise, и gossip that's about them
+--------------------------------------------------
+[Original]: in the flower fields
+[Replaced]: in   цветок fields
+--------------------------------------------------
+[Original]: insect lairs and sultans they admire or
+[Replaced]: насекомое lairs и sultans they admire or
+--------------------------------------------------
+[Original]: fungus forests
+[Replaced]: грибок forests
+--------------------------------------------------
+[Original]: water weeps, the locations of wine weeps
+[Replaced]: water weeps,   locations   вино weeps
+--------------------------------------------------
+[Original]: and the locations
+[Replaced]: и   locations
+--------------------------------------------------
+[Original]: Girsh lairs and the locations of
+[Replaced]: Girsh lairs и   locations  
+--------------------------------------------------
+[Original]: Girsh lairs and gossip that's about them
+[Replaced]: Girsh lairs и gossip that's about them
+--------------------------------------------------
+[Original]: The hindren
+[Replaced]:   hindren
+--------------------------------------------------
+[Original]: locations in the flower fields, the location
+[Replaced]: locations in   цветок fields,   location
+--------------------------------------------------
+[Original]: flower lairs and locations in the flower
+[Replaced]: цветок lairs и locations in   цветок
+--------------------------------------------------
+[Original]: technology, the locations
+[Replaced]: technology,   locations
+--------------------------------------------------
+[Original]: historic sites, the locations
+[Replaced]: historic sites,   locations
+--------------------------------------------------
+[Original]: workshops, and
+[Replaced]: workshops, и
+--------------------------------------------------
+[Original]: robot lairs. They're also interested in
+[Replaced]: робот lairs. They're also interested in
+--------------------------------------------------
+[Original]: merchants and all sorts of
+[Replaced]: merchants и all sorts  
+--------------------------------------------------
+[Original]: salt weeps, the locations of slime bogs, the
+[Replaced]: salt weeps,   locations   slime bogs,  
+--------------------------------------------------
+[Original]: bird lairs, and sultans they admire or
+[Replaced]: птица lairs, и sultans they admire or
+--------------------------------------------------
+[Original]: learning about the locations
+[Replaced]: learning about   locations
+--------------------------------------------------
+[Original]: of rust bogs, technology, and gossip that's about them
+[Replaced]:   rust bogs, technology, и gossip that's about them
+--------------------------------------------------
+[Original]: locations in the jungle, the locations of
+[Replaced]: locations in   jungle,   locations  
+--------------------------------------------------
+[Original]: slime bogs, all weep locations, and sultans
+[Replaced]: slime bogs, all weep locations, и sultans
+--------------------------------------------------
+[Original]: all settlements and all sorts of gossip
+[Replaced]: all settlements и all sorts   gossip
+--------------------------------------------------
+[Original]: the resources necessary for
+[Replaced]:   resources necessary для
+--------------------------------------------------
+[Original]: building new societies: the locations
+[Replaced]: building новый societies:   locations
+--------------------------------------------------
+[Original]: becoming nooks and the locations of
+[Replaced]: becoming nooks и   locations  
+--------------------------------------------------
+[Original]: ruins, the locations of historic sites
+[Replaced]: ruins,   locations   historic sites
+--------------------------------------------------
+[Original]: and all sultans
+[Replaced]: и all sultans
+--------------------------------------------------
+[Original]: The Seekers
+[Replaced]:   Seekers
+--------------------------------------------------
+[Original]: secrets about the darkling star and sultans they admire or
+[Replaced]: secrets about   darkling звезда и sultans they admire or
+--------------------------------------------------
+[Original]: Stopsvalinn and the locations of their forts
+[Replaced]: Stopsvalinn и   locations   their forts
+--------------------------------------------------
+[Original]: pig farms, the locations
+[Replaced]: pig farms,   locations
+--------------------------------------------------
+[Original]: farms, and gossip that's
+[Replaced]: farms, и gossip that's
+--------------------------------------------------
+[Original]: and gossip that's about them
+[Replaced]: и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs and the locations of lava
+[Replaced]: насекомое lairs и   locations   лава
+--------------------------------------------------
+[Original]: gel weeps and sultans they admire or despise
+[Replaced]: gel weeps и sultans they admire or despise
+--------------------------------------------------
+[Original]: sites, locations in the
+[Replaced]: sites, locations in  
+--------------------------------------------------
+[Original]: banana grove, and all sultans
+[Replaced]: banana grove, и all sultans
+--------------------------------------------------
+[Original]: farms, the locations of pig
+[Replaced]: farms,   locations   pig
+--------------------------------------------------
+[Original]: snapjaw forts, locations in the salt
+[Replaced]: snapjaw forts, locations in   salt
+--------------------------------------------------
+[Original]: fish lairs and the locations of frog lairs
+[Replaced]: рыбы lairs и   locations   frog lairs
+--------------------------------------------------
+[Original]: ∙ Travel to the historical site
+[Replaced]: ∙ Travel to   historical сайт
+--------------------------------------------------
+[Original]: Saloons of Nalil
+[Replaced]: Saloons   Nalil
+--------------------------------------------------
+[Original]: Visit the Saloons
+[Replaced]: Visit   Saloons
+--------------------------------------------------
+[Original]: Whenever you hit an opponent with an axe, there's a 75% chance you cleave their armor, giving them a -1 penalty to their AV. This penalty can stack a number
+[Replaced]: Whenever you hit an opponent with an топор, there's a 75% chance you cleave their armor, giving them a -1 penalty to their AV. This penalty can stack a number
+--------------------------------------------------
+[Original]: Activated; cooldown 30. Axe attack. If you hit and penetrate, you dismember one
+[Replaced]: Activated; cooldown 30. Топор attack. If you hit и penetrate, you dismember one
+--------------------------------------------------
+[Original]: limbs at random and they start bleeding (1-2 damage per turn. toughness save; difficulty 35). Additionally, your axe attacks that penetrate have a percentage chance to dismember: 3% for one-handed axes and 6% for two-handed axes
+[Replaced]: limbs at random и they start bleeding (1-2 damage per turn. toughness спасбросок; difficulty 35). Additionally, your топор attacks that penetrate have a percentage chance to dismember: 3% для one-handed axes и 6% для two-handed axes
+--------------------------------------------------
+[Original]: Activated; cooldown 50. You grab an opponent's limb with the heel
+[Replaced]: Activated; cooldown 50. You grab an opponent's limb with   heel
+--------------------------------------------------
+[Original]: axe. If successful, you pull your opponent with you as you move and make a free attack with your axe. Your opponent gets a chance to resist the move (strength save; difficulty 20 + your Str modifier) and a chance to break free at the start of their turn (same save). Lasts for 9 rounds or until you dismember the opponent
+[Replaced]: топор. If successful, you pull your opponent with you as you move и make a свободный attack with your топор. Your opponent gets a chance to resist   move (strength спасбросок; difficulty 20 + your Str modifier) и a chance to break свободный at   start   their turn (same спасбросок). Lasts для 9 rounds or until you dismember   opponent
+--------------------------------------------------
+[Original]: Heads are added to the list
+[Replaced]: Heads   added to   список
+--------------------------------------------------
+[Original]: limbs you can dismember. Chopping off the only head of a creature kills them instantly. If the creature has multiple heads, they start bleeding profusely (2-3 damage per turn. toughness save; difficulty 35
+[Replaced]: limbs you can dismember. Chopping off   only голова   a creature kills them instantly. If   creature has multiple heads, they start bleeding profusely (2-3 damage per turn. toughness спасбросок; difficulty 35
+--------------------------------------------------
+[Original]: When you choose ingredients to cook with, you can choose up to three instead
+[Replaced]: When you choose ingredients to готовить with, you can choose up to three instead
+--------------------------------------------------
+[Original]: Whenever you gain a level, and 5%
+[Replaced]: Whenever you gain a level, и 5%
+--------------------------------------------------
+[Original]: time you explore a new map, you become inspired for two days. While inspired, the next time you cook a meal by choosing ingredients, you get a choice of three dynamically-generated effects to apply. You create a recipe for the chosen effect
+[Replaced]: time you explore a новый map, you become inspired для two days. While inspired,   next time you готовить a meal by choosing ingredients, you get a choice   three dynamically-generated effects to apply. You create a recipe для   chosen effect
+--------------------------------------------------
+[Original]: You are aware
+[Replaced]: You   aware
+--------------------------------------------------
+[Original]: Doubles the chance
+[Replaced]: Doubles   chance
+--------------------------------------------------
+[Original]: your bearings when you are lost
+[Replaced]: your bearings when you   lost
+--------------------------------------------------
+[Original]: encounters while traveling through the flower fields on the world map
+[Replaced]: encounters while traveling through   цветок fields on   world map
+--------------------------------------------------
+[Original]: Reduces the chance
+[Replaced]: Reduces   chance
+--------------------------------------------------
+[Original]: lost in the flower fields from base 12% to 1%
+[Replaced]: lost in   цветок fields from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the salt marshes and watervine fields on the world map
+[Replaced]: encounters while traveling through   salt marshes и влагопаутинник fields on   world map
+--------------------------------------------------
+[Original]: lost in the salt marshes and watervine fields from base 12% to 1%
+[Replaced]: lost in   salt marshes и влагопаутинник fields from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the hills and mountains on the world map
+[Replaced]: encounters while traveling through   hills и mountains on   world map
+--------------------------------------------------
+[Original]: lost in the hills and mountains from base 12% to 1%
+[Replaced]: lost in   hills и mountains from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the desert canyons on the world map
+[Replaced]: encounters while traveling through   desert canyons on   world map
+--------------------------------------------------
+[Original]: lost in the desert canyons from base 12% to 1%
+[Replaced]: lost in   desert canyons from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the salt dunes on the world map
+[Replaced]: encounters while traveling through   salt dunes on   world map
+--------------------------------------------------
+[Original]: lost in the salt dunes from base 10% to 1%
+[Replaced]: lost in   salt dunes from base 10% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the jungles on the world map
+[Replaced]: encounters while traveling through   jungles on   world map
+--------------------------------------------------
+[Original]: lost in the jungles from base 12% to 1%
+[Replaced]: lost in   jungles from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling across rivers and lakes on the world map
+[Replaced]: encounters while traveling across rivers и lakes on   world map
+--------------------------------------------------
+[Original]: lost in rivers and lakes from base 12% to 1%
+[Replaced]: lost in rivers и lakes from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through chrome ruins on the world map
+[Replaced]: encounters while traveling through chrome ruins on   world map
+--------------------------------------------------
+[Original]: You fire at a marked target. For each penetration on each shot that hits, your target bleeds 1 point
+[Replaced]: You стрелять at a marked target. Для each penetration on each shot that бьет, your target bleeds 1 point
+--------------------------------------------------
+[Original]: per round (save: 20 + max damage of the weapon). Then your target is unmarked
+[Replaced]: per round (спасбросок: 20 + max damage     weapon). Then your target   unmarked
+--------------------------------------------------
+[Original]: offhand weapons is increased by 50%
+[Replaced]: offhand weapons   increased by 50%
+--------------------------------------------------
+[Original]: You take 15% less damage from heating and cooling effects. Additionally, the severities
+[Replaced]: You take 15% less damage from heating и cooling effects. Additionally,   severities
+--------------------------------------------------
+[Original]: that change your temperature are reduced by 15%
+[Replaced]: that change your temperature   reduced by 15%
+--------------------------------------------------
+[Original]: You can voluntarily amputate your own limbs and the limbs
+[Replaced]: You can voluntarily amputate your own limbs и   limbs
+--------------------------------------------------
+[Original]: You are skilled with pistols
+[Replaced]: You   skilled with pistols
+--------------------------------------------------
+[Original]: For purposes
+[Replaced]: Для purposes
+--------------------------------------------------
+[Original]: your accuracy with pistols, your agility is treated as if it were 4 points higher
+[Replaced]: your accuracy with pistols, your agility   treated as if it were 4 points higher
+--------------------------------------------------
+[Original]: The action cost
+[Replaced]:   action цена
+--------------------------------------------------
+[Original]: pistols is reduced by 25%
+[Replaced]: pistols   reduced by 25%
+--------------------------------------------------
+[Original]: Cooldown 200. For 20 rounds, firing a pistol only takes half a round instead
+[Replaced]: Cooldown 200. Для 20 rounds, firing a pistol only takes half a round instead
+--------------------------------------------------
+[Original]: full round
+[Replaced]: полный round
+--------------------------------------------------
+[Original]: Your short blade attacks that penetrate have a 75% chance to cause your opponent to bleed (0-1 damage per turn. toughness save; difficulty 20 + your Agi modifier). The opponent saves to stop bleeding each round, and the save difficulty decreases by 1 each round. This effect can stack a number
+[Replaced]: Your short blade attacks that penetrate have a 75% chance to cause your opponent to bleed (0-1 damage per turn. toughness спасбросок; difficulty 20 + your Agi modifier).   opponent saves to stop bleeding each round, и   спасбросок difficulty decreases by 1 each round. This effect can stack a number
+--------------------------------------------------
+[Original]: You get +1 to hit with short blades. Also, the action costs
+[Replaced]: You get +1 to hit with short blades. Also,   action costs
+--------------------------------------------------
+[Original]: with a short blade in your primary hand is reduced by 25%
+[Replaced]: with a short blade in your primary hand   reduced by 25%
+--------------------------------------------------
+[Original]: your ego is treated as though it were 4 points higher
+[Replaced]: your эго   treated as though it were 4 points higher
+--------------------------------------------------
+[Original]: Aggressive stance: Lunge through an empty space at an opponent and attack with +2 to your penetration roll. You must move through the empty space
+[Replaced]: Aggressive stance: Lunge through an empty space at an opponent и attack with +2 to your penetration roll. You must move through   empty space
+--------------------------------------------------
+[Original]: Dueling stance: Attack an opponent with +1 to your penetration roll. The attack is guaranteed to hit and penetrate at least once
+[Replaced]: Dueling stance: Attack an opponent with +1 to your penetration roll.   attack   guaranteed to hit и penetrate at least once
+--------------------------------------------------
+[Original]: offhand weapons is increased by 35%
+[Replaced]: offhand weapons   increased by 35%
+--------------------------------------------------
+[Original]: offhand weapons is increased by 20%
+[Replaced]: offhand weapons   increased by 20%
+--------------------------------------------------
+[Original]: Whenever you score a critical hit with a melee weapon while single-weapon fighting, the cooldowns
+[Replaced]: Whenever you score a critical hit with a melee weapon while single-weapon fighting,   cooldowns
+--------------------------------------------------
+[Original]: to two random weapon or shield skills are immediately refreshed
+[Replaced]: to two random weapon or shield skills   immediately refreshed
+--------------------------------------------------
+[Original]: You make an attack with a cudgel at an adjacent opponent. If you hit, you automatically daze them for 3-4 rounds. Dazing a dazed opponent stuns them. Conking a stunned opponent instead knocks them unconscious for 30-40 rounds (unconscious opponents wake up dazed when they take damage
+[Replaced]: You make an attack with a cudgel at an adjacent opponent. If you hit, you automatically ошеломление them для 3-4 rounds. Dazing a dazed opponent stuns them. Conking a stunned opponent instead knocks them unconscious для 30-40 rounds (unconscious opponents wake up dazed when they take damage
+--------------------------------------------------
+[Original]: Cooldown 100. You fire at a marked target. Your shot combines the effects
+[Replaced]: Cooldown 100. You стрелять at a marked target. Your shot combines   effects
+--------------------------------------------------
+[Original]: the other Fire powers you have
+[Replaced]:   other Стрелять powers you have
+--------------------------------------------------
+[Original]: You fire at a marked target with no accuracy penalty (the accuracy
+[Replaced]: You стрелять at a marked target with no accuracy penalty (  accuracy
+--------------------------------------------------
+[Original]: weapon still matters). Then your target is unmarked
+[Replaced]: weapon still matters). Then your target   unmarked
+--------------------------------------------------
+[Original]: You spend a turn to draw a bead on a target and mark it. Whenever you fire at a marked target with a bow or rifle, your agility is treated as if it were 2 points higher for the purpose
+[Replaced]: You spend a turn to взять a bead on a target и mark it. Whenever you стрелять at a marked target with a bow or rifle, your agility   treated as if it were 2 points higher для   purpose
+--------------------------------------------------
+[Original]: your accuracy. You may only mark one target at a time. Targets get unmarked if you lose vision of them
+[Replaced]: your accuracy. You may only mark one target at a time. Targets get unmarked if you lose vision   them
+--------------------------------------------------
+[Original]: For the purpose
+[Replaced]: Для   purpose
+--------------------------------------------------
+[Original]: your accuracy with bows and rifles, your agility is treated as if it were 4 points higher
+[Replaced]: your accuracy with bows и rifles, your agility   treated as if it were 4 points higher
+--------------------------------------------------
+[Original]: He is a wind-carved man with the posture
+[Replaced]: He   a ветер-carved man with   posture
+--------------------------------------------------
+[Original]: vinereaper; his spine is bent to point the bright turquoise of his eyes at the tilling angle, his hips are pushed odd-forward with the slumping ease of a stance much more relaxed than his. If it weren't for the salt on his brow and the scarred knuckles, he would seem a marble Saad perched under a crumbling tomb
+[Replaced]: vinereaper; his spine   bent to point   bright turquoise   his eyes at   tilling angle, his hips   pushed odd-forward with   slumping ease   a stance much more relaxed than his. If it weren't для   salt on his brow и   scarred knuckles, he would seem a marble Saad perched under a crumbling tomb
+--------------------------------------------------
+[Original]: Disliked by {{C|the Bedroll-in-Citrine Church}} for digging up the remains
+[Replaced]: Disliked by {{C|  Bedroll-in-Citrine Church}} для digging up   remains
+--------------------------------------------------
+[Original]: woven tunic, wide-brimmed hat, iron vinereaper, sandals
+[Replaced]: woven tunic, wide-brimmed hat, железный vinereaper, сандалии
+--------------------------------------------------
+[Original]: a door
+[Replaced]: a дверь
+--------------------------------------------------
+[Original]: a sign
+[Replaced]: a знак
+--------------------------------------------------
+[Original]: the p-density
+[Replaced]:   p-density
+--------------------------------------------------
+[Original]: Must you bother me? What are you, some sort
+[Replaced]: Must you bother me? What   you, some sort
+--------------------------------------------------
+[Original]: There are caves everywhere, you dolt! Scoop the surface
+[Replaced]: There   caves everywhere, you dolt! Scoop   surface
+--------------------------------------------------
+[Original]: marsh, or head
+[Replaced]: marsh, or голова
+--------------------------------------------------
+[Original]: The Canticles Chromaic, Verses XVII-XXIV
+[Replaced]:   Canticles Chromaic, Verses XVII-XXIV
+--------------------------------------------------
+[Original]: Here are several stripped trunks
+[Replaced]: Here   several stripped trunks
+--------------------------------------------------
+[Original]: Live and drink. Come in- come sit 'neath the cool shade, 'cross a pillow
+[Replaced]: Live и drink. Come in- come sit 'neath   cool shade, 'cross a pillow
+--------------------------------------------------
+[Original]: freshwater, too, and quench your thirst
+[Replaced]: freshwater, too, и quench your thirst
+--------------------------------------------------
+[Original]: this? The oasis-hamlet. 'Neath the shelf
+[Replaced]: this?   oasis-hamlet. 'Neath   shelf
+--------------------------------------------------
+[Original]: world. A million breaths of
+[Replaced]: world. A million breaths  
+--------------------------------------------------
+[Original]: salt the wind heaves over the Great Salt Desert Moghra'yi. And to the east
+[Replaced]: salt   ветер heaves over   Great Salt Desert Moghra'yi. И to   восток
+--------------------------------------------------
+[Original]: the rotting jungles
+[Replaced]:   rotting jungles
+--------------------------------------------------
+[Original]: groves. And broken against the mounts
+[Replaced]: groves. И broken against   mounts
+--------------------------------------------------
+[Original]: north, they are, in the shadow of
+[Replaced]: north, they  , in   shadow  
+--------------------------------------------------
+[Original]: mm, adventurous ones set off for their own splinter
+[Replaced]: mm, adventurous ones set off для their own splinter
+--------------------------------------------------
+[Original]: here? Speak to my daughter through the east door, for herbs. And sitting Tam
+[Replaced]: here? Speak to my daughter through   восток дверь, для herbs. И sitting Tam
+--------------------------------------------------
+[Original]: in the southeast has all manner
+[Replaced]: in   southeast has all manner
+--------------------------------------------------
+[Original]: o' there, by the southern watervine patch
+[Replaced]: o' there, by   southern влагопаутинник patch
+--------------------------------------------------
+[Original]: metal, to the southwest
+[Replaced]: metal, to   southwest
+--------------------------------------------------
+[Original]: RANK 1/10
+[Replaced]: Ранг 1/10
+--------------------------------------------------
+[Original]: Emits a 9-square ray
+[Replaced]: Emits a 9-square луч
+--------------------------------------------------
+[Original]: in the direction of your choice
+[Replaced]: in   direction   your choice
+--------------------------------------------------
+[Original]: determines the potency
+[Replaced]: determines   potency
+--------------------------------------------------
+[Original]: mental mutations, your ability to haggle with merchants, and your ability to dominate the wills of other living creatures
+[Replaced]: mental mutations, your ability to haggle with merchants, и your ability to dominate   wills   other living creatures
+--------------------------------------------------
+[Original]: modifies the cooldowns
+[Replaced]: modifies   cooldowns
+--------------------------------------------------
+[Original]: vellum are bound into a codex
+[Replaced]: vellum   bound into a codex
+--------------------------------------------------
+[Original]: is wrapped in oil-sodden cloth
+[Replaced]:   wrapped in масло-sodden cloth
+--------------------------------------------------
+[Original]: Lichen sticks in the winding grooves
+[Replaced]: Lichen sticks in   winding grooves
+--------------------------------------------------
+[Original]: shimmering and smelling of spice
+[Replaced]: shimmering и smelling   spice
+--------------------------------------------------
+[Original]: rules|Heals and confuses when eaten
+[Replaced]: rules|Heals и confuses when eaten
+--------------------------------------------------
+[Original]: ∙ Travel to the historical site
+[Replaced]: ∙ Travel to   historical сайт
+--------------------------------------------------
+[Original]: Saloons of Nalil
+[Replaced]: Saloons   Nalil
+--------------------------------------------------
+[Original]: Visit the Saloons
+[Replaced]: Visit   Saloons
+--------------------------------------------------
+[Original]: are
+[Replaced]:  
+--------------------------------------------------
+[Original]: water weeps, the locations of cat lairs, and
+[Replaced]: water weeps,   locations   cat lairs, и
+--------------------------------------------------
+[Original]: sharing secrets about the locations
+[Replaced]: sharing secrets about   locations
+--------------------------------------------------
+[Original]: Oboroqoru's lair, and sultans they admire or despise
+[Replaced]: Oboroqoru's lair, и sultans they admire or despise
+--------------------------------------------------
+[Original]: the locations of other ape lairs, sultans
+[Replaced]:   locations   other обезьяна lairs, sultans
+--------------------------------------------------
+[Original]: they admire or despise, and gossip that's about them
+[Replaced]: they admire or despise, и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs, the locations of haberdashers
+[Replaced]: насекомое lairs,   locations   haberdashers
+--------------------------------------------------
+[Original]: other baboon lairs, all sorts of gossip, and
+[Replaced]: other бабуин lairs, all sorts   gossip, и
+--------------------------------------------------
+[Original]: technology and the locations
+[Replaced]: technology и   locations
+--------------------------------------------------
+[Original]: ichor merchants' distilleries and the
+[Replaced]: ichor merchants' distilleries и  
+--------------------------------------------------
+[Original]: The Bedroll-in-Citrine
+[Replaced]:   Bedroll-in-Citrine
+--------------------------------------------------
+[Original]: is
+[Replaced]:  
+--------------------------------------------------
+[Original]: trading secrets about all sorts of
+[Replaced]: trading secrets about all sorts  
+--------------------------------------------------
+[Original]: The Cabal
+[Replaced]:   Cabal
+--------------------------------------------------
+[Original]: humanoid settlements, the locations of
+[Replaced]: humanoid settlements,   locations  
+--------------------------------------------------
+[Original]: you pet them. You
+[Replaced]: you погладить them. You
+--------------------------------------------------
+[Original]: trading secrets about the locations
+[Replaced]: trading secrets about   locations
+--------------------------------------------------
+[Original]: of all settlements
+[Replaced]:   all settlements
+--------------------------------------------------
+[Original]: oddities, the darkling star, and gossip
+[Replaced]: oddities,   darkling звезда, и gossip
+--------------------------------------------------
+[Original]: settlements and locations
+[Replaced]: settlements и locations
+--------------------------------------------------
+[Original]: in the jungle
+[Replaced]: in   jungle
+--------------------------------------------------
+[Original]: goatfolk settlements and gossip that's about
+[Replaced]: козлолюды settlements и gossip that's about
+--------------------------------------------------
+[Original]: merchants and all sorts
+[Replaced]: merchants и all sorts
+--------------------------------------------------
+[Original]: of gossip
+[Replaced]:   gossip
+--------------------------------------------------
+[Original]: dromad merchants, the locations of
+[Replaced]: дромады merchants,   locations  
+--------------------------------------------------
+[Original]: underground locations and sultans they admire or despise
+[Replaced]: underground locations и sultans they admire or despise
+--------------------------------------------------
+[Original]: The Cult of Yyram
+[Replaced]:   Cult   Yyram
+--------------------------------------------------
+[Original]: the sultan they worship
+[Replaced]:   sultan they worship
+--------------------------------------------------
+[Original]: The Cult
+[Replaced]:   Cult
+--------------------------------------------------
+[Original]: about the sultan they worship
+[Replaced]: about   sultan they worship
+--------------------------------------------------
+[Original]: The denizens
+[Replaced]:   denizens
+--------------------------------------------------
+[Original]: in the Palladium Reef
+[Replaced]: in   Palladium Reef
+--------------------------------------------------
+[Original]: about technology, the locations
+[Replaced]: about technology,   locations
+--------------------------------------------------
+[Original]: the locations
+[Replaced]:   locations
+--------------------------------------------------
+[Original]: of all settlements, the locations
+[Replaced]:   all settlements,   locations
+--------------------------------------------------
+[Original]: sites, and
+[Replaced]: sites, и
+--------------------------------------------------
+[Original]: you pet them. You are
+[Replaced]: you погладить them. You  
+--------------------------------------------------
+[Original]: other dromad merchants and locations in
+[Replaced]: other дромады merchants и locations in
+--------------------------------------------------
+[Original]: humanoid merchants, the locations of
+[Replaced]: humanoid merchants,   locations  
+--------------------------------------------------
+[Original]: despise, and gossip that's about them
+[Replaced]: despise, и gossip that's about them
+--------------------------------------------------
+[Original]: in the flower fields
+[Replaced]: in   цветок fields
+--------------------------------------------------
+[Original]: insect lairs and sultans they admire or
+[Replaced]: насекомое lairs и sultans they admire or
+--------------------------------------------------
+[Original]: fungus forests
+[Replaced]: грибок forests
+--------------------------------------------------
+[Original]: water weeps, the locations of wine weeps
+[Replaced]: water weeps,   locations   вино weeps
+--------------------------------------------------
+[Original]: and the locations
+[Replaced]: и   locations
+--------------------------------------------------
+[Original]: Girsh lairs and the locations of
+[Replaced]: Girsh lairs и   locations  
+--------------------------------------------------
+[Original]: Girsh lairs and gossip that's about them
+[Replaced]: Girsh lairs и gossip that's about them
+--------------------------------------------------
+[Original]: The hindren
+[Replaced]:   hindren
+--------------------------------------------------
+[Original]: locations in the flower fields, the location
+[Replaced]: locations in   цветок fields,   location
+--------------------------------------------------
+[Original]: flower lairs and locations in the flower
+[Replaced]: цветок lairs и locations in   цветок
+--------------------------------------------------
+[Original]: technology, the locations
+[Replaced]: technology,   locations
+--------------------------------------------------
+[Original]: historic sites, the locations
+[Replaced]: historic sites,   locations
+--------------------------------------------------
+[Original]: workshops, and
+[Replaced]: workshops, и
+--------------------------------------------------
+[Original]: robot lairs. They're also interested in
+[Replaced]: робот lairs. They're also interested in
+--------------------------------------------------
+[Original]: merchants and all sorts of
+[Replaced]: merchants и all sorts  
+--------------------------------------------------
+[Original]: salt weeps, the locations of slime bogs, the
+[Replaced]: salt weeps,   locations   slime bogs,  
+--------------------------------------------------
+[Original]: bird lairs, and sultans they admire or
+[Replaced]: птица lairs, и sultans they admire or
+--------------------------------------------------
+[Original]: learning about the locations
+[Replaced]: learning about   locations
+--------------------------------------------------
+[Original]: of rust bogs, technology, and gossip that's about them
+[Replaced]:   rust bogs, technology, и gossip that's about them
+--------------------------------------------------
+[Original]: locations in the jungle, the locations of
+[Replaced]: locations in   jungle,   locations  
+--------------------------------------------------
+[Original]: slime bogs, all weep locations, and sultans
+[Replaced]: slime bogs, all weep locations, и sultans
+--------------------------------------------------
+[Original]: all settlements and all sorts of gossip
+[Replaced]: all settlements и all sorts   gossip
+--------------------------------------------------
+[Original]: the resources necessary for
+[Replaced]:   resources necessary для
+--------------------------------------------------
+[Original]: building new societies: the locations
+[Replaced]: building новый societies:   locations
+--------------------------------------------------
+[Original]: becoming nooks and the locations of
+[Replaced]: becoming nooks и   locations  
+--------------------------------------------------
+[Original]: ruins, the locations of historic sites
+[Replaced]: ruins,   locations   historic sites
+--------------------------------------------------
+[Original]: and all sultans
+[Replaced]: и all sultans
+--------------------------------------------------
+[Original]: The Seekers
+[Replaced]:   Seekers
+--------------------------------------------------
+[Original]: secrets about the darkling star and sultans they admire or
+[Replaced]: secrets about   darkling звезда и sultans they admire or
+--------------------------------------------------
+[Original]: Stopsvalinn and the locations of their forts
+[Replaced]: Stopsvalinn и   locations   their forts
+--------------------------------------------------
+[Original]: pig farms, the locations
+[Replaced]: pig farms,   locations
+--------------------------------------------------
+[Original]: farms, and gossip that's
+[Replaced]: farms, и gossip that's
+--------------------------------------------------
+[Original]: and gossip that's about them
+[Replaced]: и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs and the locations of lava
+[Replaced]: насекомое lairs и   locations   лава
+--------------------------------------------------
+[Original]: gel weeps and sultans they admire or despise
+[Replaced]: gel weeps и sultans they admire or despise
+--------------------------------------------------
+[Original]: sites, locations in the
+[Replaced]: sites, locations in  
+--------------------------------------------------
+[Original]: banana grove, and all sultans
+[Replaced]: banana grove, и all sultans
+--------------------------------------------------
+[Original]: farms, the locations of pig
+[Replaced]: farms,   locations   pig
+--------------------------------------------------
+[Original]: snapjaw forts, locations in the salt
+[Replaced]: snapjaw forts, locations in   salt
+--------------------------------------------------
+[Original]: fish lairs and the locations of frog lairs
+[Replaced]: рыбы lairs и   locations   frog lairs
+--------------------------------------------------
+[Original]: scuttle down a dark shaft at the edge of a sunken trade path
+[Replaced]: scuttle down a dark shaft at   edge   a sunken trade path
+--------------------------------------------------
+[Original]: You equip the
+[Replaced]: You equip  
+--------------------------------------------------
+[Original]: for 1 damage with your
+[Replaced]: для 1 damage with your
+--------------------------------------------------
+[Original]: bite! [7 vs 7
+[Replaced]: укус! [7 vs 7
+--------------------------------------------------
+[Original]: for 2 damage with your
+[Replaced]: для 2 damage with your
+--------------------------------------------------
+[Original]: The snapjaw scavenger dies
+[Replaced]:   snapjaw scavenger dies
+--------------------------------------------------
+[Original]: You stop moving because there is a bear in your way
+[Replaced]: You stop moving because there   a bear in your way
+--------------------------------------------------
+[Original]: bite! [2 vs 7
+[Replaced]: укус! [2 vs 7
+--------------------------------------------------
+[Original]: The bear hits
+[Replaced]:   bear бьет
+--------------------------------------------------
+[Original]: for 4 damage with her bite. [18
+[Replaced]: для 4 damage with her укус. [18
+--------------------------------------------------
+[Original]: The bear dies
+[Replaced]:   bear dies
+--------------------------------------------------
+[Original]: You identify the odd trinket as a
+[Replaced]: You identify   odd trinket as a
+--------------------------------------------------
+[Original]: an iron battle axe
+[Replaced]: an железный battle топор
+--------------------------------------------------
+[Original]: from the north
+[Replaced]: from   north
+--------------------------------------------------
+[Original]: waterskin from the north
+[Replaced]: waterskin from   north
+--------------------------------------------------
+[Original]: You toss some stamped fish meat, a sprinkle
+[Replaced]: You toss some stamped рыбы meat, a sprinkle
+--------------------------------------------------
+[Original]: a dash of crowned fulcrete flake, and a crust of bread into a pot and stir
+[Replaced]: a dash   crowned fulcrete flake, и a crust   bread into a pot и stir
+--------------------------------------------------
+[Original]: The clockwork beetle and pariah to its people takes the
+[Replaced]:   clockwork beetle и pariah to its people takes  
+--------------------------------------------------
+[Original]: Qud, surface, Harvest Dawn
+[Replaced]: Куд, surface, Harvest Dawn
+--------------------------------------------------
+[Original]: Joppa, Beetle Moon Zenith
+[Replaced]: Joppa, Beetle Луна Zenith
+--------------------------------------------------
+[Original]: bent metal sheet from the east
+[Replaced]: bent metal sheet from   восток
+--------------------------------------------------
+[Original]: fractured microchip from the south
+[Replaced]: fractured microchip from   south
+--------------------------------------------------
+[Original]: bent metal sheet from the west
+[Replaced]: bent metal sheet from   запад
+--------------------------------------------------
+[Original]: wet watervine farmer
+[Replaced]: wet влагопаутинник farmer
+--------------------------------------------------
+[Original]: and a bridge
+[Replaced]: и a bridge
+--------------------------------------------------
+[Original]: You note the location
+[Replaced]: You note   location
+--------------------------------------------------
+[Original]: Saloons of Nalil in the
+[Replaced]: Saloons   Nalil in  
+--------------------------------------------------
+[Original]: Watervine farm in the lap
+[Replaced]: Влагопаутинник farm in   lap
+--------------------------------------------------
+[Original]: marsh. You've sucked the moisture out a
+[Replaced]: marsh. You've sucked   moisture out a
+--------------------------------------------------
+[Original]: vinewafer, yea? We tend the plant here
+[Replaced]: vinewafer, yea? We tend   plant here
+--------------------------------------------------
+[Original]: Somethin' is eating our watervine, 'round Beetle Moon. Q-ruun says he saw a
+[Replaced]: Somethin'   eating our влагопаутинник, 'round Beetle Луна. Q-ruun говорит he saw a
+--------------------------------------------------
+[Original]: creature, spider-like, slinking in the brine. But no cave spider would dare
+[Replaced]: creature, spider-like, slinking in   brine. But no cave spider would dare
+--------------------------------------------------
+[Original]: fleck in the pool. Shale, like we find in the soil by
+[Replaced]: fleck in   бассейн. Shale, like we find in   soil by
+--------------------------------------------------
+[Original]: Kill the vermin and bring one's corpse back, for seein' what it is. Elder will
+[Replaced]: Kill   vermin и bring one's corpse back, для seein' what it  . Elder will
+--------------------------------------------------
+[Original]: a door
+[Replaced]: a дверь
+--------------------------------------------------
+[Original]: Live and drink. Come in- come sit 'neath the cool shade, 'cross a pillow
+[Replaced]: Live и drink. Come in- come sit 'neath   cool shade, 'cross a pillow
+--------------------------------------------------
+[Original]: freshwater, too, and quench your thirst
+[Replaced]: freshwater, too, и quench your thirst
+--------------------------------------------------
+[Original]: this? The oasis-hamlet. 'Neath the shelf
+[Replaced]: this?   oasis-hamlet. 'Neath   shelf
+--------------------------------------------------
+[Original]: world. A million breaths of
+[Replaced]: world. A million breaths  
+--------------------------------------------------
+[Original]: salt the wind heaves over the Great Salt Desert Moghra'yi. And to the east
+[Replaced]: salt   ветер heaves over   Great Salt Desert Moghra'yi. И to   восток
+--------------------------------------------------
+[Original]: the rotting jungles
+[Replaced]:   rotting jungles
+--------------------------------------------------
+[Original]: groves. And broken against the mounts
+[Replaced]: groves. И broken against   mounts
+--------------------------------------------------
+[Original]: north, they are, in the shadow of
+[Replaced]: north, they  , in   shadow  
+--------------------------------------------------
+[Original]: mm, adventurous ones set off for their own splinter
+[Replaced]: mm, adventurous ones set off для their own splinter
+--------------------------------------------------
+[Original]: here? Speak to my daughter through the east door, for herbs. And sitting Tam
+[Replaced]: here? Speak to my daughter through   восток дверь, для herbs. И sitting Tam
+--------------------------------------------------
+[Original]: in the southeast has all manner
+[Replaced]: in   southeast has all manner
+--------------------------------------------------
+[Original]: mm, work? Try Argyve, friend. The tinker. Always looking for trinkets to wire
+[Replaced]: mm, work? Try Argyve, friend.   tinker. Always looking для trinkets to wire
+--------------------------------------------------
+[Original]: metal, to the southwest
+[Replaced]: metal, to   southwest
+--------------------------------------------------
+[Original]: Time and rest are the surest way to dress a wound, but my wares can help if
+[Replaced]: Time и отдыхать     surest way to dress a wound, but my wares can помощь if
+--------------------------------------------------
+[Original]: Witchwood for pain, bandages for bleeding, yuckwheat and honey for when your
+[Replaced]: Witchwood для pain, bandages для bleeding, yuckwheat и honey для when your
+--------------------------------------------------
+[Original]: Elder and all. Spent some years
+[Replaced]: Elder и all. Spent some years
+--------------------------------------------------
+[Original]: Fates forfend. I would hardly like to lead a village and run a shop at the
+[Replaced]: Fates forfend. I would hardly like to свинцовый a village и run a shop at  
+--------------------------------------------------
+[Original]: Welcome a-Joppa, friend. Stay peacelike, and we stay friends, hyeh? You make
+[Replaced]: Welcome a-Joppa, friend. Stay peacelike, и we stay friends, hyeh? You make
+--------------------------------------------------
+[Original]: trouble, it’s my work a-split you open like a croc
+[Replaced]: trouble, it’s my work a-split you открыть like a крокодил
+--------------------------------------------------
+[Original]: a sign
+[Replaced]: a знак
+--------------------------------------------------
+[Original]: the p-density
+[Replaced]:   p-density
+--------------------------------------------------
+[Original]: Must you bother me? What are you, some sort
+[Replaced]: Must you bother me? What   you, some sort
+--------------------------------------------------
+[Original]: There are caves everywhere, you dolt! Scoop the surface
+[Replaced]: There   caves everywhere, you dolt! Scoop   surface
+--------------------------------------------------
+[Original]: marsh, or head
+[Replaced]: marsh, or голова
+--------------------------------------------------
+[Original]: a watervine
+[Replaced]: a влагопаутинник
+--------------------------------------------------
+[Original]: Tam, dromad merchant
+[Replaced]: Tam, дромады merchant
+--------------------------------------------------
+[Original]: are you
+[Replaced]:   you
+--------------------------------------------------
+[Original]: I walked Moghra'yi in the caravans
+[Replaced]: I walked Moghra'yi in   caravans
+--------------------------------------------------
+[Original]: brethren and the saltback, but upon
+[Replaced]: brethren и   saltback, but upon
+--------------------------------------------------
+[Original]: I am dromad, human friend. Some say saltstrider. Do you know this
+[Replaced]: I am дромады, human friend. Some say saltstrider. Do you know this
+--------------------------------------------------
+[Original]: My people have walked the salt for thousands
+[Replaced]: My people have walked   salt для thousands
+--------------------------------------------------
+[Original]: that lives and thinks. From Pale Sea to the marsh
+[Replaced]: that lives и thinks. From Pale Sea to   marsh
+--------------------------------------------------
+[Original]: and under the
+[Replaced]: и under  
+--------------------------------------------------
+[Original]: RANK 1/10
+[Replaced]: Ранг 1/10
+--------------------------------------------------
+[Original]: Emits a 9-square ray
+[Replaced]: Emits a 9-square луч
+--------------------------------------------------
+[Original]: in the direction of your choice
+[Replaced]: in   direction   your choice
+--------------------------------------------------
+[Original]: determines the potency
+[Replaced]: determines   potency
+--------------------------------------------------
+[Original]: mental mutations, your ability to haggle with merchants, and your ability to dominate the wills of other living creatures
+[Replaced]: mental mutations, your ability to haggle with merchants, и your ability to dominate   wills   other living creatures
+--------------------------------------------------
+[Original]: modifies the cooldowns
+[Replaced]: modifies   cooldowns
+--------------------------------------------------
+[Original]: are
+[Replaced]:  
+--------------------------------------------------
+[Original]: water weeps, the locations of cat lairs, and
+[Replaced]: water weeps,   locations   cat lairs, и
+--------------------------------------------------
+[Original]: sharing secrets about the locations
+[Replaced]: sharing secrets about   locations
+--------------------------------------------------
+[Original]: Oboroqoru's lair, and sultans they admire or despise
+[Replaced]: Oboroqoru's lair, и sultans they admire or despise
+--------------------------------------------------
+[Original]: the locations of other ape lairs, sultans
+[Replaced]:   locations   other обезьяна lairs, sultans
+--------------------------------------------------
+[Original]: they admire or despise, and gossip that's about them
+[Replaced]: they admire or despise, и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs, the locations of haberdashers
+[Replaced]: насекомое lairs,   locations   haberdashers
+--------------------------------------------------
+[Original]: other baboon lairs, all sorts of gossip, and
+[Replaced]: other бабуин lairs, all sorts   gossip, и
+--------------------------------------------------
+[Original]: technology and the locations
+[Replaced]: technology и   locations
+--------------------------------------------------
+[Original]: ichor merchants' distilleries and the
+[Replaced]: ichor merchants' distilleries и  
+--------------------------------------------------
+[Original]: The Bedroll-in-Citrine
+[Replaced]:   Bedroll-in-Citrine
+--------------------------------------------------
+[Original]: is
+[Replaced]:  
+--------------------------------------------------
+[Original]: trading secrets about all sorts of
+[Replaced]: trading secrets about all sorts  
+--------------------------------------------------
+[Original]: The Cabal
+[Replaced]:   Cabal
+--------------------------------------------------
+[Original]: humanoid settlements, the locations of
+[Replaced]: humanoid settlements,   locations  
+--------------------------------------------------
+[Original]: you pet them. You
+[Replaced]: you погладить them. You
+--------------------------------------------------
+[Original]: trading secrets about the locations
+[Replaced]: trading secrets about   locations
+--------------------------------------------------
+[Original]: of all settlements
+[Replaced]:   all settlements
+--------------------------------------------------
+[Original]: oddities, the darkling star, and gossip
+[Replaced]: oddities,   darkling звезда, и gossip
+--------------------------------------------------
+[Original]: settlements and locations
+[Replaced]: settlements и locations
+--------------------------------------------------
+[Original]: in the jungle
+[Replaced]: in   jungle
+--------------------------------------------------
+[Original]: goatfolk settlements and gossip that's about
+[Replaced]: козлолюды settlements и gossip that's about
+--------------------------------------------------
+[Original]: merchants and all sorts
+[Replaced]: merchants и all sorts
+--------------------------------------------------
+[Original]: of gossip
+[Replaced]:   gossip
+--------------------------------------------------
+[Original]: dromad merchants, the locations of
+[Replaced]: дромады merchants,   locations  
+--------------------------------------------------
+[Original]: underground locations and sultans they admire or despise
+[Replaced]: underground locations и sultans they admire or despise
+--------------------------------------------------
+[Original]: The Cult of Yyram
+[Replaced]:   Cult   Yyram
+--------------------------------------------------
+[Original]: the sultan they worship
+[Replaced]:   sultan they worship
+--------------------------------------------------
+[Original]: The Cult
+[Replaced]:   Cult
+--------------------------------------------------
+[Original]: about the sultan they worship
+[Replaced]: about   sultan they worship
+--------------------------------------------------
+[Original]: The denizens
+[Replaced]:   denizens
+--------------------------------------------------
+[Original]: in the Palladium Reef
+[Replaced]: in   Palladium Reef
+--------------------------------------------------
+[Original]: about technology, the locations
+[Replaced]: about technology,   locations
+--------------------------------------------------
+[Original]: the locations
+[Replaced]:   locations
+--------------------------------------------------
+[Original]: of all settlements, the locations
+[Replaced]:   all settlements,   locations
+--------------------------------------------------
+[Original]: sites, and
+[Replaced]: sites, и
+--------------------------------------------------
+[Original]: you pet them. You are
+[Replaced]: you погладить them. You  
+--------------------------------------------------
+[Original]: other dromad merchants and locations in
+[Replaced]: other дромады merchants и locations in
+--------------------------------------------------
+[Original]: humanoid merchants, the locations of
+[Replaced]: humanoid merchants,   locations  
+--------------------------------------------------
+[Original]: despise, and gossip that's about them
+[Replaced]: despise, и gossip that's about them
+--------------------------------------------------
+[Original]: in the flower fields
+[Replaced]: in   цветок fields
+--------------------------------------------------
+[Original]: insect lairs and sultans they admire or
+[Replaced]: насекомое lairs и sultans they admire or
+--------------------------------------------------
+[Original]: fungus forests
+[Replaced]: грибок forests
+--------------------------------------------------
+[Original]: water weeps, the locations of wine weeps
+[Replaced]: water weeps,   locations   вино weeps
+--------------------------------------------------
+[Original]: and the locations
+[Replaced]: и   locations
+--------------------------------------------------
+[Original]: Girsh lairs and the locations of
+[Replaced]: Girsh lairs и   locations  
+--------------------------------------------------
+[Original]: Girsh lairs and gossip that's about them
+[Replaced]: Girsh lairs и gossip that's about them
+--------------------------------------------------
+[Original]: The hindren
+[Replaced]:   hindren
+--------------------------------------------------
+[Original]: locations in the flower fields, the location
+[Replaced]: locations in   цветок fields,   location
+--------------------------------------------------
+[Original]: flower lairs and locations in the flower
+[Replaced]: цветок lairs и locations in   цветок
+--------------------------------------------------
+[Original]: technology, the locations
+[Replaced]: technology,   locations
+--------------------------------------------------
+[Original]: historic sites, the locations
+[Replaced]: historic sites,   locations
+--------------------------------------------------
+[Original]: workshops, and
+[Replaced]: workshops, и
+--------------------------------------------------
+[Original]: robot lairs. They're also interested in
+[Replaced]: робот lairs. They're also interested in
+--------------------------------------------------
+[Original]: merchants and all sorts of
+[Replaced]: merchants и all sorts  
+--------------------------------------------------
+[Original]: salt weeps, the locations of slime bogs, the
+[Replaced]: salt weeps,   locations   slime bogs,  
+--------------------------------------------------
+[Original]: bird lairs, and sultans they admire or
+[Replaced]: птица lairs, и sultans they admire or
+--------------------------------------------------
+[Original]: learning about the locations
+[Replaced]: learning about   locations
+--------------------------------------------------
+[Original]: of rust bogs, technology, and gossip that's about them
+[Replaced]:   rust bogs, technology, и gossip that's about them
+--------------------------------------------------
+[Original]: locations in the jungle, the locations of
+[Replaced]: locations in   jungle,   locations  
+--------------------------------------------------
+[Original]: slime bogs, all weep locations, and sultans
+[Replaced]: slime bogs, all weep locations, и sultans
+--------------------------------------------------
+[Original]: all settlements and all sorts of gossip
+[Replaced]: all settlements и all sorts   gossip
+--------------------------------------------------
+[Original]: the resources necessary for
+[Replaced]:   resources necessary для
+--------------------------------------------------
+[Original]: building new societies: the locations
+[Replaced]: building новый societies:   locations
+--------------------------------------------------
+[Original]: becoming nooks and the locations of
+[Replaced]: becoming nooks и   locations  
+--------------------------------------------------
+[Original]: ruins, the locations of historic sites
+[Replaced]: ruins,   locations   historic sites
+--------------------------------------------------
+[Original]: and all sultans
+[Replaced]: и all sultans
+--------------------------------------------------
+[Original]: The Seekers
+[Replaced]:   Seekers
+--------------------------------------------------
+[Original]: secrets about the darkling star and sultans they admire or
+[Replaced]: secrets about   darkling звезда и sultans they admire or
+--------------------------------------------------
+[Original]: Stopsvalinn and the locations of their forts
+[Replaced]: Stopsvalinn и   locations   their forts
+--------------------------------------------------
+[Original]: pig farms, the locations
+[Replaced]: pig farms,   locations
+--------------------------------------------------
+[Original]: farms, and gossip that's
+[Replaced]: farms, и gossip that's
+--------------------------------------------------
+[Original]: and gossip that's about them
+[Replaced]: и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs and the locations of lava
+[Replaced]: насекомое lairs и   locations   лава
+--------------------------------------------------
+[Original]: gel weeps and sultans they admire or despise
+[Replaced]: gel weeps и sultans they admire or despise
+--------------------------------------------------
+[Original]: sites, locations in the
+[Replaced]: sites, locations in  
+--------------------------------------------------
+[Original]: banana grove, and all sultans
+[Replaced]: banana grove, и all sultans
+--------------------------------------------------
+[Original]: farms, the locations of pig
+[Replaced]: farms,   locations   pig
+--------------------------------------------------
+[Original]: snapjaw forts, locations in the salt
+[Replaced]: snapjaw forts, locations in   salt
+--------------------------------------------------
+[Original]: fish lairs and the locations of frog lairs
+[Replaced]: рыбы lairs и   locations   frog lairs
+--------------------------------------------------
+[Original]: RANK 1/10
+[Replaced]: Ранг 1/10
+--------------------------------------------------
+[Original]: Emits a 9-square ray
+[Replaced]: Emits a 9-square луч
+--------------------------------------------------
+[Original]: in the direction of your choice
+[Replaced]: in   direction   your choice
+--------------------------------------------------
+[Original]: modifies the cooldowns
+[Replaced]: modifies   cooldowns
+--------------------------------------------------
+[Original]: determines the potency
+[Replaced]: determines   potency
+--------------------------------------------------
+[Original]: mental mutations, your ability to haggle with merchants, and your ability to dominate the wills of other living creatures
+[Replaced]: mental mutations, your ability to haggle with merchants, и your ability to dominate   wills   other living creatures
+--------------------------------------------------
+[Original]: are
+[Replaced]:  
+--------------------------------------------------
+[Original]: water weeps, the locations of cat lairs, and
+[Replaced]: water weeps,   locations   cat lairs, и
+--------------------------------------------------
+[Original]: sharing secrets about the locations
+[Replaced]: sharing secrets about   locations
+--------------------------------------------------
+[Original]: Oboroqoru's lair, and sultans they admire or despise
+[Replaced]: Oboroqoru's lair, и sultans they admire or despise
+--------------------------------------------------
+[Original]: the locations of other ape lairs, sultans
+[Replaced]:   locations   other обезьяна lairs, sultans
+--------------------------------------------------
+[Original]: they admire or despise, and gossip that's about them
+[Replaced]: they admire or despise, и gossip that's about them
+--------------------------------------------------
+[Original]: insect lairs, the locations of haberdashers
+[Replaced]: насекомое lairs,   locations   haberdashers
+--------------------------------------------------
+[Original]: other baboon lairs, all sorts of gossip, and
+[Replaced]: other бабуин lairs, all sorts   gossip, и
+--------------------------------------------------
+[Original]: technology and the locations
+[Replaced]: technology и   locations
+--------------------------------------------------
+[Original]: ichor merchants' distilleries and the
+[Replaced]: ichor merchants' distilleries и  
+--------------------------------------------------
+[Original]: The Bedroll-in-Citrine
+[Replaced]:   Bedroll-in-Citrine
+--------------------------------------------------
+[Original]: is
+[Replaced]:  
+--------------------------------------------------
+[Original]: trading secrets about all sorts of
+[Replaced]: trading secrets about all sorts  
+--------------------------------------------------
+[Original]: The Cabal
+[Replaced]:   Cabal
+--------------------------------------------------
+[Original]: humanoid settlements, the locations of
+[Replaced]: humanoid settlements,   locations  
+--------------------------------------------------
+[Original]: you pet them. You
+[Replaced]: you погладить them. You
+--------------------------------------------------
+[Original]: trading secrets about the locations
+[Replaced]: trading secrets about   locations
+--------------------------------------------------
+[Original]: of all settlements
+[Replaced]:   all settlements
+--------------------------------------------------
+[Original]: oddities, the darkling star, and gossip
+[Replaced]: oddities,   darkling звезда, и gossip
+--------------------------------------------------
+[Original]: settlements and locations
+[Replaced]: settlements и locations
+--------------------------------------------------
+[Original]: in the jungle
+[Replaced]: in   jungle
+--------------------------------------------------
+[Original]: goatfolk settlements and gossip that's about
+[Replaced]: козлолюды settlements и gossip that's about
+--------------------------------------------------
+[Original]: merchants and all sorts
+[Replaced]: merchants и all sorts
+--------------------------------------------------
+[Original]: of gossip
+[Replaced]:   gossip
+--------------------------------------------------
+[Original]: dromad merchants, the locations of
+[Replaced]: дромады merchants,   locations  
+--------------------------------------------------
+[Original]: underground locations and sultans they admire or despise
+[Replaced]: underground locations и sultans they admire or despise
+--------------------------------------------------
+[Original]: The Cult of Yyram
+[Replaced]:   Cult   Yyram
+--------------------------------------------------
+[Original]: the sultan they worship
+[Replaced]:   sultan they worship
+--------------------------------------------------
+[Original]: The Cult
+[Replaced]:   Cult
+--------------------------------------------------
+[Original]: about the sultan they worship
+[Replaced]: about   sultan they worship
+--------------------------------------------------
+[Original]: The denizens
+[Replaced]:   denizens
+--------------------------------------------------
+[Original]: in the Palladium Reef
+[Replaced]: in   Palladium Reef
+--------------------------------------------------
+[Original]: about technology, the locations
+[Replaced]: about technology,   locations
+--------------------------------------------------
+[Original]: the locations
+[Replaced]:   locations
+--------------------------------------------------
+[Original]: of all settlements, the locations
+[Replaced]:   all settlements,   locations
+--------------------------------------------------
+[Original]: sites, and
+[Replaced]: sites, и
+--------------------------------------------------
+[Original]: scuttle down a dark shaft at the edge of a sunken trade path
+[Replaced]: scuttle down a dark shaft at   edge   a sunken trade path
+--------------------------------------------------
+[Original]: You equip the
+[Replaced]: You equip  
+--------------------------------------------------
+[Original]: for 1 damage with your
+[Replaced]: для 1 damage with your
+--------------------------------------------------
+[Original]: bite! [7 vs 7
+[Replaced]: укус! [7 vs 7
+--------------------------------------------------
+[Original]: for 2 damage with your
+[Replaced]: для 2 damage with your
+--------------------------------------------------
+[Original]: The snapjaw scavenger dies
+[Replaced]:   snapjaw scavenger dies
+--------------------------------------------------
+[Original]: You stop moving because there is a bear in your way
+[Replaced]: You stop moving because there   a bear in your way
+--------------------------------------------------
+[Original]: bite! [2 vs 7
+[Replaced]: укус! [2 vs 7
+--------------------------------------------------
+[Original]: The bear hits
+[Replaced]:   bear бьет
+--------------------------------------------------
+[Original]: for 4 damage with her bite. [18
+[Replaced]: для 4 damage with her укус. [18
+--------------------------------------------------
+[Original]: The bear dies
+[Replaced]:   bear dies
+--------------------------------------------------
+[Original]: You identify the odd trinket as a
+[Replaced]: You identify   odd trinket as a
+--------------------------------------------------
+[Original]: an iron battle axe
+[Replaced]: an железный battle топор
+--------------------------------------------------
+[Original]: from the north
+[Replaced]: from   north
+--------------------------------------------------
+[Original]: waterskin from the north
+[Replaced]: waterskin from   north
+--------------------------------------------------
+[Original]: You toss some stamped fish meat, a sprinkle
+[Replaced]: You toss some stamped рыбы meat, a sprinkle
+--------------------------------------------------
+[Original]: a dash of crowned fulcrete flake, and a crust of bread into a pot and stir
+[Replaced]: a dash   crowned fulcrete flake, и a crust   bread into a pot и stir
+--------------------------------------------------
+[Original]: The clockwork beetle and pariah to its people takes the
+[Replaced]:   clockwork beetle и pariah to its people takes  
+--------------------------------------------------
+[Original]: Qud, surface, Harvest Dawn
+[Replaced]: Куд, surface, Harvest Dawn
+--------------------------------------------------
+[Original]: Joppa, Beetle Moon Zenith
+[Replaced]: Joppa, Beetle Луна Zenith
+--------------------------------------------------
+[Original]: bent metal sheet from the east
+[Replaced]: bent metal sheet from   восток
+--------------------------------------------------
+[Original]: fractured microchip from the south
+[Replaced]: fractured microchip from   south
+--------------------------------------------------
+[Original]: bent metal sheet from the west
+[Replaced]: bent metal sheet from   запад
+--------------------------------------------------
+[Original]: wet watervine farmer
+[Replaced]: wet влагопаутинник farmer
+--------------------------------------------------
+[Original]: and a bridge
+[Replaced]: и a bridge
+--------------------------------------------------
+[Original]: You note the location
+[Replaced]: You note   location
+--------------------------------------------------
+[Original]: Saloons of Nalil in the
+[Replaced]: Saloons   Nalil in  
+--------------------------------------------------
+[Original]: ∙ Travel to the historical site
+[Replaced]: ∙ Travel to   historical сайт
+--------------------------------------------------
+[Original]: Saloons of Nalil
+[Replaced]: Saloons   Nalil
+--------------------------------------------------
+[Original]: Visit the Saloons
+[Replaced]: Visit   Saloons
+--------------------------------------------------
+[Original]: Whenever you hit an opponent with an axe, there's a 75% chance you cleave their armor, giving them a -1 penalty to their AV. This penalty can stack a number
+[Replaced]: Whenever you hit an opponent with an топор, there's a 75% chance you cleave their armor, giving them a -1 penalty to their AV. This penalty can stack a number
+--------------------------------------------------
+[Original]: Activated; cooldown 30. Axe attack. If you hit and penetrate, you dismember one
+[Replaced]: Activated; cooldown 30. Топор attack. If you hit и penetrate, you dismember one
+--------------------------------------------------
+[Original]: limbs at random and they start bleeding (1-2 damage per turn. toughness save; difficulty 35). Additionally, your axe attacks that penetrate have a percentage chance to dismember: 3% for one-handed axes and 6% for two-handed axes
+[Replaced]: limbs at random и they start bleeding (1-2 damage per turn. toughness спасбросок; difficulty 35). Additionally, your топор attacks that penetrate have a percentage chance to dismember: 3% для one-handed axes и 6% для two-handed axes
+--------------------------------------------------
+[Original]: Activated; cooldown 50. You grab an opponent's limb with the heel
+[Replaced]: Activated; cooldown 50. You grab an opponent's limb with   heel
+--------------------------------------------------
+[Original]: axe. If successful, you pull your opponent with you as you move and make a free attack with your axe. Your opponent gets a chance to resist the move (strength save; difficulty 20 + your Str modifier) and a chance to break free at the start of their turn (same save). Lasts for 9 rounds or until you dismember the opponent
+[Replaced]: топор. If successful, you pull your opponent with you as you move и make a свободный attack with your топор. Your opponent gets a chance to resist   move (strength спасбросок; difficulty 20 + your Str modifier) и a chance to break свободный at   start   their turn (same спасбросок). Lasts для 9 rounds or until you dismember   opponent
+--------------------------------------------------
+[Original]: Heads are added to the list
+[Replaced]: Heads   added to   список
+--------------------------------------------------
+[Original]: limbs you can dismember. Chopping off the only head of a creature kills them instantly. If the creature has multiple heads, they start bleeding profusely (2-3 damage per turn. toughness save; difficulty 35
+[Replaced]: limbs you can dismember. Chopping off   only голова   a creature kills them instantly. If   creature has multiple heads, they start bleeding profusely (2-3 damage per turn. toughness спасбросок; difficulty 35
+--------------------------------------------------
+[Original]: When you choose ingredients to cook with, you can choose up to three instead
+[Replaced]: When you choose ingredients to готовить with, you can choose up to three instead
+--------------------------------------------------
+[Original]: Whenever you gain a level, and 5%
+[Replaced]: Whenever you gain a level, и 5%
+--------------------------------------------------
+[Original]: time you explore a new map, you become inspired for two days. While inspired, the next time you cook a meal by choosing ingredients, you get a choice of three dynamically-generated effects to apply. You create a recipe for the chosen effect
+[Replaced]: time you explore a новый map, you become inspired для two days. While inspired,   next time you готовить a meal by choosing ingredients, you get a choice   three dynamically-generated effects to apply. You create a recipe для   chosen effect
+--------------------------------------------------
+[Original]: You are aware
+[Replaced]: You   aware
+--------------------------------------------------
+[Original]: Doubles the chance
+[Replaced]: Doubles   chance
+--------------------------------------------------
+[Original]: your bearings when you are lost
+[Replaced]: your bearings when you   lost
+--------------------------------------------------
+[Original]: encounters while traveling through the flower fields on the world map
+[Replaced]: encounters while traveling through   цветок fields on   world map
+--------------------------------------------------
+[Original]: Reduces the chance
+[Replaced]: Reduces   chance
+--------------------------------------------------
+[Original]: lost in the flower fields from base 12% to 1%
+[Replaced]: lost in   цветок fields from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the salt marshes and watervine fields on the world map
+[Replaced]: encounters while traveling through   salt marshes и влагопаутинник fields on   world map
+--------------------------------------------------
+[Original]: lost in the salt marshes and watervine fields from base 12% to 1%
+[Replaced]: lost in   salt marshes и влагопаутинник fields from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the hills and mountains on the world map
+[Replaced]: encounters while traveling through   hills и mountains on   world map
+--------------------------------------------------
+[Original]: lost in the hills and mountains from base 12% to 1%
+[Replaced]: lost in   hills и mountains from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the desert canyons on the world map
+[Replaced]: encounters while traveling through   desert canyons on   world map
+--------------------------------------------------
+[Original]: lost in the desert canyons from base 12% to 1%
+[Replaced]: lost in   desert canyons from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the salt dunes on the world map
+[Replaced]: encounters while traveling through   salt dunes on   world map
+--------------------------------------------------
+[Original]: lost in the salt dunes from base 10% to 1%
+[Replaced]: lost in   salt dunes from base 10% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through the jungles on the world map
+[Replaced]: encounters while traveling through   jungles on   world map
+--------------------------------------------------
+[Original]: lost in the jungles from base 12% to 1%
+[Replaced]: lost in   jungles from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling across rivers and lakes on the world map
+[Replaced]: encounters while traveling across rivers и lakes on   world map
+--------------------------------------------------
+[Original]: lost in rivers and lakes from base 12% to 1%
+[Replaced]: lost in rivers и lakes from base 12% to 1%
+--------------------------------------------------
+[Original]: encounters while traveling through chrome ruins on the world map
+[Replaced]: encounters while traveling through chrome ruins on   world map
+--------------------------------------------------
+[Original]: a door
+[Replaced]: a дверь
+--------------------------------------------------
+[Original]: Live and drink. Come in- come sit 'neath the cool shade, 'cross a pillow
+[Replaced]: Live и drink. Come in- come sit 'neath   cool shade, 'cross a pillow
+--------------------------------------------------
+[Original]: freshwater, too, and quench your thirst
+[Replaced]: freshwater, too, и quench your thirst
+--------------------------------------------------
+[Original]: this? The oasis-hamlet. 'Neath the shelf
+[Replaced]: this?   oasis-hamlet. 'Neath   shelf
+--------------------------------------------------
+[Original]: world. A million breaths of
+[Replaced]: world. A million breaths  
+--------------------------------------------------
+[Original]: salt the wind heaves over the Great Salt Desert Moghra'yi. And to the east
+[Replaced]: salt   ветер heaves over   Great Salt Desert Moghra'yi. И to   восток
+--------------------------------------------------
+[Original]: the rotting jungles
+[Replaced]:   rotting jungles
+--------------------------------------------------
+[Original]: groves. And broken against the mounts
+[Replaced]: groves. И broken against   mounts
+--------------------------------------------------
+[Original]: north, they are, in the shadow of
+[Replaced]: north, they  , in   shadow  
+--------------------------------------------------
+[Original]: mm, adventurous ones set off for their own splinter
+[Replaced]: mm, adventurous ones set off для their own splinter
+--------------------------------------------------
+[Original]: here? Speak to my daughter through the east door, for herbs. And sitting Tam
+[Replaced]: here? Speak to my daughter through   восток дверь, для herbs. И sitting Tam
+--------------------------------------------------
+[Original]: in the southeast has all manner
+[Replaced]: in   southeast has all manner
+--------------------------------------------------
+[Original]: o' there, by the southern watervine patch
+[Replaced]: o' there, by   southern влагопаутинник patch
+--------------------------------------------------
+[Original]: metal, to the southwest
+[Replaced]: metal, to   southwest
+--------------------------------------------------
+[Original]: RANK 1/10
+[Replaced]: Ранг 1/10
+--------------------------------------------------
+[Original]: insect lairs, the locations of haberdashers
+[Replaced]: насекомое lairs, the locations of haberdashers
+--------------------------------------------------
+[Original]: other baboon lairs, all sorts of gossip, and
+[Replaced]: other бабуин lairs, all sorts of gossip, and
+--------------------------------------------------
+[Original]: oddities, the darkling star, and gossip
+[Replaced]: oddities, the darkling звезда, and gossip
+--------------------------------------------------
+[Original]: goatfolk settlements and gossip that's about
+[Replaced]: козлолюды settlements and gossip that's about
+--------------------------------------------------
+[Original]: dromad merchants, the locations of
+[Replaced]: дромады merchants, the locations of
+--------------------------------------------------
+[Original]: other dromad merchants and locations in
+[Replaced]: other дромады merchants and locations in
+--------------------------------------------------
+[Original]: in the flower fields
+[Replaced]: in the цветок fields
+--------------------------------------------------
+[Original]: insect lairs and sultans they admire or
+[Replaced]: насекомое lairs and sultans they admire or
+--------------------------------------------------
+[Original]: fungus forests
+[Replaced]: грибок forests
+--------------------------------------------------
+[Original]: water weeps, the locations of wine weeps
+[Replaced]: water weeps, the locations of вино weeps
+--------------------------------------------------
+[Original]: locations in the flower fields, the location
+[Replaced]: locations in the цветок fields, the location
+--------------------------------------------------
+[Original]: flower lairs and locations in the flower
+[Replaced]: цветок lairs and locations in the цветок
+--------------------------------------------------
+[Original]: robot lairs. They're also interested in
+[Replaced]: робот lairs. They're also interested in
+--------------------------------------------------
+[Original]: bird lairs, and sultans they admire or
+[Replaced]: птица lairs, and sultans they admire or
+--------------------------------------------------
+[Original]: secrets about the darkling star and sultans they admire or
+[Replaced]: secrets about the darkling звезда and sultans they admire or
+--------------------------------------------------
+[Original]: insect lairs and the locations of lava
+[Replaced]: насекомое lairs and the locations of лава
+--------------------------------------------------
+[Original]: fish lairs and the locations of frog lairs
+[Replaced]: рыбы lairs and the locations of frog lairs
+--------------------------------------------------
+[Original]: a door
+[Replaced]: a дверь
+--------------------------------------------------
+[Original]: here? Speak to my daughter through the east door, for herbs. And sitting Tam
+[Replaced]: here? Speak to my daughter through the east дверь, for herbs. And sitting Tam
+--------------------------------------------------
+[Original]: o' there, by the southern watervine patch
+[Replaced]: o' there, by the southern влагопаутинник patch
+--------------------------------------------------
+[Original]: Fates forfend. I would hardly like to lead a village and run a shop at the
+[Replaced]: Fates forfend. I would hardly like to свинцовый a village and run a shop at the
+--------------------------------------------------
+[Original]: a sign
+[Replaced]: a знак
+--------------------------------------------------
+[Original]: marsh, or head
+[Replaced]: marsh, or голова
+--------------------------------------------------
+[Original]: a watervine
+[Replaced]: a влагопаутинник
+--------------------------------------------------
+[Original]: Tam, dromad merchant
+[Replaced]: Tam, дромады merchant
+--------------------------------------------------
+[Original]: I am dromad, human friend. Some say saltstrider. Do you know this
+[Replaced]: I am дромады, human friend. Some say saltstrider. Do you know this
+--------------------------------------------------
+[Original]: ∙ Travel to the historical site
+[Replaced]: ∙ Travel to the historical сайт
+--------------------------------------------------
+[Original]: bite! [7 vs 7
+[Replaced]: укус! [7 vs 7
+--------------------------------------------------
+[Original]: bite! [2 vs 7
+[Replaced]: укус! [2 vs 7
+--------------------------------------------------
+[Original]: The bear hits
+[Replaced]: The bear бьет
+--------------------------------------------------
+[Original]: for 4 damage with her bite. [18
+[Replaced]: for 4 damage with her укус. [18
+--------------------------------------------------
+[Original]: an iron battle axe
+[Replaced]: an железный battle axe
+--------------------------------------------------
+[Original]: You toss some stamped fish meat, a sprinkle
+[Replaced]: You toss some stamped рыбы meat, a sprinkle
+--------------------------------------------------
+[Original]: Joppa, Beetle Moon Zenith
+[Replaced]: Joppa, Beetle Луна Zenith
+--------------------------------------------------
+[Original]: wet watervine farmer
+[Replaced]: wet влагопаутинник farmer
+--------------------------------------------------
+[Original]: is a deep and sometimes long process. We included some preset builds to help you get started. After the tutorial, you can try another build, or make a character from scratch. (The recommended way! Once you get your footing
+[Replaced]: is a глубоко and sometimes long process. We included some preset builds to помощь you get started. After the tutorial, you can try another build, or make a character from scratch. (The recommended way! Once you get your footing
+--------------------------------------------------
+[Original]: are idle lives, and you may soon grow weary of them
+[Replaced]: are idle lives, and you may скоро grow weary of them
+--------------------------------------------------
+[Original]: Ux, you scuttle down a dark shaft at the edge of a sunken trade path and arrive at a caravanserai. It's powdered in salt and dust from across the ribbon of time
+[Replaced]: Ux, you scuttle down a dark shaft at the edge of a sunken trade path and arrive at a caravanserai. It's powdered in salt and пыль from across the ribbon of time
+--------------------------------------------------
+[Original]: Narrow Shaft Fletched with Bird Feather
+[Replaced]: Narrow Shaft Fletched with Птица Feather
+--------------------------------------------------
+[Original]: to view the tooltip
+[Replaced]: to осмотреть the tooltip
+--------------------------------------------------
+[Original]: Select an item
+[Replaced]: Select an предмет
+--------------------------------------------------
+[Original]: You read one
+[Replaced]: You прочитать one
+--------------------------------------------------
+[Original]: Take out what you've done for our world
+[Replaced]: Take out what you've готово for our world
+--------------------------------------------------
+[Original]: Narrow Shaft Fletched with Bird
+[Replaced]: Narrow Shaft Fletched with Птица
+--------------------------------------------------
+[Original]: The fire breathes its warmth on your bones
+[Replaced]: The стрелять breathes its warmth on your bones
+--------------------------------------------------
+[Original]: Ants in the viridian chaff, the farmers sap the last drops
+[Replaced]: Ants in the viridian chaff, the farmers sap the предыдущий drops
+--------------------------------------------------
+[Original]: Beetle Moon Zenith 3rd
+[Replaced]: Beetle Луна Zenith 3rd
+--------------------------------------------------
+[Original]: You can see a list
+[Replaced]: You can see a список
+--------------------------------------------------
+[Original]: The list will grow as you explore more
+[Replaced]: The список will grow as you explore more
+--------------------------------------------------
+[Original]: Tam, dromad merchant [E
+[Replaced]: Tam, дромады merchant [E
+--------------------------------------------------
+[Original]: watervine farmer and Mechanimist convert [NE
+[Replaced]: влагопаутинник farmer and Mechanimist convert [NE
+--------------------------------------------------
+[Original]: Mehmet, the tongue says. Live and drink, Ymeyushur
+[Replaced]: Mehmet, the tongue говорит. Live and drink, Ymeyushur
+--------------------------------------------------
+[Original]: Watervine farm in the lap
+[Replaced]: Влагопаутинник farm in the lap
+--------------------------------------------------
+[Original]: Somethin' is eating our watervine, 'round Beetle Moon. Q-ruun says he saw a
+[Replaced]: Somethin' is eating our влагопаутинник, 'round Beetle Луна. Q-ruun говорит he saw a
+--------------------------------------------------
+[Original]: fleck in the pool. Shale, like we find in the soil by
+[Replaced]: fleck in the бассейн. Shale, like we find in the soil by
+--------------------------------------------------
+[Original]: Beetle Moon Zenith 4th
+[Replaced]: Beetle Луна Zenith 4th
+--------------------------------------------------
+[Original]: Waning Beetle Moon 4th
+[Replaced]: Waning Beetle Луна 4th
+--------------------------------------------------
+[Original]: a watervine
+[Replaced]: a влагопаутинник
+--------------------------------------------------
+[Original]: cyan|Painted: This item is painted with a scene from the life
+[Replaced]: cyan|Painted: This предмет is painted with a scene from the жизнь
+--------------------------------------------------
+[Original]: Deep in the wilds
+[Replaced]: Глубоко in the wilds
+--------------------------------------------------
+[Original]: The shrine depicts a significant event from the life
+[Replaced]: The shrine depicts a significant event from the жизнь
+--------------------------------------------------
+[Original]: plagues of the Gyre and taught Abram to sow watervine along its fertile tracks
+[Replaced]: plagues of the Gyre and taught Abram to sow влагопаутинник along its fertile tracks
+--------------------------------------------------
+[Original]: a door
+[Replaced]: a дверь
+--------------------------------------------------
+[Original]: none>
+[Replaced]: ничего>
+--------------------------------------------------
+[Original]: difficulty 18 Willpower save
+[Replaced]: difficulty 18 Willpower сохранить
+--------------------------------------------------
+[Original]: nearby area
+[Replaced]: nearby зона
+--------------------------------------------------
+[Original]: You generate a wall
+[Replaced]: You generate a стена
+--------------------------------------------------
+[Original]: You read the history
+[Replaced]: You читать the history
+--------------------------------------------------
+[Original]: a nearby area
+[Replaced]: a nearby зона
+--------------------------------------------------
+[Original]: you've done so far
+[Replaced]: you've готово so far
+--------------------------------------------------

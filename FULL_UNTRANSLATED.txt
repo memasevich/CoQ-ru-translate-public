@@ -1,0 +1,579 @@
+=== ОТЧЕТ О НЕПЕРЕВЕДЕННОМ ТЕКСТЕ ===
+Всего уникальных проблемных строк: 576
+
+[30 раз] </color><color=#B1C9C3FF>don't care about you, but
+[20 раз] </color><color=#B1C9C3FF>you, but агрессивный ones
+[16 раз] </color><color=#B1C9C3FF>ones will атаковать you. </color>
+[14 раз] </color><color=#B1C9C3FF>about them. </color>
+[8 раз] </color><color=#B1C9C3FF>but агрессивный members
+[6 раз] [TEXT]: Загрузка SparkingBaetyls.xml
+[6 раз] [TEXT]: Загрузка PronounSets.xml
+[6 раз] [TEXT]: Загрузка Relics.xml
+[6 раз] [TEXT]: Загрузка Colors.xml
+[6 раз] [TEXT]: %BodyText%
+[6 раз] [TEXT]: %DisplayName%
+[6 раз] [TEXT]: %ConText%
+[6 раз] [TEXT]: %LongDescription%
+[6 раз] [TEXT]: %WoundLevel%
+[6 раз] [TEXT]: Загрузка Naming.xml
+[6 раз] [TEXT]: Загрузка Mutations.xml
+[6 раз] [TEXT]: Загрузка ZoneTemplates.xml
+[6 раз] [TEXT]: Загрузка Quests.xml
+[6 раз] [TEXT]: Загрузка BuildingTiles.txt
+[6 раз] [TEXT]: Загрузка Conversations.xml
+[6 раз] [TEXT]: {{{{W|M}}koef.
+[6 раз] [TEXT]: {{C|Peshchery of Kud}}
+[6 раз] [TEXT]: <color=#B1C9C3FF>Type: Навыки
+[6 раз] </color><color=#B1C9C3FF>care about you, but
+[6 раз] </color><color=#B1C9C3FF>dislikes you, but послушный
+[6 раз] </color><color=#B1C9C3FF>members не будут attack you </color>
+[5 раз] [TEXT]: Загрузка Compat.xml
+[4 раз] Missile
+[4 раз] </color><color=#B1C9C3FF>you, but послушный members
+[4 раз] </color><color=#B1C9C3FF>but docile ones не будут
+[4 раз] </color><color=#B1C9C3FF>презирают. They're also заинтересованы в прослушивании слухов that's
+[4 раз] </color><color=#B1C9C3FF>in прослушивании слухов that's about them </color>
+[4 раз] </color><color=#B1C9C3FF>презирают. Они также заинтересованы в hearing слухи that's
+[2 раз] [TEXT]: <color=#CFC041FF>Fayumet :: Уровень 1 [Обучение]</color>
+[2 раз] [TEXT]: <color=#77BFCFFF>Локация:</color><color=#B1C9C3FF> Джоппа, 00:11:36 turn 555</color>
+[2 раз] [TEXT]: <color=#77BFCFFF>Последнее сохранение: </color><color=#B1C9C3FF> четверг, 28 May 2026 в 09:24:24</color>
+[2 раз] [TEXT]: Fayumet :: Уровень 1 [Обучение]
+[2 раз] [TEXT]: Последнее сохранение: Четверг, 28 May 2026 at 09:24:24
+[2 раз] [TEXT]: <color=#77BFCFFF>Локация:</color><color=#B1C9C3FF> Джоппа, 00:14:44 turn 115</color>
+[2 раз] [TEXT]: <color=#77BFCFFF>Последнее сохранение: </color><color=#B1C9C3FF> среда, 27 May 2026 в 22:24:38</color>
+[2 раз] [TEXT]: Последнее сохранение: Среда, 27 May 2026 at 22:24:38
+[2 раз] [TEXT]: Harvest Dawn 24th of Тишру  Ux
+[2 раз] [TEXT]: Fayumet
+[2 раз] [TEXT]: <color=#FFFFFFFF><color=#508d75>ACTIVE Эффекты:</color></</color><color=#B1C9C3FF> </color>
+[2 раз] [TEXT]: b) Замораживающий Ray
+[2 раз] [TEXT]: <color=#B1C9C3FF>[</color><color=#CFC041FF>Insert</color><color=#B1C9C3FF>]</color>
+[2 раз] [TEXT]: <color=#B1C9C3FF>Type: Ментальная Мутации
+[2 раз] Дальность: 2-3 spaces
+[2 раз] Кровотечение damage: 1d2 per раунд
+[2 раз] [TEXT]: <color=#B1C9C3FF>Type: Физическая Мутации
+[2 раз] You emit a ray of frost from your руки.
+[2 раз] [TEXT]: <color=#B1C9C3FF>You emit a ray of frost from your руки.
+[2 раз] [TEXT]: |2 lbs.|
+[2 раз] [TEXT]: |1 lbs.|
+[2 раз] [TEXT]: |0 lbs.|
+[2 раз] [TEXT]: <color=#98875FFF>вяленый медведь</color><color=#B1C9C3FF> [</color><color=#77BFCFFF>10</color><color=#B1C9C3FF> servings]</color>
+[2 раз] [TEXT]: |14 lbs.|
+[2 раз] [TEXT]: |7 lbs.|
+[2 раз] [TEXT]: |6 lbs.|
+[2 раз] [TEXT]: bent metal sheet x2
+[2 раз] [TEXT]: Right
+[2 раз] [TEXT]: Left
+[2 раз] [TEXT]: <color=#CFC041FF>[+Tab]</color><color=#B1C9C3FF> show кибернетика </color>
+[2 раз] </color><color=#009403FF></color><color=#0096FFFF>water</color><color=#009403FF>]</color><color=#40A4B9FF>
+[2 раз] [TEXT]: <color=#B1C9C3FF>Влагопаутинник farm in the lap of the marsh. You've sucked the moisture out </color><color=#B1C9C3FF>листолоза, yea? We tend the растение here.
+[2 раз] [TEXT]: <color=#B1C9C3FF>Мехмет, the tongue говорит. Live and пить, Fayumet.
+[2 раз] </color><color=#B1C9C3FF>get so near Страж's stomps.
+[2 раз] </color><color=#B1C9C3FF>take care to pay you after, waterhand.
+[2 раз] [TEXT]: <color=#CFC041FF>[c]</color><color=#40A4B9FF> </color><color=#CFC041FF>c</color><color=#B1C9C3FF>ollect жидкость </color>
+[2 раз] [TEXT]: <color=#CFC041FF>[k]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>drin</color><color=#CFC041FF>k </color>
+[2 раз] [TEXT]: <color=#CFC041FF>[p]</color><color=#40A4B9FF> </color><color=#CFC041FF>p</color><color=#B1C9C3FF>our </color>
+[2 раз] [TEXT]: <color=#CFC041FF>[c] c</color><color=#B1C9C3FF>ollect жидкость </color>
+[2 раз] [TEXT]: <color=#CFC041FF>[p] p</color><color=#B1C9C3FF>our </color>
+[2 раз] [TEXT]: <color=#CFC041FF>[k] </color><color=#B1C9C3FF>drin</color><color=#CFC041FF>k </color>
+[2 раз] [TEXT]: bed
+[2 раз] [TEXT]: Растущая Salt Sun 24th of Тишру  Ux
+[2 раз] </color><color=#B1C9C3FF>Live and пить. Come in- come sit 'neath the cool тень, 'cross a pillow
+[2 раз] [TEXT]: <color=#B1C9C3FF>-this? The oasis-hamlet. 'Neath the shelf of the world. A million breaths of
+[2 раз] </color><color=#B1C9C3FF>salt the ветер heaves over the Отлично Salt Desert Moghra'yi. And to the восток,
+[2 раз] [TEXT]: <color=#B1C9C3FF>-mm, there? Land slopes up and is toothed in хром steeples, ageless things.
+[2 раз] </color><color=#B1C9C3FF>Looming over the старый-земля туннели, pillowed in rotting джунгли and грибок
+[2 раз] </color><color=#B1C9C3FF>groves. And сломанный against the mounts of the север, they are, in the shadow of
+[2 раз] </color><color=#B1C9C3FF>There are люди, друзья, communities. And друзья-to-noone, too. History is
+[2 раз] </color><color=#B1C9C3FF>thick as the высокий salt sun, друг, and where the past is ground up like matz
+[2 раз] </color><color=#B1C9C3FF>meal, a mix of жизнь sets in.
+[2 раз] </color><color=#B1C9C3FF>-mm, adventurous ones set off for their own splinter of артефакт. To both
+[2 раз] </color><color=#B1C9C3FF>Fates, жизнь and death...
+[2 раз] [TEXT]: <color=#B1C9C3FF>-here? Speak to my дочь through the восток дверь, for herbs. And sitting Tam
+[2 раз] </color><color=#B1C9C3FF>in the юго-восток has all manner of trinket, against his chests o' drawers.
+[2 раз] [TEXT]: <color=#B1C9C3FF>-mm, work? Try Аржив, друг. The изобретатель. Always looking for брелки to wire
+[2 раз] </color><color=#B1C9C3FF>between, heh. Go through his hut of sheet metal, to the юго-запад.
+[2 раз] [TEXT]: <color=#B1C9C3FF>Witchwood for pain, bandages for кровотечение, yuckwheat and мёд for when your
+[2 раз] [TEXT]: <color=#B1C9C3FF>I grew up right here in Джоппа, дочь of the Старейшина and all. Spent some years
+[2 раз] </color><color=#B1C9C3FF>delving, but gave it up after a few near escapes and nearly deadly wounds. I’m
+[2 раз] </color><color=#B1C9C3FF>better suited to herbalism anyway, and my отец worries less.
+[2 раз] [TEXT]: <color=#B1C9C3FF>Fates forfend. I would hardly like to свинцовый поселение and run a shop at the
+[2 раз] </color><color=#B1C9C3FF>местоположениях water weeps, the локации of cat логово, and
+[2 раз] </color><color=#B1C9C3FF>but агрессивный ones will
+[2 раз] [TEXT]: <color=#77BFCFFF>Обезьяны</color><color=#B1C9C3FF> are interested in sharing secrets about the локации
+[2 раз] </color><color=#B1C9C3FF>of насекомое логово, the локации of other обезьяна логово,
+[2 раз] </color><color=#B1C9C3FF>Оборокору'логово, and султанах they admire or презирают.
+[2 раз] </color><color=#B1C9C3FF>насекомое логово, the локации of other обезьяна логово, султанах
+[2 раз] </color><color=#B1C9C3FF>they admire or презирают, and слухи that's about them. </color>
+[2 раз] </color><color=#B1C9C3FF>местоположениях насекомое логово, the локации of haberdashers'
+[2 раз] </color><color=#B1C9C3FF>workshops, and султанах they admire or презирают. They're
+[2 раз] </color><color=#B1C9C3FF>also заинтересованы в прослушивании слухов that's about them </color>
+[2 раз] </color><color=#B1C9C3FF>местоположениях other бабуин логово, all sorts of слухи, and
+[2 раз] </color><color=#B1C9C3FF>султанах they admire or презирают. </color>
+[2 раз] [TEXT]: <color=#77BFCFFF>Бетилы</color><color=#B1C9C3FF> заинтересованы в обмене секретами about all
+[2 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>Бетилы</color><color=#B1C9C3FF> заинтересованы в изучении all sultans
+[2 раз] </color><color=#B1C9C3FF>технология and the локации of Putus Тамплиеры enclaves.
+[2 раз] </color><color=#B1C9C3FF>местоположениях ichor торговцы' distilleries and the
+[2 раз] </color><color=#B1C9C3FF>местоположениях мёд weeps. They're also interested in
+[2 раз] [TEXT]: The Спальник-in-Citrine Church
+[2 раз] [TEXT]: <color=#77BFCFFF>The Спальник-in-Citrine
+[2 раз] </color><color=#77BFCFFF>Church</color><color=#B1C9C3FF> недолюбливает вас, но
+[2 раз] [TEXT]: <color=#77BFCFFF>The Спальник-in-Citrine Church</color><color=#B1C9C3FF> заинтересован в торговле
+[2 раз] [TEXT]: <color=#77BFCFFF>Птицы</color><color=#B1C9C3FF> заинтересованы в торговле секретами о all sorts of
+[2 раз] [TEXT]: The Cabal of the Scrollskipper
+[2 раз] [TEXT]: <color=#77BFCFFF>The Cabal of the
+[2 раз] </color><color=#77BFCFFF>Scrollskipper</color><color=#B1C9C3FF> dislikes
+[2 раз] [TEXT]: <color=#77BFCFFF>The Cabal of the Scrollskipper</color><color=#B1C9C3FF> заинтересован в торговле
+[2 раз] </color><color=#B1C9C3FF>местоположениях гуманоидов поселения, the локации of
+[2 раз] </color><color=#B1C9C3FF>гуманоидов логово, and султанах they admire or презирают.
+[2 раз] </color><color=#B1C9C3FF>you погладить them. You
+[2 раз] </color><color=#B1C9C3FF>aren't welcome in
+[2 раз] [TEXT]: <color=#77BFCFFF>Кошки</color><color=#B1C9C3FF> заинтересованы в торговле секретами о locations
+[2 раз] </color><color=#B1C9C3FF>местоположениях странности, the darkling звезда, and слухи
+[2 раз] </color><color=#B1C9C3FF>презирают you. Even послушный
+[2 раз] </color><color=#B1C9C3FF>about the локации of козлолюды поселения and локации
+[2 раз] </color><color=#B1C9C3FF>in the джунгли.
+[2 раз] </color><color=#B1C9C3FF>местоположениях козлолюды поселения and слухи that's about
+[2 раз] </color><color=#B1C9C3FF>about the локации of Консорциум торговцы and all sorts
+[2 раз] </color><color=#B1C9C3FF>местоположениях дромады торговцы, the локации of
+[2 раз] </color><color=#77BFCFFF>Lamb</color><color=#B1C9C3FF> не обращает внимания на
+[2 раз] </color><color=#B1C9C3FF>you, but агрессивный
+[2 раз] </color><color=#B1C9C3FF>members will атаковать you. </color>
+[2 раз] </color><color=#77BFCFFF>Wife</color><color=#B1C9C3FF> недолюбливает вас, но
+[2 раз] [TEXT]: The Cult of Yyram
+[2 раз] [TEXT]: <color=#77BFCFFF>The Cult of Yyram</color><color=#B1C9C3FF> dislikes
+[2 раз] [TEXT]: <color=#77BFCFFF>The Cult of Yyram</color><color=#B1C9C3FF> интересуется обменом секретами о
+[2 раз] [TEXT]: The Cult of Yyram II
+[2 раз] [TEXT]: <color=#77BFCFFF>The Cult of Yyram II</color><color=#B1C9C3FF>
+[2 раз] [TEXT]: <color=#77BFCFFF>The Cult of Yyram II</color><color=#B1C9C3FF> заинтересована в trading secrets
+[2 раз] </color><color=#B1C9C3FF>about Решеф's healer Ребекка.
+[2 раз] </color><color=#B1C9C3FF>in the Palladium Reef.
+[2 раз] </color><color=#B1C9C3FF>about технология, the локации of странности, the локации
+[2 раз] </color><color=#B1C9C3FF>of all поселения, the локации of исторический sites, and
+[2 раз] [TEXT]: <color=#77BFCFFF>собаки</color><color=#B1C9C3FF> favor you. Агрессивный
+[2 раз] </color><color=#B1C9C3FF>ones не будут attack you </color>
+[2 раз] [TEXT]: <color=#77BFCFFF>собаки</color><color=#B1C9C3FF> will обычно let
+[2 раз] </color><color=#B1C9C3FF>you погладить them. You are
+[2 раз] </color><color=#B1C9C3FF>welcome in their holy
+[2 раз] </color><color=#B1C9C3FF>places. </color>
+[2 раз] [TEXT]: <color=#77BFCFFF>собаки</color><color=#B1C9C3FF> заинтересованы в торговле секретами о locations
+[2 раз] </color><color=#B1C9C3FF>of гуманоидов поселения and султанах they admire or
+[2 раз] </color><color=#B1C9C3FF>местоположениях other дромады торговцы and локации in
+[2 раз] </color><color=#B1C9C3FF>местоположениях гуманоидов торговцы, the локации of
+[2 раз] [TEXT]: <color=#77BFCFFF>лошади</color><color=#B1C9C3FF> заинтересованы в торговле секретами о locations
+[2 раз] </color><color=#B1C9C3FF>султанах they admire or презирают.
+[2 раз] </color><color=#B1C9C3FF>местоположениях гуманоидов поселения, султанах they admire or
+[2 раз] </color><color=#B1C9C3FF>презирают, and слухи that's about them. </color>
+[2 раз] [TEXT]: <color=#77BFCFFF>Братство стражей</color><color=#B1C9C3FF> заинтересована в trading secrets
+[2 раз] </color><color=#B1C9C3FF>about the локации of all поселения. They're also
+[2 раз] [TEXT]: <color=#77BFCFFF>рыба</color><color=#B1C9C3FF> заинтересованы в торговле секретами о watery
+[2 раз] [TEXT]: <color=#77BFCFFF>цветы</color><color=#B1C9C3FF> заинтересованы в торговле секретами о locations
+[2 раз] </color><color=#B1C9C3FF>местоположениях насекомое логово and султанах they admire or
+[2 раз] </color><color=#B1C9C3FF>местоположениях грибок forests.
+[2 раз] [TEXT]: <color=#77BFCFFF>Гирши</color><color=#B1C9C3FF> презирают you
+[2 раз] </color><color=#B1C9C3FF>Even послушный ones will
+[2 раз] [TEXT]: <color=#77BFCFFF>козлята</color><color=#B1C9C3FF> заинтересованы в торговле секретами о locations
+[2 раз] </color><color=#B1C9C3FF>местоположениях water weeps, the локации of вино weeps,
+[2 раз] </color><color=#B1C9C3FF>местоположениях Гирш логово and the локации of
+[2 раз] </color><color=#B1C9C3FF>nephilims.
+[2 раз] </color><color=#B1C9C3FF>местоположениях Гирш логово and слухи that's about them. </color>
+[2 раз] [TEXT]: <color=#77BFCFFF>отшельники</color><color=#B1C9C3FF> заинтересованы в торговле секретами о books
+[2 раз] [TEXT]: <color=#77BFCFFF>Высокоэнтропийные существа</color><color=#B1C9C3FF> заинтересованы в trading secrets
+[2 раз] </color><color=#B1C9C3FF>about everything. </color>
+[2 раз] </color><color=#B1C9C3FF>местоположениях цветок логово and локации in the цветок
+[2 раз] </color><color=#B1C9C3FF>locations in the salt dunes. They're also заинтересованы в
+[2 раз] </color><color=#B1C9C3FF>технология, the локации of руины, the локации of
+[2 раз] </color><color=#B1C9C3FF>исторический sites, the локации of gunsmiths' workshops, and
+[2 раз] </color><color=#B1C9C3FF>местоположениях робота логово. They're also interested in
+[2 раз] [TEXT]: <color=#77BFCFFF>Гильдия Купцов</color><color=#B1C9C3FF> заинтересована в trading secrets
+[2 раз] </color><color=#B1C9C3FF>about the локации of other торговцы and all sorts of
+[2 раз] </color><color=#B1C9C3FF>местоположениях salt weeps, the локации of слизь bogs, the
+[2 раз] </color><color=#B1C9C3FF>местоположениях птица логово, and султанах they admire or
+[2 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>Мопанго</color><color=#B1C9C3FF> заинтересованы в изучении locations
+[2 раз] </color><color=#B1C9C3FF>of rust bogs, технология, and слухи that's about them. </color>
+[2 раз] </color><color=#B1C9C3FF>about the локации of странности.
+[2 раз] [TEXT]: The Нафтаали tribe
+[2 раз] [TEXT]: <color=#77BFCFFF>The Нафтаали tribe</color><color=#B1C9C3FF>
+[2 раз] [TEXT]: <color=#77BFCFFF>The Нафтаали tribe</color><color=#B1C9C3FF> заинтересован в обмене секретами о
+[2 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>The Нафтаали tribe</color><color=#B1C9C3FF> интересуется изучением
+[2 раз] </color><color=#B1C9C3FF>локации in the джунгли, the локации of робота логово, and
+[2 раз] </color><color=#B1C9C3FF>местоположениях слизь bogs, all weep локации, and султанах
+[2 раз] </color><color=#B1C9C3FF>they восхищаются or презирают. They're also заинтересованы в hearing
+[2 раз] </color><color=#B1C9C3FF>местоположениях all поселения and all sorts of слухи.
+[2 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>изгои</color><color=#B1C9C3FF> are interested in the resources necessary for
+[2 раз] </color><color=#B1C9C3FF>building новый societies: the локации of water weeps,
+[2 раз] </color><color=#B1C9C3FF>you. Even послушный ones will
+[2 раз] </color><color=#B1C9C3FF>местоположениях становление nooks and the локации of
+[2 раз] [TEXT]: <color=#77BFCFFF>роботы</color><color=#B1C9C3FF> заинтересованы в обмене секретами about технологии
+[2 раз] </color><color=#B1C9C3FF>местоположениях руины, the локации of исторический sites,
+[2 раз] </color><color=#B1C9C3FF>and all султанах.
+[2 раз] </color><color=#B1C9C3FF>rust bogs, sultan tomb inscriptions, султанах they admire
+[2 раз] </color><color=#B1C9C3FF>or презирают и слухах that's about them </color>
+[2 раз] [TEXT]: <color=#77BFCFFF>The Искатели of the
+[2 раз] </color><color=#B1C9C3FF>secrets about the darkling звезда and султанах they admire or
+[2 раз] </color><color=#B1C9C3FF>местоположение Stopsvalinn and the локации of their forts.
+[2 раз] </color><color=#B1C9C3FF>pig farms, the локации of apple farms, and слухи that's
+[2 раз] </color><color=#B1C9C3FF>местоположениях pig farms. They're also interested in hearing
+[2 раз] [TEXT]: <color=#77BFCFFF>черепахи</color><color=#B1C9C3FF> are interested in trading secrets about султанах
+[2 раз] [TEXT]: <color=#77BFCFFF>деревья</color><color=#B1C9C3FF> заинтересованы в обмене секретами about all sultans
+[2 раз] </color><color=#B1C9C3FF>местоположениях storied предметы. They're also interested in
+[2 раз] [TEXT]: <color=#77BFCFFF>Рептилии без панциря</color><color=#B1C9C3FF> dislike
+[2 раз] </color><color=#B1C9C3FF>you, but docile ones не будут
+[2 раз] </color><color=#B1C9C3FF>местоположениях насекомое логово and the локации of лава
+[2 раз] </color><color=#B1C9C3FF>местоположениях gel weeps and султанах they admire or презирают.
+[2 раз] </color><color=#B1C9C3FF>about the локации of исторический sites, локации in the
+[2 раз] </color><color=#B1C9C3FF>банан роща, and all султанах.
+[2 раз] </color><color=#B1C9C3FF>about the локации of apple farms, the локации of pig
+[2 раз] </color><color=#B1C9C3FF>местоположениях челюсть forts, локации in the salt
+[2 раз] </color><color=#B1C9C3FF>secrets about локации in the джунгли and the локации of
+[2 раз] </color><color=#77BFCFFF>Shearrakish</color><color=#B1C9C3FF> не обращают внимания
+[2 раз] </color><color=#77BFCFFF>Shursishan</color><color=#B1C9C3FF> не обращают внимания
+[2 раз] </color><color=#B1C9C3FF>местоположениях water weeps.
+[2 раз] </color><color=#B1C9C3FF>местоположениях рыбы логово and the локации of frog логово.
+[2 раз] </color><color=#B1C9C3FF>которыми они восхищаются или которых презирают. Они также заинтересованы в hearing
+[1 раз] ﻿[TEXT]: Загрузка Compat.xml
+[1 раз] [TEXT]: <color=#40A4B9FF>Создать файл Моды.csproj </color>
+[1 раз] [TEXT]: <color=#40A4B9FF>Генератор карт Waveform Collapse </color>
+[1 раз] [TEXT]: <color=#CFC041FF>Генератор карт Waveform Collapse </color>
+[1 раз] [TEXT]: <color=#CFC041FF>Создать файл Моды.csproj </color>
+[1 раз] [TEXT]: Русификатор 0.9.3 от memasevich (MacOS, Linux, Windows)
+[1 раз] [TEXT]: Public
+[1 раз] [TEXT]: c) Make Лагерь
+[1 раз] [TEXT]: <color=#D74200FF>[Физическая Defect] </color>
+[1 раз] [TEXT]: |20 lbs.|
+[1 раз] {{rules|Сила Бонус Cap: 2
+[1 раз] {{K|Вес: 5 lbs.}}
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>Сила Бонус Cap: 2
+[1 раз] {{rules|Offhand Атаковать Chance: 15%}}
+[1 раз] {{K|Вес: 1 lbs.}}
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>Offhand Атаковать Chance: 15%</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#98875FFF>[1]</color><color=#40A4B9FF> </color><color=#00C420FF>I am called Fayumet.</color><color=#40A4B9FF>
+[1 раз] [TEXT]: <color=#98875FFF>[1]</color><color=#CFC041FF> </color><color=#00C420FF>I am called Fayumet.</color><color=#CFC041FF>
+[1 раз] </color><color=#009403FF></color><color=#0096FFFF>water</color><color=#009403FF>]</color><color=#CFC041FF>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ветер off the Отлично Desert cools a touch and gives up moisture. Just enough. A
+[1 раз] </color><color=#B1C9C3FF>tongue can taste a hundred kinds of ветер, y'know?
+[1 раз] </color><color=#B1C9C3FF>Anywhile, that's where my wandering mind goes. More's about Джоппа  say speak
+[1 раз] </color><color=#B1C9C3FF>to our Elderfriend. Ирудад. Up northwise the path.
+[1 раз] </color><color=#B1C9C3FF>Somethin' is eating our влагопаутинник, 'раунд Жук Луна. Q-ruun говорит he saw </color><color=#B1C9C3FF>существо, spider-like, slinking in the brine. But no cave spider would dare
+[1 раз] </color><color=#B1C9C3FF>Kill the vermin and bring one'труп back, for seein' what it is. Старейшина will
+[1 раз] [TEXT]: :: Вы прошли мимо: watervine..
+[1 раз] [TEXT]: :: The влагопаутинник farmer wakes up.
+[1 раз] [TEXT]: :: <color=#B1C9C3FF>You wade through бассейн of </color><color=#FFFFFFFF>salty</color><color=#B1C9C3FF> </color><color=#0096FFFF>water</color><color=#B1C9C3FF>.</color>
+[1 раз] [TEXT]: <color=#FFFFFFFF><color=#508d75>ACTIVE Эффекты:</color></</color><color=#B1C9C3FF> </color><color=#0096FFFF>wading</color><color=#B1C9C3FF>, </color><color=#0096FFFF>Влажный</color>
+[1 раз] [TEXT]: <color=#FFFFFFFF><color=#508d75>ACTIVE Эффекты:</color></</color><color=#B1C9C3FF> </color><color=#0096FFFF>Влажный</color>
+[1 раз] [TEXT]: Загрузка Mods.xml
+[1 раз] [TEXT]: <color=#B1C9C3FF>пул </color><color=#77BFCFFF>441</color><color=#B1C9C3FF> драмов </color><color=#FFFFFFFF>salty</color><color=#B1C9C3FF> </color><color=#0096FFFF>water </color>
+[1 раз] {{rules|Adds simple taste-based эффекты to cooked meals.}}
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>Adds simple taste-based эффекты to cooked meals.</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: :: Вы прошли мимо: bed..
+[1 раз] [TEXT]: :: <color=#B1C9C3FF>Вы прошли мимо: дверь and лужа of .</color><color=#FFFFFFFF>dilute</color><color=#B1C9C3FF> </color><color=#FFFFFFFF>salt</color><color=#B1C9C3FF>.</color>
+[1 раз] </color><color=#B1C9C3FF>there. And welcome to Джоппа.
+[1 раз] </color><color=#B1C9C3FF>the rotting jungles of Куд.
+[1 раз] </color><color=#B1C9C3FF>guts act up. Coldcaps when I can find them. Why not take a look?
+[1 раз] </color><color=#B1C9C3FF>same time.
+[1 раз] [TEXT]: :: <color=#B1C9C3FF>Вы прошли мимо: пул .</color><color=#FFFFFFFF>salty</color><color=#B1C9C3FF> </color><color=#0096FFFF>water</color><color=#B1C9C3FF> and мост.</color>
+[1 раз] [TEXT]: <color=#CFC041FF>[D]</color><color=#40A4B9FF> </color><color=#CFC041FF>D</color><color=#B1C9C3FF>esecrate </color>
+[1 раз] [TEXT]: <color=#CFC041FF>[y]</color><color=#40A4B9FF> </color><color=#B1C9C3FF>pra</color><color=#CFC041FF>y </color>
+[1 раз] [TEXT]: <color=#CFC041FF>[D] D</color><color=#B1C9C3FF>esecrate </color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>You need драм of either </color><color=#A64A2EFF>blood</color><color=#B1C9C3FF> -или- </color><color=#155352FF>гниение</color><color=#B1C9C3FF> to осквернить святыня. </color>
+[1 раз] [TEXT]: <color=#CFC041FF>[y] </color><color=#B1C9C3FF>pra</color><color=#CFC041FF>y </color>
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>Обезьяны</color><color=#B1C9C3FF> are interested in learning about the локации of
+[1 раз] [TEXT]: <color=#77BFCFFF>Баратрумиты</color><color=#B1C9C3FF> don't
+[1 раз] </color><color=#B1C9C3FF>of all поселения. They're also interested in hearing
+[1 раз] </color><color=#B1C9C3FF>locations in the mountains. They're also заинтересованы в
+[1 раз] [TEXT]: <color=#77BFCFFF>The Cult of the Coiled
+[1 раз] [TEXT]: <color=#77BFCFFF>Культ Спирального Агнца</color><color=#B1C9C3FF> заинтересована в hearing
+[1 раз] [TEXT]: The Cult of the Mappur's Wife
+[1 раз] [TEXT]: <color=#77BFCFFF>The Cult of the Mappur's
+[1 раз] [TEXT]: <color=#77BFCFFF>The Cult of the Mappur's Wife</color><color=#B1C9C3FF> заинтересован в торговле
+[1 раз] </color><color=#B1C9C3FF>the sultan they worship. They're also заинтересованы в
+[1 раз] </color><color=#B1C9C3FF>about the sultan they worship. They're also заинтересованы в
+[1 раз] [TEXT]: <color=#77BFCFFF>торговцы-дромады</color><color=#B1C9C3FF> don't
+[1 раз] [TEXT]: <color=#77BFCFFF>Гильдия Фермеров</color><color=#B1C9C3FF> doesn't
+[1 раз] </color><color=#B1C9C3FF>locations. They're also заинтересованы в прослушивании слухов
+[1 раз] </color><color=#B1C9C3FF>in the цветок fields. They're also interested in hearing
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>грибы</color><color=#B1C9C3FF> are interested in learning about the локации of
+[1 раз] </color><color=#B1C9C3FF>locations in the Moon Stair. They're also заинтересованы в
+[1 раз] </color><color=#B1C9C3FF>in the jungle. They're also заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: <color=#77BFCFFF>Гедонисты-пастухи</color><color=#B1C9C3FF> don't
+[1 раз] </color><color=#B1C9C3FF>and the локации of сидр weeps. They're also interested
+[1 раз] </color><color=#B1C9C3FF>fields. They're also interested in hearing слухи that's
+[1 раз] [TEXT]: <color=#77BFCFFF>Механимисты</color><color=#B1C9C3FF> don't
+[1 раз] [TEXT]: <color=#77BFCFFF>таинственные незнакомцы</color><color=#B1C9C3FF> don't
+[1 раз] </color><color=#B1C9C3FF>cooking recipes, and технологии. They're also interested
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>роботы</color><color=#B1C9C3FF> are interested in learning about the локации of
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>челюсти</color><color=#B1C9C3FF> are interested in learning about the локации of
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>свардим</color><color=#B1C9C3FF> are interested in learning about the локации of
+[1 раз] </color><color=#B1C9C3FF>weeps. They're also interested in hearing слухи that's
+[1 раз] [TEXT]: The villagers of Alep
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Alep</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Alep</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Alil
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Alil</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Alil</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Bitara
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Bitara</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Bitara</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Damrinna
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Damrinna</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Damrinna</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Darqammu
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Darqammu</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Darqammu</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Datum
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Datum</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Datum</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Dubash
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Dubash</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Dubash</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Dubylep
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Dubylep</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Dubylep</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Ekamor
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Ekamor</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Ekamor</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Ekavuh
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Ekavuh</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Ekavuh</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Эзра
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Эзра</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Эзра</color><color=#B1C9C3FF> заинтересованы в обмене секретами
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>The villagers of Эзра</color><color=#B1C9C3FF> заинтересованы в получении сведений о
+[1 раз] [TEXT]: The villagers of Hashan
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Hashan</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Hashan</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Ibykesh
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Ibykesh</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Ibykesh</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Inna
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Inna</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Inna</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Джоппа
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Джоппа</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Джоппа</color><color=#B1C9C3FF> заинтересованы в обмене секретами
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>The villagers of Джоппа</color><color=#B1C9C3FF> заинтересованы в получении сведений о
+[1 раз] [TEXT]: The villagers of Kiilikesh
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Kiilikesh</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Kiilikesh</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: The villagers of Кьякукья
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Кьякукья</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Кьякукья</color><color=#B1C9C3FF> заинтересованы в обмене
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>The villagers of Кьякукья</color><color=#B1C9C3FF> заинтересованы в получении сведений о
+[1 раз] [TEXT]: The villagers of Mirsivah
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Mirsivah</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Mirsivah</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Qaarralep
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Qaarralep</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Qaarralep</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: The villagers of Shamrilep
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Shamrilep</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Shamrilep</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: The villagers of Shearrakish
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Shearrakish</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: The villagers of Shumrod
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Shumrod</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Shumrod</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Shunip
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Shunip</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Shunip</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Shursishan
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Shursishan</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: The villagers of Sumas
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Sumas</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Sumas</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Tashur
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Tashur</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Tashur</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Urqukish
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Urqukish</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Urqukish</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: The villagers of Uvah
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Uvah</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>The villagers of Uvah</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] </color><color=#B1C9C3FF>underground locations. They're also заинтересованы в hearing
+[1 раз] [TEXT]: 30-го числа месяца Кису Укс вы scuttle down a dark shaft at the edge of a sunken торговля path и прибываете в caravanserai. Он покрыт солью и пылью, принесенными сквозь ленту времени.
+[1 раз] [TEXT]: <color=#B1C9C3FF>You экипировать the </color><color=#98875FFF>бронзовый</color><color=#B1C9C3FF> Кинжал</color>
+[1 раз] [TEXT]: <color=#009403FF>Ты ударил </color><color=#98875FFF>(x1)</color><color=#009403FF> for 1 damage with your </color><color=#98875FFF>бронзовый</color><color=#009403FF> кинжал! [18]</color>
+[1 раз] [TEXT]: <color=#009403FF>Ты ударил </color><color=#98875FFF>(x1)</color><color=#009403FF> for 2 damage with your </color><color=#98875FFF>бронзовый</color><color=#009403FF> кинжал! [14]</color>
+[1 раз] [TEXT]: <color=#00C420FF>The челюсть падальщик dies!</color>
+[1 раз] [TEXT]: You pass by some мусор.
+[1 раз] [TEXT]: <color=#A64A2EFF>You stop движущийся because there is a bear in your way.</color>
+[1 раз] [TEXT]: <color=#A64A2EFF>You miss with your </color><color=#98875FFF>бронзовый</color><color=#A64A2EFF> Кинжал</color><color=#B1C9C3FF> [2 vs 7]</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>The bear hits </color><color=#98875FFF>(x1)</color><color=#B1C9C3FF> for 4 damage with her укус. [18]</color>
+[1 раз] [TEXT]: <color=#009403FF>Ты ударил </color><color=#98875FFF>(x1)</color><color=#009403FF> for 2 damage with your </color><color=#98875FFF>бронзовый</color><color=#009403FF> кинжал! [19]</color>
+[1 раз] [TEXT]: <color=#00C420FF>The bear dies!</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>You опознать the odd trinket as </color><color=#40A4B9FF>Хим-ячейка</color><color=#B1C9C3FF>.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>You pass by </color><color=#40A4B9FF>Хим-ячейка</color><color=#B1C9C3FF>.</color>
+[1 раз] [TEXT]: You pass by an железный battle топор.
+[1 раз] [TEXT]: <color=#B1C9C3FF>You снять your </color><color=#98875FFF>бронзовый</color><color=#B1C9C3FF> Кинжал</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>You take </color><color=#CFC041FF>Афоризмы о птицах</color><color=#B1C9C3FF> from the север.</color>
+[1 раз] [TEXT]: You take Here More from the север.
+[1 раз] [TEXT]: Вы берете: бурдюк from the север.
+[1 раз] [TEXT]: You pass by some лестница up.
+[1 раз] [TEXT]: You pass by some лестница down.
+[1 раз] [TEXT]: <color=#77BFCFFF>Salt marsh, поверхность, Harvest Dawn</color>
+[1 раз] [TEXT]: You toss some stamped рыбы meat, a sprinkle of мусор, a dash of crowned полнокритовый flake, and a crust of bread into a pot and stir.
+[1 раз] [TEXT]: <color=#B1C9C3FF>The часовой жук and pariah to its люди takes the </color><color=#98875FFF>бронзовый</color><color=#B1C9C3FF> Кинжал</color>
+[1 раз] [TEXT]: <color=#77BFCFFF>Куд, поверхность, Harvest Dawn</color>
+[1 раз] [TEXT]: Вы прошли мимо: watervine..
+[1 раз] [TEXT]: Вы прошли мимо: bed..
+[1 раз] [TEXT]: Вы берете: bent metal sheet from the восток.
+[1 раз] [TEXT]: Вы берете: fractured microchip from the юг.
+[1 раз] [TEXT]: Вы берете: bent metal sheet from the запад.
+[1 раз] [TEXT]: You pass by some brinestalk.
+[1 раз] [TEXT]: <color=#B1C9C3FF>, </color><color=#0096FFFF>wet влагопаутинник farmer</color><color=#B1C9C3FF> harvests листолоза.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>You pass by a </color><color=#A64A2EFF>p</color><color=#D74200FF>a</color><color=#CFC041FF>i</color><color=#98875FFF>n</color><color=#009403FF>t</color><color=#00C420FF>e</color><color=#0096FFFF></color><color=#B1C9C3FF> Напольная подушка.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Вы прошли мимо: пул .</color><color=#FFFFFFFF>salty</color><color=#B1C9C3FF> </color><color=#0096FFFF>water</color><color=#B1C9C3FF> and мост.</color>
+[1 раз] [TEXT]: Вы обнаружили местоположение: the Saloons of Nalil..
+[1 раз] [TEXT]: <color=#B1C9C3FF>You note the локация of the Saloons of Nalil in the </color><color=#CFC041FF>Локации > Исторический Sites</color><color=#B1C9C3FF> раздел вашего журнала.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Вы получили новый квест, </color><color=#CFC041FF>Посетить the Saloons of Nalil</color><color=#B1C9C3FF>!</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Вы записываете эту информацию в </color><color=#CFC041FF>Sultan Histories > Girashid II</color><color=#B1C9C3FF> раздел вашего журнала.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Вы записываете эту информацию в </color><color=#CFC041FF>Sultan Histories > Yyram </color><color=#B1C9C3FF> раздел вашего журнала.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Вы проходите мимо: </color><color=#FFFFFFFF>e</color><color=#B1C9C3FF>n</color><color=#40A4B9FF>g</color><color=#77BFCFFF>r</color><color=#FFFFFFFF>a</color><color=#B1C9C3FF>v</color><color=#40A4B9FF>e</color><color=#77BFCFFF></color><color=#B1C9C3FF> Напольная подушка.</color>
+[1 раз] [TEXT]: The влагопаутинник farmer wakes up.
+[1 раз] [TEXT]: <color=#B1C9C3FF>You wade through бассейн of </color><color=#FFFFFFFF>salty</color><color=#B1C9C3FF> </color><color=#0096FFFF>water</color><color=#B1C9C3FF>.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Вы прошли мимо: дверь and лужа of .</color><color=#FFFFFFFF>dilute</color><color=#B1C9C3FF> </color><color=#FFFFFFFF>salt</color><color=#B1C9C3FF>.</color>
+[1 раз] [TEXT]: <color=#98875FFF>[1]</color><color=#40A4B9FF> </color><color=#00C420FF>Меня зовут Fayumet.</color><color=#40A4B9FF>
+[1 раз] [TEXT]: <color=#98875FFF>[1]</color><color=#CFC041FF> </color><color=#00C420FF>Меня зовут Fayumet.</color><color=#CFC041FF>
+[1 раз] </color><color=#B1C9C3FF>Somгравированная Жук Луна. Q-ruun говорит he saw a
+[1 раз] </color><color=#B1C9C3FF>crгравированнаяer would dare
+[1 раз] </color><color=#B1C9C3FF>Kill the vermin and bring one's corрасписнаяer will
+[1 раз] [TEXT]: <color=#FFFFFFFF>e</color><color=#B1C9C3FF>n</color><color=#40A4B9FF>g</color><color=#77BFCFFF>r</color><color=#FFFFFFFF>a</color><color=#B1C9C3FF>v</color><color=#40A4B9FF>e</color><color=#77BFCFFF></color><color=#B1C9C3FF> Напольная подушка</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>фермер водяной лозы</color><color=#0096FFFF>lying on a bed</color><color=#B1C9C3FF>] </color>
+[1 раз] [TEXT]: The tatters of a sweat-запятнанный kufiya thrash in the ветер from where they hang about the farmer's neck. Clasрасписнаяian растение called влагопаутинник.
+[1 раз] [TEXT]: <color=#B1C9C3FF>The tatters of a sweat-запятнанный kufiya thrash in the ветер from where they
+[1 раз] </color><color=#B1C9C3FF>hang about the farmer's neck. Clasрасписнаяian растение called влагопаутинник.
+[1 раз] </color><color=#B1C9C3FF>Экипировано: woven tunic, wide-brimmed hat, железный vinereaper, сандалии
+[1 раз] </color><color=#B1C9C3FF></color><color=#77BFCFFF>lying on a bed</color><color=#B1C9C3FF>, </color><color=#40A4B9FF>спит</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#B1C9C3FF>фермер водяной лозы</color><color=#0096FFFF>lying on a bed</color><color=#B1C9C3FF>]
+[1 раз] [TEXT]: <color=#98875FFF>*Ираме nods.*</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: :: Вы проходите мимо: холст folding стул.
+[1 раз] [TEXT]: :: Вы проходите мимо: a floor cushion.
+[1 раз] [TEXT]: :: Вы проходите мимо: a woven basket.
+[1 раз] [TEXT]: Here are several striрасписная with mud.
+[1 раз] [TEXT]: <color=#B1C9C3FF>Here are several striрасписная with mud.
+[1 раз] [TEXT]: <color=#B1C9C3FF>human? We are greeted! What do you desire?
+[1 раз] [TEXT]: <color=#CFC041FF>Tam, дромады торговец [</color><color=#0096FFFF>sitting</color><color=#CFC041FF>] </color>
+[1 раз] [TEXT]: <color=#98875FFF>[1]</color><color=#40A4B9FF> </color><color=#00C420FF>I am Fayumet. Who are you?</color><color=#40A4B9FF>
+[1 раз] [TEXT]: <color=#98875FFF>[1]</color><color=#CFC041FF> </color><color=#00C420FF>I am Fayumet. Who are you?</color><color=#CFC041FF>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Tam, дромады торговец [</color><color=#0096FFFF>sitting</color><color=#B1C9C3FF>]</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>It is a pleasure to know this, human друг Fayumet! I am Tam.
+[1 раз] </color><color=#B1C9C3FF>друг human, if you speak to him.
+[1 раз] [TEXT]: <color=#98875FFF>[1]</color><color=#40A4B9FF> </color><color=#009403FF>I am Fayumet. Who are you?</color><color=#40A4B9FF>
+[1 раз] [TEXT]: <color=#98875FFF>[1]</color><color=#CFC041FF> </color><color=#009403FF>I am Fayumet. Who are you?</color><color=#CFC041FF>
+[1 раз] [TEXT]: <color=#B1C9C3FF>I am дромады, human друг. Some say saltstrider. Do you know this?
+[1 раз] [TEXT]: <color=#B1C9C3FF>My люди have walked the salt for thousands of years, meeting every существо
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>Сила</color><color=#B1C9C3FF> determines how much melee damage you do (by imрасписная движение и ваша грузоподъемность.</color>
+[1 раз] </color><color=#B1C9C3FF>султанах they admire or презирают. Они также заинтересованы в
+[1 раз] [TEXT]: <color=#77BFCFFF>Баратрумиты</color><color=#B1C9C3FF> don'</color><color=#B1C9C3FF>обращают на вас внимание, но
+[1 раз] </color><color=#B1C9C3FF>of all поселения. Они также заинтересованы в hearing
+[1 раз] [TEXT]: Культ: Coiled Lamb
+[1 раз] [TEXT]: <color=#77BFCFFF>Культ: Coiled
+[1 раз] [TEXT]: <color=#77BFCFFF>Культ: Coiled Lamb</color><color=#B1C9C3FF> заинтересована в hearing
+[1 раз] [TEXT]: |19 lbs.|
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>эго</color><color=#B1C9C3FF> determines the расписная your ability to доминировать the wills of other living существа.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>интеллект</color><color=#B1C9C3FF> determines your number of навык points and your ability to осмотреть артефакты.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>Стойкость</color><color=#B1C9C3FF> determines your number of hit расписная your ability to resist ядовитый and disease.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>ловкость</color><color=#B1C9C3FF> Ваш {{W|Agility}} определяет вашу точность обращения с оружием ближнего и дальнего боя, а также ваш шанс уклониться от атак.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>Показатель брони (AV)</color><color=#B1C9C3FF> measures how well расписная do damage to you. Your base AV is 0.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>Показатель уклонения (DV)</color><color=#B1C9C3FF> measures how likely you are to be hit by расписная by your Ловкость modifier. Your base DV is 6.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>ментальная броня (МА)</color><color=#B1C9C3FF> measures how well расписнаяefenses and harm you. Your MA is modified by your Willpower modifier. Your base MA is 4.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>Теплостойкость:</color><color=#B1C9C3FF> determines how much тепло damage you ablate and how insulated you are from эффекты that increase your temрасписнаяamage and your температура cannot be increased.</color>
+[1 раз] [TEXT]: <color=#B1C9C3FF>Ваш </color><color=#CFC041FF>Сопр. холоду</color><color=#B1C9C3FF> determines how much cold damage you ablate and how insulated you are from эффекты that reduce your temрасписная your температура cannot be reduced.</color>
+[1 раз] [TEXT]: Культ: Mappur's Wife
+[1 раз] [TEXT]: <color=#77BFCFFF>Культ: Mappur's
+[1 раз] [TEXT]: <color=#77BFCFFF>Культ: Mappur's Wife</color><color=#B1C9C3FF> заинтересован в торговле
+[1 раз] </color><color=#B1C9C3FF>the sultan they поклоняются. Они также заинтересованы в
+[1 раз] </color><color=#B1C9C3FF>about the sultan they поклоняются. Они также заинтересованы в
+[1 раз] [TEXT]: <color=#77BFCFFF>торговцы-дромады</color><color=#B1C9C3FF> don'</color><color=#B1C9C3FF>обращают на вас внимание, но
+[1 раз] [TEXT]: <color=#77BFCFFF>Гильдия Фермеров</color><color=#B1C9C3FF> doesn'</color><color=#B1C9C3FF>обращают на вас внимание, но
+[1 раз] </color><color=#B1C9C3FF>in the цветок fields. Они также заинтересованы в hearing
+[1 раз] </color><color=#B1C9C3FF>in the джунгли. Они также заинтересованы в слушать слухи
+[1 раз] [TEXT]: <color=#77BFCFFF>Гедонисты-пастухи</color><color=#B1C9C3FF> don'</color><color=#B1C9C3FF>обращают на вас внимание, но
+[1 раз] </color><color=#B1C9C3FF>and the локации of сидр weeрасписная
+[1 раз] </color><color=#B1C9C3FF>fields. Они также заинтересованы в hearing слухи that's
+[1 раз] [TEXT]: <color=#77BFCFFF>Механимисты</color><color=#B1C9C3FF> don'</color><color=#B1C9C3FF>обращают на вас внимание, но
+[1 раз] [TEXT]: <color=#77BFCFFF>таинственные незнакомцы</color><color=#B1C9C3FF> don'</color><color=#B1C9C3FF>обращают на вас внимание, но
+[1 раз] </color><color=#B1C9C3FF>cooking reciрасписная
+[1 раз] </color><color=#B1C9C3FF>weeps. Они также заинтересованы в hearing слухи that's
+[1 раз] [TEXT]: Жители поселения Alep
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Alep</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Alep</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Alil
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Alil</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Alil</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Bitara
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Bitara</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Bitara</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Damrinna
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Damrinna</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Damrinna</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Darqammu
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Darqammu</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Darqammu</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Datum
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Datum</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Datum</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Dubash
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Dubash</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Dubash</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Dubylep
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Dubylep</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Dubylep</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Ekamor
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Ekamor</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Ekamor</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Ekavuh
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Ekavuh</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Ekavuh</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Hashan
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Hashan</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Hashan</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Ibykesh
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Ibykesh</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Ibykesh</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Inna
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Inna</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Inna</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Kiilikesh
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Kiilikesh</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Kiilikesh</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: Жители поселения Mirsivah
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Mirsivah</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Mirsivah</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Qaarralep
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Qaarralep</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Qaarralep</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: Жители поселения Shamrilep
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Shamrilep</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Shamrilep</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: Жители поселения Shearrakish
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Shearrakish</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: Жители поселения Shumrod
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Shumrod</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Shumrod</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Shunip
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Shunip</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Shunip</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Shursishan
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Shursishan</color><color=#B1C9C3FF> заинтересованы в прослушивании
+[1 раз] [TEXT]: Жители поселения Sumas
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Sumas</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Sumas</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Tashur
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Tashur</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Tashur</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Urqukish
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Urqukish</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Urqukish</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] [TEXT]: Жители поселения Uvah
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Uvah</color><color=#B1C9C3FF>
+[1 раз] [TEXT]: <color=#77BFCFFF>Жители поселения Uvah</color><color=#B1C9C3FF> заинтересованы в прослушивании слухов
+[1 раз] </color><color=#B1C9C3FF>обожают или презирают. Они также заинтересованы в hearing
+[1 раз] </color><color=#B1C9C3FF>подземных местах. Они также заинтересованы в hearing
+[1 раз] [TEXT]: [■] дисрасписная of dots (for color
+[1 раз] [TEXT]: <color=#40A4B9FF>Xbox</color>
+[1 раз] [TEXT]: <color=#40A4B9FF>XBox заполнен</color>
+[1 раз] [TEXT]: [ ] Включить обход бага клавиши Shift на Steam Deck
+[1 раз] [TEXT]: [ ] Показать advanced options
+[1 раз] [TEXT]: <color=#B1C9C3FF>Заряда | </color><color=#CFC041FF>Space</color><color=#B1C9C3FF>-выбрать | unlock (</color><color=#CFC041FF>F1</color><color=#B1C9C3FF>)) </color>
+[1 раз] You make an топор атаковать against an oрасписнаяom and they start кровотечение.
