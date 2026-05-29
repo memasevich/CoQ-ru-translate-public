@@ -433,5 +433,15 @@
   "^(?<pref>.*?)Ваш (?<attr>.*?) measures (?<desc>.*?)(?<suff>\\.?)$": "{pref}Ваш {attr} измеряет {desc}{suff}",
   "^(?<pref>.*?)You wade through бассейн of (?<liquid>.*?)\\.(?<suff>.*?)$": "{pref}Вы идете вброд через бассейн с: {liquid}.{suff}",
   "^(?<pref>.*?)You emit a ray of frost from your (?<part>.*?)\\.(?<suff>.*?)$": "{pref}Вы выпускаете ледяной луч из ваших {part}.{suff}",
-  "^(?<pref>.*?)You make an (?<atk>.*?) attack against an (?<target>.*?) and they start (?<eff>.*?)\\.(?<suff>.*?)$": "{pref}Вы проводите атаку ({atk}) против {target}, и у цели начинается {eff}.{suff}"
+  "^(?<pref>.*?)You make an (?<atk>.*?) attack against an (?<target>.*?) and they start (?<eff>.*?)\\.(?<suff>.*?)$": "{pref}Вы проводите атаку ({atk}) против {target}, и у цели начинается {eff}.{suff}",
+  "^(?<p>[a-z]\\)) Charge$": "{p} Рывок",
+  "^(?<p>[a-z]\\)) Freezing Ray$": "{p} Замораживающий луч",
+  "^(?<p>[a-z]\\)) Flaming Ray$": "{p} Пламенный луч",
+  "^(?<pref>.*?)robot lairs(?<suff>.*?)$": "{pref}логова роботов{suff}",
+  "^(?<pref>.*?)bear lairs(?<suff>.*?)$": "{pref}логова медведей{suff}",
+  "^(?<pref>.*?)insect lairs(?<suff>.*?)$": "{pref}логова насекомых{suff}",
+  "^(?<pref>.*?)baboon lairs(?<suff>.*?)$": "{pref}логова бабуинов{suff}",
+  "^(?<pref>.*?)ape lairs(?<suff>.*?)$": "{pref}логова обезьян{suff}",
+  "^(?<pref>.*?)Ваша (?<attr>Сила|Ловкость|Стойкость|Воля) determines (?<desc>.*?)(?<suff>\\.?)$": "{pref}Ваша {attr} определяет {desc}{suff}",
+  "^(?<pref>.*?)Ваш (?<attr>Интеллект|Эго|Показатель брони \\(AV\\)|Показатель уклонения \\(DV\\)|Теплостойкость|Сопр\\. холоду) determines (?<desc>.*?)(?<suff>\\.?)$": "{pref}Ваш {attr} определяет {desc}{suff}"
 }
