@@ -17,5 +17,8 @@
   "^(?P<p>.*?) turn (?P<v>\\d+)$": "{p} ход {v}",
   "^Loved by (?P<fac>.+?) for (?P<reason>.+?)$": "Любим фракцией: {fac} за {reason}",
   "^Admired by (?P<fac>.+?) for (?P<reason>.+?)$": "Им восхищаются: {fac} за {reason}",
-  "^Hated by (?P<fac>.+?) for (?P<reason>.+?)$": "Его ненавидят: {fac} за {reason}"
+  "^Hated by (?P<fac>.+?) for (?P<reason>.+?)$": "Его ненавидят: {fac} за {reason}",
+  "\\(! \\(x(?P<mult>\\d+)\\)": "(! (x{mult})",
+  "for (?P<dmg>\\d+) damage": "на {dmg} ед. урона",
+  "misses you with (?P<possessive>his|her|its|their)": "промахивается по вам своим(и)"
 }
