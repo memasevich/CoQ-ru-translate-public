@@ -2413,3 +2413,57 @@
 [Original]: you've done so far
 [Replaced]: you've готово so far
 --------------------------------------------------
+[Original]: face's bone structure and plump tissue mass into a soft and angelic countenance. Through such thaumaturgy, the people of hoary Ibul, cradled in the breast of a collapsed ice shelf, wander its lamplighted streets in rosy-cheeked disinterest
+[Replaced]: лицо's кость structure and plump tissue mass into a soft and angelic countenance. Through such thaumaturgy, the people of hoary Ibul, cradled in the breast of a collapsed ice shelf, wander its lamplighted streets in rosy-cheeked disinterest
+--------------------------------------------------
+[Original]: RANK 1/10
+[Replaced]: Ранг 1/10
+--------------------------------------------------
+[Original]: insect lairs, the locations of haberdashers
+[Replaced]: насекомое lairs, the locations of haberdashers
+--------------------------------------------------
+[Original]: other baboon lairs, all sorts of gossip, and
+[Replaced]: other бабуин lairs, all sorts of gossip, and
+--------------------------------------------------
+[Original]: oddities, the darkling star, and gossip
+[Replaced]: oddities, the darkling звезда, and gossip
+--------------------------------------------------
+[Original]: goatfolk settlements and gossip that's about
+[Replaced]: козлолюды settlements and gossip that's about
+--------------------------------------------------
+[Original]: dromad merchants, the locations of
+[Replaced]: дромад merchants, the locations of
+--------------------------------------------------
+[Original]: other dromad merchants and locations in
+[Replaced]: other дромад merchants and locations in
+--------------------------------------------------
+[Original]: in the flower fields
+[Replaced]: in the цветок fields
+--------------------------------------------------
+[Original]: insect lairs and sultans they admire or
+[Replaced]: насекомое lairs and sultans they admire or
+--------------------------------------------------
+[Original]: fungus forests
+[Replaced]: грибок forests
+--------------------------------------------------
+[Original]: water weeps, the locations of wine weeps
+[Replaced]: water weeps, the locations of вино weeps
+--------------------------------------------------
+[Original]: locations in the flower fields, the location
+[Replaced]: locations in the цветок fields, the location
+--------------------------------------------------
+[Original]: flower lairs and locations in the flower
+[Replaced]: цветок lairs and locations in the цветок
+--------------------------------------------------
+[Original]: robot lairs. They're also interested in
+[Replaced]: робот lairs. They're also interested in
+--------------------------------------------------
+[Original]: bird lairs, and sultans they admire or
+[Replaced]: птица lairs, and sultans they admire or
+--------------------------------------------------
+[Original]: secrets about the darkling star and sultans they admire or
+[Replaced]: secrets about the darkling звезда and sultans they admire or
+--------------------------------------------------
+[Original]: woven tunic, wide-brimmed hat, iron vinereaper, sandals
+[Replaced]: woven tunic, wide-brimmed hat, железный vinereaper, сандалии
+--------------------------------------------------
