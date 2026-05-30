@@ -20,5 +20,9 @@
   "^Hated by (?P<fac>.+?) for (?P<reason>.+?)$": "Его ненавидят: {fac} за {reason}",
   "\\(! \\(x(?P<mult>\\d+)\\)": "(! (x{mult})",
   "for (?P<dmg>\\d+) damage": "на {dmg} ед. урона",
-  "misses you with (?P<possessive>his|her|its|their)": "промахивается по вам своим(и)"
+  "misses you with (?P<possessive>his|her|its|their)": "промахивается по вам своим(и)",
+  "\\(! \\(х(?P<mult>\\d+)\\)": "(! (x{mult})",
+  "^(?P<pref>.*?)You hit(?P<suff>.*?)$": "{pref}Вы ударили{suff}",
+  "^(?P<pref>.*?)You miss(?P<suff>.*?)$": "{pref}Вы промахнулись{suff}",
+  "^(?P<pref>.*?)You don't penetrate(?P<suff>.*?)$": "{pref}Вы не пробиваете{suff}"
 }
