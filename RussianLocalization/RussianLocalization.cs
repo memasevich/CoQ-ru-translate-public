@@ -653,30 +653,33 @@ namespace RussianLocalization
 
 
         public static string Translate(string text)
-
         {
-
             if (string.IsNullOrEmpty(text)) return text;
 
-
+            // Если строка содержит кириллицу И не содержит английских букв, 
+            // значит она полностью переведена. Пропускаем.
+            if (ContainsCyrillic(text) && !ContainsEnglish(text)) return text;
 
             string result = TranslateInternal(text);
 
-
-
             if (result != null)
-
             {
-
-                if (result.Contains("]]"))
-
+                // Финальная очистка от "мусорных" скобок, которые могли остаться после процедурной сборки
+                if (result.Contains("}}") && !result.Contains("{{"))
                 {
-
-                    result = result.Replace("]]", "]");
-
+                    result = result.Replace("}}", "");
+                }
+                
+                // Исправление 4-х скобок (результат двойного прохода)
+                if (result.Contains("{{{{"))
+                {
+                    result = result.Replace("{{{{", "{{").Replace("}}}}", "}}");
                 }
 
-
+                if (result.Contains("]]"))
+                {
+                    result = result.Replace("]]", "]");
+                }
 
                 // Устраняем дублирование хоткеев в скобках (например, [L] [L] посмотреть -> [L] посмотреть)
                 result = System.Text.RegularExpressions.Regex.Replace(result, 
@@ -808,14 +811,12 @@ namespace RussianLocalization
                 string verb = matchPref.Groups["verb"].Value.ToLower();
                 string rest = matchPref.Groups["rest"].Value.Trim();
 
-                bool hasGossip = false;
                 string gossipSuffix = "";
 
                 // Проверяем окончание со слухами вариант 1: . They're also interested in hearing gossip that's about them
                 var gossipPattern1 = new System.Text.RegularExpressions.Regex(@"\.\s*They\'re\s+also\s+interested\s+in\s+(?:hearing\s+)?gossip\s+that\'s\s+about\s+them$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 if (gossipPattern1.IsMatch(rest))
                 {
-                    hasGossip = true;
                     rest = gossipPattern1.Replace(rest, "").Trim();
                     gossipSuffix = ". Им также интересно слушать слухи, которые их касаются";
                 }
@@ -825,7 +826,6 @@ namespace RussianLocalization
                     var gossipPattern2 = new System.Text.RegularExpressions.Regex(@",\s*and\s+(?:hearing\s+)?gossip\s+that\'s\s+about\s+them$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                     if (gossipPattern2.IsMatch(rest))
                     {
-                        hasGossip = true;
                         rest = gossipPattern2.Replace(rest, "").Trim();
                         gossipSuffix = " и слухах, которые их касаются";
                     }
@@ -1789,11 +1789,8 @@ namespace RussianLocalization
 
 
         private static readonly HashSet<char> PunctuationAndSpaces = new HashSet<char>
-
         {
-
-            ' ', '\t', '\r', '\n', '.', ',', '!', '?', ':', ';', '~', '-', '_', '"', '\'', '(', ')', '[', ']', '{', '}', '\u00A0', '\u2007', '\u200B', '\u202F'
-
+            ' ', '\t', '\r', '\n', '.', ',', '!', '?', ':', ';', '~', '-', '_', '"', '\'', '(', ')', '\u00A0', '\u2007', '\u200B', '\u202F'
         };
 
 
@@ -2035,27 +2032,29 @@ namespace RussianLocalization
             }
 
             if (string.IsNullOrEmpty(translatedCore))
-
             {
-
-                translatedCore = TryWordReplacement(normalizedCore);
-
-                if (translatedCore != normalizedCore)
-
+                // Защита от "Франкенштейнов": не пытаемся переводить пословно длинные предложения,
+                // так как это портит грамматику и делает текст нечитаемым.
+                // Пословный перевод разрешен только для коротких фраз (до 3 слов).
+                int wordCount = trimmedCore.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length;
+                
+                if (wordCount <= 3)
                 {
-
-                    LogWordReplacement(normalizedCore, translatedCore);
-
+                    translatedCore = TryWordReplacement(normalizedCore);
+                    if (translatedCore != normalizedCore)
+                    {
+                        LogWordReplacement(normalizedCore, translatedCore);
+                    }
+                }
+                else
+                {
+                    translatedCore = normalizedCore;
                 }
 
                 if (ContainsEnglish(translatedCore))
-
                 {
-
                     LogUntranslated(trimmedCore);
-
                 }
-
             }
 
 
@@ -2259,6 +2258,20 @@ namespace RussianLocalization
         }
 
 
+
+        private static bool ContainsCyrillic(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if ((c >= '\u0430' && c <= '\u044f') || (c >= '\u0410' && c <= '\u042f') || c == '\u0451' || c == '\u0401')
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         private static bool ContainsEnglish(string text)
 
@@ -2525,19 +2538,23 @@ namespace RussianLocalization
 
 
         private static bool IsJunkText(string text)
-
         {
-
             if (string.IsNullOrEmpty(text)) return true;
-
             string trimmed = text.Trim();
-
             if (trimmed.Length <= 1) return true;
 
-
+            // Игнорируем технические ключи Caves of Qud только если они точно являются именами полей
+            if (trimmed == "WoundLevel" || 
+                trimmed == "WoundLevel2" || 
+                trimmed == "DisplayName" || 
+                trimmed == "ConText" || 
+                trimmed == "LongDescription" ||
+                trimmed == "Esc]" ||
+                trimmed == "PgDown" ||
+                trimmed == "PgUp") 
+                return true;
 
             // Если строка состоит только из цифр, знаков препинания, скобок и пробелов - это мусор
-
             bool hasLetters = false;
 
             for (int i = 0; i < trimmed.Length; i++)
@@ -2794,16 +2811,238 @@ namespace RussianLocalization
             }
 
             catch (Exception ex)
-
             {
-
                 UnityEngine.Debug.LogError("[RussianLocalization] UIElements dynamic patch error: " + ex.ToString());
-
+            }
             }
 
-        }
+            public static string DistributeColors(string originalTextWithTags, string translatedText)
+            {
+            if (string.IsNullOrEmpty(translatedText)) return translatedText;
+            if (string.IsNullOrEmpty(originalTextWithTags) || !originalTextWithTags.Contains("<color=")) return translatedText;
 
-    }
+            if (originalTextWithTags.Contains("\n") && translatedText.Contains("[") && !translatedText.Contains("\n"))
+            {
+                int bracketIdx = translatedText.IndexOf('[');
+                translatedText = translatedText.Insert(bracketIdx, "\n");
+            }
+
+            var colors = ExtractColors(originalTextWithTags);
+            if (colors.Count == 0) return translatedText;
+
+            string origStrip = TagRegex.Replace(originalTextWithTags, "");
+            return DistributeColorsInternal(colors, translatedText, origStrip);
+            }
+
+            private static List<string> ExtractColors(string originalTextWithTags)
+            {
+            var colors = new List<string>();
+            int i = 0;
+            int len = originalTextWithTags.Length;
+            var colorStack = new Stack<string>();
+            string currentParentColor = null;
+
+            while (i < len)
+            {
+                if (i < len - 7 && originalTextWithTags.Substring(i).StartsWith("<color=", StringComparison.OrdinalIgnoreCase))
+                {
+                    int closeBracket = originalTextWithTags.IndexOf('>', i);
+                    if (closeBracket != -1)
+                    {
+                        string colorValue = originalTextWithTags.Substring(i + 7, closeBracket - (i + 7));
+                        if (currentParentColor != null) colorStack.Push(currentParentColor);
+                        currentParentColor = colorValue;
+                        i = closeBracket + 1;
+                        continue;
+                    }
+                }
+                else if (i < len - 8 && originalTextWithTags.Substring(i).StartsWith("</color>", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (colorStack.Count > 0) currentParentColor = colorStack.Pop();
+                    else currentParentColor = null;
+                    i += 8;
+                    continue;
+                }
+
+                if (originalTextWithTags[i] == '<' && originalTextWithTags.IndexOf('>', i) != -1)
+                {
+                    int closeBracket = originalTextWithTags.IndexOf('>', i);
+                    string potentialTag = originalTextWithTags.Substring(i, closeBracket - i + 1);
+                    if (TagRegex.IsMatch(potentialTag))
+                    {
+                        i = closeBracket + 1;
+                        continue;
+                    }
+                }
+
+                colors.Add(currentParentColor);
+                i++;
+            }
+            return colors;
+            }
+
+            private static string DistributeColorsInternal(List<string> colors, string translatedText, string origStrip)
+            {
+            if (colors.Count == 0) return translatedText;
+
+            bool bracketMatch = false;
+            int startTrans = 0;
+            int endTrans = translatedText.Length - 1;
+            int startOrig = 0;
+            int endOrig = colors.Count - 1;
+
+            if (origStrip.Length >= 2 && translatedText.Length >= 2 && colors.Count == origStrip.Length)
+            {
+                while (startTrans < endTrans && (translatedText[startTrans] == '\n' || translatedText[startTrans] == ' ')) startTrans++;
+                while (endTrans > startTrans && (translatedText[endTrans] == '\n' || translatedText[endTrans] == ' ')) endTrans--;
+
+                while (startOrig < endOrig && (origStrip[startOrig] == '\n' || origStrip[startOrig] == ' ')) startOrig++;
+                while (endOrig > startOrig && (origStrip[endOrig] == '\n' || origStrip[endOrig] == ' ')) endOrig--;
+            }
+
+            string[] mappedColors = new string[translatedText.Length];
+            for (int j = 0; j < translatedText.Length; j++)
+            {
+                int colorIdx = (int)Math.Min(colors.Count - 1, Math.Floor(j * (double)colors.Count / translatedText.Length));
+                mappedColors[j] = colors[colorIdx];
+            }
+
+            StringBuilder sb = new StringBuilder(translatedText.Length * 2);
+            string activeColor = null;
+
+            for (int j = 0; j < translatedText.Length; j++)
+            {
+                if (translatedText[j] == '\n')
+                {
+                    sb.Append('\n');
+                    continue;
+                }
+
+                string charColor = mappedColors[j];
+
+                if (charColor != activeColor)
+                {
+                    if (activeColor != null) sb.Append("</color>");
+                    if (charColor != null) sb.Append("<color=" + charColor + ">");
+                    activeColor = charColor;
+                }
+                sb.Append(translatedText[j]);
+            }
+
+            if (activeColor != null) sb.Append("</color>");
+
+            return sb.ToString();
+            }
+
+            public static string TranslateTextStrict(string text)
+            {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            bool success;
+            string modernUITranslated = TryTranslateModernUI(text, out success);
+            if (success) return modernUITranslated;
+
+            if (!ContainsEnglish(text)) return text;
+
+            if (text.Length == 1 && ((text[0] >= 'a' && text[0] <= 'z') || (text[0] >= 'A' && text[0] <= 'Z')))
+            {
+                return text;
+            }
+
+            string cached;
+            if (translationCache.TryGetValue(text, out cached))
+            {
+                return cached;
+            }
+
+            string prefix;
+            string core;
+            string suffix;
+            ExtractCoreText(text, out prefix, out core, out suffix);
+
+            if (string.IsNullOrEmpty(core)) return text;
+
+            string normalizedCore = core.Replace('\u00A0', ' ')
+                                        .Replace('\u2007', ' ')
+                                        .Replace('\u200B', ' ')
+                                        .Replace('\u202F', ' ');
+            string trimmedCore = normalizedCore.Trim();
+            string translatedCore = "";
+
+            string exactMatch;
+            if (staticDictionary.TryGetValue(trimmedCore, out exactMatch))
+            {
+                translatedCore = exactMatch;
+            }
+            else
+            {
+                string sn = SuperNormalize(trimmedCore);
+                bool isKeyName = sn.Length == 1 || sn == "esc" || sn == "tab" || sn == "enter" || sn == "space" || sn == "backspace" || sn == "insert" || sn == "delete" || sn == "up" || sn == "down" || sn == "left" || sn == "right";
+                bool hasBrackets = trimmedCore.StartsWith("[") && trimmedCore.EndsWith("]");
+
+                if (!isKeyName || hasBrackets)
+                {
+                    string originalKey;
+                    if (normalizedKeyDictionary.TryGetValue(sn, out originalKey))
+                    {
+                        if (staticDictionary.TryGetValue(originalKey, out exactMatch))
+                        {
+                            translatedCore = exactMatch;
+                        }
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(translatedCore))
+            {
+                return text; // Strict mode: no fallback!
+            }
+
+            string result = prefix + translatedCore + suffix;
+            translationCache[text] = result;
+            return result;
+            }
+
+            public static string TranslateDialogueLine(string text)
+            {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            string numPrefix = "";
+            string rest = text;
+            var numMatch = System.Text.RegularExpressions.Regex.Match(text, @"^\[(?<num>\d+)\]\s*(?<rest>.*)$");
+            if (numMatch.Success)
+            {
+                numPrefix = "[" + numMatch.Groups["num"].Value + "] ";
+                rest = numMatch.Groups["rest"].Value.Trim();
+            }
+
+            var actionMatch = System.Text.RegularExpressions.Regex.Match(rest, @"^(?<dialog>.*?)\s*\[(?<action>[^\]]+)\]$");
+            if (actionMatch.Success)
+            {
+                string dialog = actionMatch.Groups["dialog"].Value.Trim();
+                string action = actionMatch.Groups["action"].Value.Trim();
+
+                string translatedDialog = TranslateTextStrict(dialog);
+
+                string translatedAction = TranslateTextStrict("[" + action + "]");
+                if (translatedAction != "[" + action + "]")
+                {
+                    if (translatedAction.StartsWith("[") && translatedAction.EndsWith("]"))
+                    {
+                        translatedAction = translatedAction.Substring(1, translatedAction.Length - 2);
+                    }
+                }
+                else
+                {
+                    translatedAction = TranslateTextStrict(action);
+                }
+
+                return numPrefix + translatedDialog + " [" + translatedAction + "]";
+            }
+
+            return numPrefix + TranslateTextStrict(rest);
+            }
+            }
 
 
 
