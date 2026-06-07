@@ -923,5 +923,7 @@
     "^(?:<color=[^>]+>)?I'm watching you, drifter\\.(?:</color>)?$": "Я слежу за тобой, бродяга.",
     "^(?:<color=[^>]+>)?(?<prefix>.*)the Fellowship of Wardens(?<suffix>.*)(?:</color>)?$": "{prefix}Братство Смотрителей{suffix}",
     "^▶?\\[(?<key>.)\\] (?<action>reload)$": "[{key}] перезарядить",
-    "^▶?\\[(?<key>.)\\] (?<action>Reload)$": "[{key}] Перезарядить"
+    "^▶?\\[(?<key>.)\\] (?<action>Reload)$": "[{key}] Перезарядить",
+    "^▶?\\[(?<key>.)\\] (?<action>get)$": "[{key}] взять",
+    "^▶?\\[(?<key>.)\\] (?<action>Get)$": "[{key}] Взять"
 }
