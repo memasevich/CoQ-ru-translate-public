@@ -919,5 +919,8 @@
     "^(?:<color=[^>]+>)?Weapon Class:\\s*(?<cls>.+?)\\s*\\((?<desc>.+?)(?:</color>)?$": "Класс оружия: {cls} ({desc}",
     "^(?:<color=[^>]+>)?Wilderness Lore: (?<biome>.+?) \\[(?<cost>\\d+)sp\\] (?<req>\\d+) (?<stat>Strength|Agility|Toughness|Intelligence|Willpower|Ego)(?:</color>)?$": "Знание дикой природы: {biome} [{cost}ОН] Требуется {req} {stat}",
     "^(?:<color=[^>]+>)?You gain (?<num>\\d+) hitpoints(?:</color>)?$": "Вы получаете {num} очков здоровья",
-    "^(?:<color=[^>]+>)?Оружие Класс: (?<cls>.+?) \\((?<desc>.+?)(?:</color>)?$": "Класс оружия: {cls} ({desc}"
+    "^(?:<color=[^>]+>)?Оружие Класс: (?<cls>.+?) \\((?<desc>.+?)(?:</color>)?$": "Класс оружия: {cls} ({desc}",
+    "^(?:<color=[^>]+>)?(?<npc>.+?) has nothing to trade\\.(?:</color>)?$": "У {npc} нет ничего для торговли.",
+    "^(?:<color=[^>]+>)?I'm watching you, drifter\\.(?:</color>)?$": "Я слежу за тобой, бродяга.",
+    "^(?:<color=[^>]+>)?(?<prefix>.*)the Fellowship of Wardens(?<suffix>.*)(?:</color>)?$": "{prefix}Братство Смотрителей{suffix}"
 }
