@@ -904,5 +904,17 @@
     "^(?:<color=[^>]+>)?The (?<fac>.+?) are interested in sharing secrets(?<rest>.*)$": "{fac} заинтересованы в обмене секретами{rest}",
     "^(?:<color=[^>]+>)?The (?<fac>.+?) are interested in learning about the(?<rest>.*)$": "{fac} хотят узнать больше о{rest}",
     "^(?:<color=[^>]+>)?(?<name>.+?), the Tree of Life is interested in (?<rest>.*)$": "{name}, Древо Жизни, заинтересована в {rest}",
-    "^(?:<color=[^>]+>)?Equipped: (?<items>.+?)(?:</color>)?$": "Экипировано: {items}"
+    "^(?:<color=[^>]+>)?Equipped: (?<items>.+?)(?:</color>)?$": "Экипировано: {items}",
+    "^(?:<color=[^>]+>)?Starting Cost \\[(?<num>\\d+) sp(?:</color>)?$": "Начальная цена [{num} ОН",
+    "^(?:<color=[^>]+>)?Weapon Class: (?<cls>.+?) \\((?<desc>.+?)(?:</color>)?$": "Класс оружия: {cls} ({desc}",
+    "^(?:<color=[^>]+>)?{{rules\\|This item is a tonic\\. Applying one tonic while under the effects of another may produce undesired results\\.}}(?:</color>)?$": "{{rules|Этот предмет является тоником. Применение одного тоника во время действия другого может привести к нежелательным результатам.}}",
+    "^(?:<color=[^>]+>)?Total size:\\s*(?<size>.+?)\\s*[\\{\\[](?<id>[a-zA-Z0-9\\-]+)[\\}\\]]?(?:</color>)?$": "Общий размер: {size} [{id}]",
+    "^(?:<color=[^>]+>)?(?<name>.+?) :: Level (?<lvl>\\d+)\\s*\\[(?<mode>Tutorial|Classic|Roleplay|Daily|Wander).*$": "{name} :: Уровень {lvl} [{mode}]",
+    "^(?:<color=[^>]+>)?Last saved:\\s*(?<day>.+?),\\s*(?<date>\\d{1,2}\\s+[a-zA-Z]+\\s+\\d{4})\\s*at\\s*(?<time>\\d{2}:\\d{2}:\\d{2})(?:</color>)?$": "Последнее сохранение: {day}, {date} в {time}",
+    "^(?:<color=[^>]+>)?(?<day>[a-zA-Z]+),\\s*(?<date>\\d{1,2}\\s+[a-zA-Z]+\\s+\\d{4})\\s*at\\s*(?<time>\\d{2}:\\d{2}:\\d{2})(?:</color>)?$": "{day}, {date} в {time}",
+    "^(?:<color=[^>]+>)?Location:\\s*(?<loc>.+?),\\s*(?<time>\\d{2}:\\d{2}:\\d{2})\\s*turn\\s*(?<turn>\\d+)(?:</color>)?$": "Место: {loc}, {time} ход {turn}",
+    "^(?:<color=[^>]+>)?(?<num>\\d+)\\s+(?<stat>Strength|Agility|Toughness|Intelligence|Willpower|Ego)(?:</color>)?$": "{num} {stat}",
+    "^(?:<color=[^>]+>)?(?<num>-?\\d+)\\s+pts?(?:</color>)?$": "{num} очк.",
+    "^(?:<color=[^>]+>)?Equipped:\\s*(?<items>.+?)(?:</color>)?$": "Экипировано: {items}",
+    "^(?:<color=[^>]+>)?Weapon Class:\\s*(?<cls>.+?)\\s*\\((?<desc>.+?)(?:</color>)?$": "Класс оружия: {cls} ({desc}"
 }
