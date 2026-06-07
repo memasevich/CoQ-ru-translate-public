@@ -704,10 +704,10 @@ namespace RussianLocalization
 
 
                 // Удаление дублирующих букв в НАЧАЛЕ слова (например, [r] rпереименовать -> [r] переименовать)
-                result = System.Text.RegularExpressions.Regex.Replace(result, @"\b([a-zA-Z])\b(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)([а-яА-ЯёЁ])", "$3$4$5$6$7");
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"\b([a-zA-Zа-яА-ЯёЁ])\b(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)([а-яА-ЯёЁ])", "$3$4$5$6$7");
 
                 // Удаление дублирующих букв в КОНЦЕ слова (например, атаковать k -> атаковать)
-                result = System.Text.RegularExpressions.Regex.Replace(result, @"([а-яА-ЯёЁ])(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)\b([a-zA-Z])\b(\s*)(</color>)?", "$1$2$3$4$5$6$8$9");
+                result = System.Text.RegularExpressions.Regex.Replace(result, @"([а-яА-ЯёЁ])(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)\b([a-zA-Zа-яА-ЯёЁ])\b(\s*)(</color>)?", "$1$2$3$4$5$6$8$9");
 
 
 

@@ -721,7 +721,6 @@
     "(?i)^Upon the completion (?<pil>.+?), (?<name>.+?) cemented (?<pron>.+?) friendship with (?<target>.+?) by marrying (?<partner>.+?)\\.$": "По завершении {pil}, {name} укрепил(а) {pron} дружбу с {target}, женившись/выйдя замуж за {partner}.",
     "^<color=[^>]+>\\s*</color><color=[^>]+>(?<weight>\\d+)#</color><color=[^>]+>\\s*</color><color=[^>]+>\\$</color><color=[^>]+>(?<price>[\\d\\.]+)\\s*</color>$": "{weight}# ${price}",
     "(?i).*?Warden Creomaomaagaric Bolganobolete": "Страж Креомаомаагарик Болганоболет",
-    "(?i).*?reload": "перезарядить",
     "(?i)^Rummaging over your surroundings, you find these ingredients:\\s*(?<items>.*)$": "Осмотревшись вокруг, вы находите следующие ингредиенты: {items}",
     "(?i)^▶Rummaging over your surroundings, you find these ingredients:\\s*(?<items>.*)$": "▶Осмотревшись вокруг, вы находите следующие ингредиенты: {items}",
     "(?i)^You collect (?<drams>\\d+) drams? of\\s*$": "Вы собираете {drams} драм",
@@ -922,5 +921,7 @@
     "^(?:<color=[^>]+>)?Оружие Класс: (?<cls>.+?) \\((?<desc>.+?)(?:</color>)?$": "Класс оружия: {cls} ({desc}",
     "^(?:<color=[^>]+>)?(?<npc>.+?) has nothing to trade\\.(?:</color>)?$": "У {npc} нет ничего для торговли.",
     "^(?:<color=[^>]+>)?I'm watching you, drifter\\.(?:</color>)?$": "Я слежу за тобой, бродяга.",
-    "^(?:<color=[^>]+>)?(?<prefix>.*)the Fellowship of Wardens(?<suffix>.*)(?:</color>)?$": "{prefix}Братство Смотрителей{suffix}"
+    "^(?:<color=[^>]+>)?(?<prefix>.*)the Fellowship of Wardens(?<suffix>.*)(?:</color>)?$": "{prefix}Братство Смотрителей{suffix}",
+    "^▶?\\[(?<key>.)\\] (?<action>reload)$": "[{key}] перезарядить",
+    "^▶?\\[(?<key>.)\\] (?<action>Reload)$": "[{key}] Перезарядить"
 }
