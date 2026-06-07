@@ -929,5 +929,7 @@
     "^▶?\\[(?<key>.)\\] (?<action>begin trade)$": "[{key}] начать торговлю",
     "^▶?\\[(?<key>.)\\] (?<action>start trade)$": "[{key}] начать торговлю",
     "^▶?\\[(?<key>.)\\] (?<action>Accept Quest)$": "[{key}] Принять задание",
-    "^▶?\\[(?<key>.)\\] (?<action>Accept)$": "[{key}] Принять"
+    "^▶?\\[(?<key>.)\\] (?<action>Accept)$": "[{key}] Принять",
+    "^▶?\\[(?<key>.)\\] (?<action>Examine)$": "[{key}] Изучить",
+    "^▶?\\[?(?<dev>.*?)device is broken\\]?$": "[{dev}устройство сломано]"
 }
