@@ -3758,6 +3758,8 @@ namespace RussianLocalization
             {
             if (string.IsNullOrEmpty(text)) return text;
 
+            if (InternalGameKeys.Contains(text.Trim())) return text;
+
             bool success;
             string modernUITranslated = TryTranslateModernUI(text, out success);
             if (success) return modernUITranslated;
