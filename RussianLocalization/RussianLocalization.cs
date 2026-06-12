@@ -2497,6 +2497,8 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(text)) return text;
 
+            if (InternalGameKeys.Contains(text.Trim())) return text;
+
             if (text.Contains("serving"))
             {
                 // Console.WriteLine($"[DEBUG TranslateText] Contains serving: text='{text}', length={text.Length}");
