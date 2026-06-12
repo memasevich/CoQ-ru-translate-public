@@ -65,6 +65,15 @@ namespace RussianLocalization
         private static readonly System.Text.RegularExpressions.Regex ColorBlockRegex = new System.Text.RegularExpressions.Regex(@"(?<pref><color=[^>]+>)(?<content>.*?)(?<suff></color>)", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
         private static readonly System.Text.RegularExpressions.Regex ShadowRegex = new System.Text.RegularExpressions.Regex(@"(?<core>.+?)(?<deco>\s*(?:!|\.|\?)*\s*(?:\[?\d+(?:\s+vs\s+\d+)?\]?|\(unburnt\)|x\d+)(?:!|\.|\?)*)$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
+        private static readonly HashSet<string> InternalGameKeys = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "BodyText", "DisplayName", "ConText", "LongDescription",
+            "WoundLevel", "WoundLevel2", "Name", "Title", "Description",
+            "PlainName", "ShortDescription", "LongDescription",
+            "RenderString", "RenderStringSimple", "DisplayNameShort",
+            "DisplayNameLong", "DisplayNameStripped"
+        };
+
 
 
         // Потокобезопасный сборщик непереведенных строк
@@ -862,6 +871,8 @@ namespace RussianLocalization
             // Если строка содержит кириллицу И не содержит английских букв, 
             // значит она полностью переведена. Пропускаем.
             if (ContainsCyrillic(text) && !ContainsEnglish(text)) return text;
+
+            if (InternalGameKeys.Contains(text.Trim())) return text;
 
             if (translationCache.Count > 50000) translationCache.Clear();
 
