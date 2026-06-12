@@ -1530,7 +1530,8 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(text)) return text;
 
-
+            bool hasLogPrefix = text.StartsWith(":: ");
+            string matchText = hasLogPrefix ? text.Substring(3) : text;
 
             for (int i = 0; i < patternDictionary.Count; i++)
 
@@ -1540,9 +1541,9 @@ namespace RussianLocalization
 
                 var regex = rule.Key;
 
-                var match = regex.Match(text);
+                var match = regex.Match(matchText);
 
-                if (match.Success && match.Index == 0 && match.Length == text.Length)
+                if (match.Success && match.Index == 0 && match.Length == matchText.Length)
 
                 {
 
@@ -1569,7 +1570,7 @@ namespace RussianLocalization
                     });
                     
                     success = true;
-                    return result;
+                    return hasLogPrefix ? ":: " + result : result;
 
                 }
 
