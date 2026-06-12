@@ -986,5 +986,8 @@
   "^(?<name>.+?) has nothing to trade\\.?$": "{name} нечего предложить для торговли.",
   "^(?i)Location: (?<loc>.+?)$": "Местоположение: {loc}",
   "^(?::: )?(?:The )?(?<target>.+?) slips on the gel!$": "{target} поскальзывается на геле!",
-  "^(?<name>.+?) cannot carry things\\.?$": "{name} не может нести вещи."
+  "^(?<name>.+?) cannot carry things\\.?$": "{name} не может нести вещи.",
+  "^(?::: )?(?:\\<color=[^\\>]+\\>)?On the (?<day>\\\\d+)(?:st|nd|rd|th) of (?<month>[A-Za-z\\\\s]+), you arrive at the village of (?<loc>.+?)\\\\.?(?:\\</color\\>)?$": "{day}-го числа {month}, вы прибыли в поселение {loc}.",
+  "^(?:[tT]he )?Sect of the (?<name>.+)$": "Секта {name}",
+  "^(?:[tT]he )?Kinfolk of the (?<name>.+)$": "Родня {name}"
 }
