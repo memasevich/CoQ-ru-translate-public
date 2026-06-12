@@ -698,7 +698,7 @@ namespace RussianLocalization
                                 }
                             }
                         }
-                        catch {}
+            catch {}
                     }
 
                     // Динамический патч для Modern UI (UI Toolkit / UIElements)
@@ -1111,7 +1111,7 @@ namespace RussianLocalization
                 if (result.StartsWith("</color>")) result = result.Substring(8);
             }
 
-            if (text == " serving]") // Console.WriteLine($"[DEBUG Translate] final returned result: '{result}'");
+            // if (text == " serving]") // Console.WriteLine($"[DEBUG Translate] final returned result: '{result}'");
             LogAllGameplayText(text, result);
 
             return result;
@@ -3092,7 +3092,10 @@ namespace RussianLocalization
 
             }
 
-            catch {}
+            catch (Exception ex)
+            {
+                LogError("[RussianLocalization] Failed to write to MyDocuments log: " + ex.Message + "\n" + ex.StackTrace);
+            }
 
         }
 
@@ -5073,31 +5076,6 @@ namespace RussianLocalization
     [HarmonyPatch(typeof(XRL.MutationFactory))]
     public static class MutationFactory_Patch
     {
-        [HarmonyPostfix]
-        [HarmonyPatch("Init")]
-        public static void Init_Postfix()
-        {
-            if (!TranslationEngine.Initialized) return;
-            try
-            {
-                var mutations = XRL.MutationFactory.MutationsByName;
-                if (mutations != null)
-                {
-                    foreach (var kvp in mutations)
-                    {
-                        var entry = kvp.Value;
-                        if (entry == null) continue;
-                        if (!string.IsNullOrEmpty(entry.BearerDescription))
-                            entry.BearerDescription = TranslationEngine.TranslateTextStrict(entry.BearerDescription);
-                    }
-                    UnityEngine.Debug.Log("[RussianLocalization] Translated loaded Mutations in memory.");
-                }
-            }
-            catch (Exception ex)
-            {
-                UnityEngine.Debug.LogError("[RussianLocalization] Mutation translation error: " + ex.ToString());
-            }
-        }
     }
 
     [HarmonyPatch(typeof(XRL.World.Skills.SkillFactory))]
