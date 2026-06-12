@@ -5065,8 +5065,6 @@ namespace RussianLocalization
                     {
                         var entry = kvp.Value;
                         if (entry == null) continue;
-                        if (!string.IsNullOrEmpty(entry.DisplayName))
-                            entry.DisplayName = TranslationEngine.TranslateTextStrict(entry.DisplayName);
                         if (!string.IsNullOrEmpty(entry.BearerDescription))
                             entry.BearerDescription = TranslationEngine.TranslateTextStrict(entry.BearerDescription);
                     }
