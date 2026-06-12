@@ -54,6 +54,8 @@ namespace RussianLocalization
 
         public static bool Initialized = false;
 
+        public static string CachedModPath = null;
+
         public static int disableWordReplacementCounter;
 
         private static readonly System.Text.RegularExpressions.Regex RelationInterestRegex = new System.Text.RegularExpressions.Regex(@"^(?<subj>are|is)\s+interested\s+in\s+(?<verb>trading\s+secrets\s+about|sharing\s+secrets\s+about|learning\s+about|sharing\s+secrets\s+of|hearing\s+gossip\s+that\'s\s+about|hearing\s+gossip\s+about|the\s+resources\s+necessary\s+for\s+building\s+new\s+societies:)\s+(?<rest>.*)$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
@@ -671,6 +673,7 @@ namespace RussianLocalization
                     }
 
                     Initialized = true;
+                    CachedModPath = modPath;
 
                     LogInfo("[RussianLocalization] Initialized successfully. Loaded " + staticDictionary.Count + " phrases, " + wordDictionary.Count + " words, " + patternDictionary.Count + " patterns, and " + factionCases.Count + " faction case entries.");
 
@@ -3029,25 +3032,29 @@ namespace RussianLocalization
 
         {
 
-            try
+            if (!string.IsNullOrEmpty(CachedModPath))
 
             {
 
-                string modPath = GetModPath();
-
-                if (!string.IsNullOrEmpty(modPath))
+                try
 
                 {
 
-                    string logPath = Path.Combine(modPath, filename);
+                    string logPath = Path.Combine(CachedModPath, filename);
 
                     File.AppendAllText(logPath, content, Encoding.UTF8);
 
                 }
 
-            }
+                catch (Exception ex)
 
-            catch {}
+                {
+
+                    LogError("[RussianLocalization] Failed to write log " + filename + ": " + ex.Message);
+
+                }
+
+            }
 
 
 
