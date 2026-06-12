@@ -1,18 +1,22 @@
 # Caves of Qud — Русский перевод
 
-Русификатор для игры Caves of Qud.
+Русификатор для игры Caves of Qud. Работает без Steam Workshop — просто скопируйте папку.
 
 ## 🛠 Установка
 
 1. **Скачивание:**
-   - Нажмите кнопку `Code` $\rightarrow$ `Download ZIP` в этом репозитории.
+   - Нажмите зелёную кнопку `Code` → `Download ZIP`.
    - Распакуйте архив.
 
 2. **Установка:**
-   - Перейдите в папку `plugin` в скачанном архиве.
-   - Скопируйте все файлы из неё в папку с модами игры:
-     `Documents/My Games/Caves of Qud/mods/`
-     *(Если папки mods нет, создайте её или проверьте корневую папку игры).*
+   - В распакованном архиве найдите папку `RussianLocalization`.
+   - Скопируйте её **целиком** в:
+     `C:\Users\<ВашеИмя>\AppData\LocalLow\Freehold Games\CavesOfQud\Mods\`
+   - Если папки `Mods` нет — создайте её вручную.
+   - Должен получиться путь: `...\CavesOfQud\Mods\RussianLocalization\`
+
+3. **Включение в игре:**
+   - Запустите игру → Настройки → Моды → включите "Caves of Qud Russian Localization".
 
 ## 📞 Связь
-По всем вопросам и предложениям: [Telegram @memasev1ch](https://t.me/memasev1ch)
+По всем вопросам: [Telegram @memasev1ch](https://t.me/memasev1ch)
