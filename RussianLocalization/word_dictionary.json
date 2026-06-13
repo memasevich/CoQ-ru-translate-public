@@ -4392,5 +4392,22 @@
   "The leech has nothing to trade.": "У пиявки нет ничего для обмена.",
   "You recover 0.9 hit points per level (minimum 5) each": "Вы восстанавливаете 0,9 очков здоровья за уровень (минимум 5) каждый",
   "Weapon Class: Cudgel (dazes on critical hit)": "Класс оружия: Дубинка (оглушает при критическом ударе)",
-  "Strength Bonus Cap: 1": "Ограничение бонуса силы: 1"
+  "Strength Bonus Cap: 1": "Ограничение бонуса силы: 1",
+  "cushion": "подушка",
+  "floor cushion": "напольная подушка",
+  "lacquered floor cushion": "лакированная напольная подушка",
+  "scales": "чешуя",
+  "chameleon scales tent": "палатка из чешуи хамелеона",
+  "gearbox": "коробка передач",
+  "ornate": "изящный",
+  "ornate table": "изящный стол",
+  "angelic": "ангельский",
+  "shawl": "шаль",
+  "Pest": "Вредитель",
+  "Sorrow": "Печаль",
+  "Schnitzel": "Шницель",
+  "Dip": "Соус",
+  "Meaty": "Мясной",
+  "Meatballs": "Фрикадельки",
+  "Inside of": "внутри"
 }

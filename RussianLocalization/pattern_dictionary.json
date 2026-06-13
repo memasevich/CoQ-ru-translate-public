@@ -995,5 +995,13 @@
   "^Find the (?<item>.+?)$": "Найдите {item}",
   "^Locate the (?<item>.+?) at (?<loc>.+?)\\.$": "Найдите {item} в {loc}.",
   "^Return the (?<item>.+?) to (?<npc>.+?)$": "Верните {item} {npc}",
-  "^Return the (?<item>.+?) to (?<npc>.+?) and speak with (?<other_npc>.+?)\\.$": "Верните {item} {npc} и поговорите с {other_npc}."
+  "^Return the (?<item>.+?) to (?<npc>.+?) and speak with (?<other_npc>.+?)\\.$": "Верните {item} {npc} и поговорите с {other_npc}.",
+  "^(?<name>.+?)'\\s+Skills$": "Навыки: {name}",
+  "^(?:[tT]he )?Sect of the (?<name>.+?) (?<noun>.+?)$": "Секта {name} {noun}",
+  "^(?:[tT]he )?Kinfolk of the (?<name>.+?) (?<noun>.+?)$": "Родня {name} {noun}",
+  "^(?s)Friend, there was a time where my clan used to spend our days hunting and\\s+gathering\\. But after discovering the divinity of those with (?<faction1>.+?),\\s+we changed our priorities and consecrated new rituals\\. May (?<curse>.+?) take\\s+us, (?<npc>.+?) lost our (?<item>.+?)\\. We need someone to recover it,\\s+friend\\. Will you do it\\? We hear it has been taken to (?<loc>.+?)\\. We will\\s+reward your work\\.$": "Друг, было время, когда мой клан проводил дни на охоте и собирательстве. Но после открытия божественности тех, у кого {faction1}, мы изменили наши приоритеты и освятили новые ритуалы. Пусть {curse} заберет нас, {npc} потерял(а) наш {item}. Нам нужен кто-то, кто вернет его, друг. Сделаешь это? Мы слышали, что его отнесли в {loc}. Мы вознаградим твою работу.",
+  "^(?s)Nomad, welcome to the village of (?<village>.+?)\\. We are a people who pay homage to\\s+those with (?<faction1>.+?) and detest (?<detest>.+?)\\. Per\\s+our custom, you may drink of our freshwater and quench your thirst\\.$": "Кочевник, добро пожаловать в поселение {village}. Мы — народ, который чтит тех, у кого {faction1}, и ненавидит {detest}. По нашему обычаю, ты можешь испить нашей пресной воды и утолить жажду.",
+  "^(?s)Drifter! Those with (?<faction1>.+?) cluster here\\. Be gentle to them, or may (?<sultan>.+?) take you\\.?$": "Скиталец! Те, у кого {faction1}, собираются здесь. Будь нежен с ними, или пусть {sultan} заберет тебя.",
+  "^No blessing shall be lauded in (?<village>.+?) without lifting a canteen of (?<liquid>.+?)!$": "Ни одно благословение не должно восхваляться в {village} без поднятия фляги {liquid}!",
+  "^(?s)While wandering around the (?<loc1>.+?), (?<name>.+?) discovered (?<loc2>.+?)\\. There (?:he|she|it|they) befriended (?<faction>.+?) and dug into the earth's strata\\.?$": "Блуждая по {loc1}, {name} обнаружил(а) {loc2}. Там он(а) подружился(ась) с {faction} и погрузился(ась) в земные недра."
 }

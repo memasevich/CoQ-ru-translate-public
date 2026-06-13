@@ -5881,7 +5881,7 @@
   "I am called": "Меня зовут",
   "dram": "драм",
   "drams": "драмов",
-  "[begin water ritual; 1 dram of water]": "[Начать водный ритуал; 1 драм воды]",
+  "[begin water ritual; 1 dram of water]": "[начать ритуал воды; 1 драм воды]",
   "begin water ritual; 1 dram of water": "начать ритуал воды; 1 драм воды",
   "[begin water ritual; 2 drams of water]": "[начать ритуал воды; 2 драма воды]",
   "begin water ritual; 2 drams of water": "начать ритуал воды; 2 драма воды",
@@ -109435,5 +109435,7 @@
   "You discover the location of Nanna.": "Вы открываете местоположение Нанны.",
   "Horn is a short-blade class natural weapon.": "Рог — это естественное оружие класса коротких клинков.",
   "A horn juts out of your head.": "Рог торчит из вашей головы.",
-  "Your bones are brittle.\\nYou suffer 50% more damage from bludgeoning attacks, falling, and\\nother sources of concussive damage.": "Ваши кости хрупкие.\\nВы получаете на 50% больше урона от дробящих атак, падения и\\nдругих источников ударного урона."
+  "Your bones are brittle.\\nYou suffer 50% more damage from bludgeoning attacks, falling, and\\nother sources of concussive damage.": "Ваши кости хрупкие.\\nВы получаете на 50% больше урона от дробящих атак, падения и\\nдругих источников ударного урона.",
+  "No, I will not": "Нет, не буду",
+  "Examining an ornate table": "Осмотр изящного стола"
 }
