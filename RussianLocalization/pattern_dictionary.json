@@ -989,5 +989,11 @@
   "^(?<name>.+?) cannot carry things\\.?$": "{name} не может нести вещи.",
   "^(?::: )?(?:\\<color=[^\\>]+\\>)?On the (?<day>\\\\d+)(?:st|nd|rd|th) of (?<month>[A-Za-z\\\\s]+), you arrive at the village of (?<loc>.+?)\\\\.?(?:\\</color\\>)?$": "{day}-го числа {month}, вы прибыли в поселение {loc}.",
   "^(?:[tT]he )?Sect of the (?<name>.+)$": "Секта {name}",
-  "^(?:[tT]he )?Kinfolk of the (?<name>.+)$": "Родня {name}"
+  "^(?:[tT]he )?Kinfolk of the (?<name>.+)$": "Родня {name}",
+  "^(?s)Come, close! I have an errand that needs doing\\. A short while ago I lost my (?<item>.+?) at (?<loc>.+?)\\. To (?<reason>.+?), I am in need of it\\. Procure it and I'll reward your service\\.\\s+Will you\\?(\\s+)?$": "Подойди ближе! У меня есть поручение, которое нужно выполнить. Некоторое время назад я потерял {item} в {loc}. Мне нужно это, чтобы {reason}. Добудь это, и я вознагражу тебя за службу.\nСделаешь это?",
+  "^Yes\\. I will find the (?<item>.+?) as you ask\\.$": "Да. Я найду {item}, как ты просишь.",
+  "^Find the (?<item>.+?)$": "Найдите {item}",
+  "^Locate the (?<item>.+?) at (?<loc>.+?)\\.$": "Найдите {item} в {loc}.",
+  "^Return the (?<item>.+?) to (?<npc>.+?)$": "Верните {item} {npc}",
+  "^Return the (?<item>.+?) to (?<npc>.+?) and speak with (?<other_npc>.+?)\\.$": "Верните {item} {npc} и поговорите с {other_npc}."
 }

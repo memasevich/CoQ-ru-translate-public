@@ -4378,5 +4378,19 @@
   "burnt capacitor": "сгоревший конденсатор",
   "cracked lens": "треснувшая линза",
   "fractured microchip": "сломанная микросхема",
-  "begin trade": "начать торговлю"
+  "begin trade": "начать торговлю",
+  "leech": "пиявка",
+  "peptic": "пептический",
+  "toga": "тога",
+  "folding": "складной",
+  "sturdy canvas folding chair": "прочный холщовый складной стул",
+  "clay oven": "глиняная печь",
+  "catch basin": "водосборник",
+  "salt-encrusted": "солончаковый",
+  "witchwood tree": "ведьмино дерево",
+  "*idly undulating*": "*лениво колышется*",
+  "The leech has nothing to trade.": "У пиявки нет ничего для обмена.",
+  "You recover 0.9 hit points per level (minimum 5) each": "Вы восстанавливаете 0,9 очков здоровья за уровень (минимум 5) каждый",
+  "Weapon Class: Cudgel (dazes on critical hit)": "Класс оружия: Дубинка (оглушает при критическом ударе)",
+  "Strength Bonus Cap: 1": "Ограничение бонуса силы: 1"
 }
