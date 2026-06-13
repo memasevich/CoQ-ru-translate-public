@@ -1795,7 +1795,10 @@ namespace RussianLocalization
             }
 
             // 2. Построчный перевод при наличии \n (для сохранения форматирования и каст)
-            if (text.Contains("\n"))
+            bool isQuestDialog = text.Contains("Come, close! I have an errand") || 
+                                 text.Contains("Friend, there was a time") ||
+                                 text.Contains("welcome to the village of");
+            if (text.Contains("\n") && !isQuestDialog)
             {
                 bool canSplitLines = true;
                 string[] lines = text.Split('\n');
