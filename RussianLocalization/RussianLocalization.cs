@@ -54,9 +54,44 @@ namespace RussianLocalization
 
         public static bool Initialized = false;
 
+        /// <summary>
+        /// Флаг вкл/выкл перевода. Можно переключать хоткеем (по умолч. F1).
+        /// </summary>
+        public static bool IsEnabled = true;
+
         public static string CachedModPath = null;
 
         public static int disableWordReplacementCounter;
+
+        public static bool EnableFileLogging = true;
+
+        // Лимит кэша переводов. Сбрасываем только при превышении, не на каждом вызове.
+        private const int TranslationCacheMaxEntries = 200000;
+        // Сбрасываем кэш не чаще, чем раз в N мс, чтобы не нагружать GC.
+        private static long lastCacheResetMs;
+        private const long CacheResetIntervalMs = 30000;
+
+        /// <summary>
+        /// Периодически сбрасывает translationCache, чтобы избежать неограниченного роста.
+        /// Использует Interlocked counter для дешёвой проверки на горячем пути.
+        /// </summary>
+        private static int cacheCallCounter;
+        private static void MaybeResetTranslationCache()
+        {
+            int n = System.Threading.Interlocked.Increment(ref cacheCallCounter);
+            // Проверяем размер и время только каждый 1024-й вызов.
+            if ((n & 1023) != 0) return;
+            if (translationCache.Count < TranslationCacheMaxEntries) return;
+            // Environment.TickCount (int) переполняется через 24.8 дней; используем Interlocked для атомарного доступа.
+            int nowMs = Environment.TickCount;
+            int lastMs = (int)System.Threading.Interlocked.Read(ref lastCacheResetMs);
+            if (lastMs != 0 && (uint)(nowMs - lastMs) < (uint)CacheResetIntervalMs) return;
+            // Защита от гонки при сбросе: только один поток выполнит реальный сброс.
+            if (System.Threading.Interlocked.CompareExchange(ref lastCacheResetMs, (long)nowMs, (long)lastMs) == (long)lastMs)
+            {
+                translationCache.Clear();
+            }
+        }
 
         private static readonly System.Text.RegularExpressions.Regex RelationInterestRegex = new System.Text.RegularExpressions.Regex(@"^(?<subj>are|is)\s+interested\s+in\s+(?<verb>trading\s+secrets\s+about|sharing\s+secrets\s+about|learning\s+about|sharing\s+secrets\s+of|hearing\s+gossip\s+that\'s\s+about|hearing\s+gossip\s+about|the\s+resources\s+necessary\s+for\s+building\s+new\s+societies:)\s+(?<rest>.*)$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
         private static readonly System.Text.RegularExpressions.Regex RelationAlsoRegex = new System.Text.RegularExpressions.Regex(@"\.\s*They\'re\s+also\s+interested\s+in\s+(?<clause>.*)$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
@@ -80,25 +115,19 @@ namespace RussianLocalization
 
         // Потокобезопасный сборщик непереведенных строк
 
-        private static HashSet<string> loggedStrings = new HashSet<string>();
-
-        private static object LogLock = new object();
+        // Потокобезопасный сборщик непереведенных строк (без lock через ConcurrentDictionary)
+        private static ConcurrentDictionary<string, byte> loggedStrings = new ConcurrentDictionary<string, byte>();
 
 
 
         // Потокобезопасный сборщик пословных автозамен (для отлова Франкенштейнов)
-
-        private static HashSet<string> loggedReplacements = new HashSet<string>();
-
-        private static object ReplacementLogLock = new object();
+        private static ConcurrentDictionary<string, byte> loggedReplacements = new ConcurrentDictionary<string, byte>();
 
 
 
         // Потокобезопасный сборщик вообще всего игрового текста (и русского, и английского)
-
-        private static HashSet<string> loggedAllTexts = new HashSet<string>();
-
-        private static object AllTextLogLock = new object();
+        // Оптимизация: используем ConcurrentDictionary вместо HashSet+lock, чтобы убрать contention на каждый вызов Translate.
+        private static ConcurrentDictionary<string, byte> loggedAllTexts = new ConcurrentDictionary<string, byte>();
 
 
 
@@ -499,6 +528,20 @@ namespace RussianLocalization
 
                                 {
 
+                                    // Фильтр безопасности: в основном словаре отбрасываем 1-2 буквенные записи,
+                                    // которые НЕ являются игровыми сокращениями (HP, MP, SP, и т.д.).
+                                    // Опасные 1-2 буквенные слова: 'St', 'To', 'Me', 'in', 'on' — ломают длинные строки
+                                    // при разбиении движком на подстроки (например 'together' -> 'toвзятьher' из-за
+                                    // записи 'et'->'взять' в word_dictionary, что было исправлено в коммите 080bf99).
+                                    string trimmedKey = normKey.Trim();
+                                    if (trimmedKey.Length > 0 && trimmedKey.Length <= 2 &&
+                                        System.Text.RegularExpressions.Regex.IsMatch(trimmedKey, @"^[A-Za-z]+$") &&
+                                        !IsGameAbbreviation(trimmedKey))
+                                    {
+                                        // Слишком короткое английское слово (не сокращение) — опасно.
+                                        continue;
+                                    }
+
                                     staticDictionary[normKey] = kvp.Value;
 
                                     string sn = SuperNormalize(normKey);
@@ -565,7 +608,22 @@ namespace RussianLocalization
 
                                 if (kvp.Key == null) continue;
 
-                                string normKey = kvp.Key.Replace('\u00A0', ' ')
+                                // Фильтр безопасности: защита от 1-2 буквенных английских слов, которые ломают составные слова.
+                                // 2-буквенные слова (in, to, at, is, by, as, on, be, it) при попадании в word_dictionary
+                                // ломают длинные строки (например 'together' -> 'toвзятьher').
+                                string rawKey = kvp.Key;
+                                string trimmedKey = rawKey.Trim();
+
+                                // Безопасный 1-2 буквенный фильтр: только буквы + не игровое сокращение
+                                if (trimmedKey.Length > 0 && trimmedKey.Length <= 2 &&
+                                    System.Text.RegularExpressions.Regex.IsMatch(trimmedKey, @"^[A-Za-z]+$") &&
+                                    !IsGameAbbreviation(trimmedKey))
+                                {
+                                    // Слишком короткое английское слово (не сокращение) — опасно, пропускаем.
+                                    continue;
+                                }
+
+                                string normKey = rawKey.Replace('\u00A0', ' ')
 
                                                         .Replace('\u2007', ' ')
 
@@ -613,6 +671,8 @@ namespace RussianLocalization
 
                             patternDictionary.Clear();
 
+                            // Сначала собираем все валидные паттерны
+                            var tempList = new List<KeyValuePair<System.Text.RegularExpressions.Regex, string>>();
                             foreach (var property in patternObj.Properties())
 
                             {
@@ -629,7 +689,7 @@ namespace RussianLocalization
 
                                     var regex = new System.Text.RegularExpressions.Regex(patternKey, System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
-                                    patternDictionary.Add(new KeyValuePair<System.Text.RegularExpressions.Regex, string>(regex, patternValue));
+                                    tempList.Add(new KeyValuePair<System.Text.RegularExpressions.Regex, string>(regex, patternValue));
 
                                 }
 
@@ -641,6 +701,18 @@ namespace RussianLocalization
 
                                 }
 
+                            }
+
+                            // Сортируем по убыванию длины regex-строки: более специфичные паттерны
+                            // (например, "You take the (?<item>.+?)$") проверяются раньше общих
+                            // (например, "You pass by (?<item>.+?)$"). Это важно, потому что при матче
+                            // строки "You take the bronze sword." оба паттерна матчатся — побеждает
+                            // более длинный, что даёт правильный перевод.
+                            tempList.Sort((a, b) => b.Key.ToString().Length.CompareTo(a.Key.ToString().Length));
+
+                            foreach (var kv in tempList)
+                            {
+                                patternDictionary.Add(kv);
                             }
 
                         }
@@ -673,6 +745,7 @@ namespace RussianLocalization
                     }
 
                     Initialized = true;
+                    translationCache.Clear();
                     CachedModPath = modPath;
 
                     LogInfo("[RussianLocalization] Initialized successfully. Loaded " + staticDictionary.Count + " phrases, " + wordDictionary.Count + " words, " + patternDictionary.Count + " patterns, and " + factionCases.Count + " faction case entries.");
@@ -701,9 +774,63 @@ namespace RussianLocalization
             catch {}
                     }
 
+                    // ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ ДИАГНОСТИКИ КРАША (2026-07-02): игра стабильно
+                    // крашится (access violation в ntdll.dll, WER-код 0xc0000005) в момент
+                    // старта "Loading object blueprints" — после того, как эти 5 хуков были
+                    // добавлены 2026-07-01. Отключаем всё разом одним тестовым прогоном,
+                    // чтобы подтвердить, что причина среди них, затем включим по одному.
+                    // См. память ru-qud-crash-fix-20260702 (v2) за подробностями.
+                    // 2026-07-02 (v3): бисекция показала, что 5 хуков НЕ виноваты (краш был при
+                    // них отключённых), причина — RuntimeTranslator без лимита глубины рекурсии.
+                    // Хуки снова включены (флаг = false).
+                    const bool DIAG_DISABLE_20260701_HOOKS = false;
+                    if (!DIAG_DISABLE_20260701_HOOKS)
+                    {
                     // Динамический патч для Modern UI (UI Toolkit / UIElements)
 
                     PatchUIElements();
+
+                    // Динамический патч для встроенного транслятора QudTranslator (≥ 2.0.214).
+                    // Запускаем ПОСЛЕ PatchUIElements, чтобы QudTranslator.dll уже был загружен.
+                    try { PatchQudTranslator(); } catch (Exception exQ) { LogError("[RussianLocalization] PatchQudTranslator dispatch error: " + exQ.ToString()); }
+
+                    // Главный хук Modern UI: текст нового интерфейса рисуется через XRL.UI.UITextSkin.SetText().
+                    try { PatchUITextSkin(); } catch (Exception exT) { LogError("[RussianLocalization] PatchUITextSkin dispatch error: " + exT.ToString()); }
+
+                    // Патч XRL.UI.Popup — popup-сообщения, меню выбора, запросы строки/числа.
+                    // ~277 вызовов в коде (ShowYesNo=108, PickOption=84, AskString=23, AskNumber=13...).
+                    try { PatchPopup(); } catch (Exception exP) { LogError("[RussianLocalization] PatchPopup dispatch error: " + exP.ToString()); }
+
+                    // Патч XRL.GameText.VariableReplace — подстановка плейсхолдеров (=subject.X=, =verb:X=).
+                    // 11 перегрузок, 78 вызовов в коде.
+                    try { PatchGameText(); } catch (Exception exG) { LogError("[RussianLocalization] PatchGameText dispatch error: " + exG.ToString()); }
+                    }
+
+                    // ДИАГНОСТИКА КРАША (2026-07-02, шаг 2): с отключёнными 5 хуками игра
+                    // ВСЁ РАВНО крашится на "Loading object blueprints". PatchAll в моде нет,
+                    // все аннотационные [HarmonyPatch]-классы инертны — значит единственный
+                    // оставшийся активный per-frame код это RuntimeTranslator (LateUpdate →
+                    // WalkVisualTree, рекурсия по дереву UI без ограничения глубины). Отключаем
+                    // его этим прогоном, чтобы подтвердить/исключить как причину.
+                    // 2026-07-02 (v3): подтверждено — он и был причиной. Включён обратно с лимитом
+                    // MaxWalkDepth=512.
+                    // 2026-07-02 (v5, ОКОНЧАТЕЛЬНО): даже С лимитом глубины игра ВСЁ РАВНО крашится
+                    // (Player.log 13:11: сборка с фиксом в 13:11:37, краш на 00:00:07 — фикс был
+                    // активен и не спас). Значит причина НЕ в глубине рекурсии: RuntimeTranslator.
+                    // LateUpdate дёргает Resources.FindObjectsOfTypeAll<TMP_Text>() и
+                    // FindObjectsOfType(UIDocument) из кадра ПОСРЕДИ фазы "Loading object blueprints",
+                    // когда объектная система Unity ещё наполовину построена → обращение к
+                    // полупостроенному нативному объекту → access violation 0xc0000005 в ntdll.dll
+                    // (нативный, без managed-исключения — потому в логе пусто). Диаг-строка
+                    // "RuntimeTranslator scan: docs=" в логе так и не появилась = смерть в первом же
+                    // скане. RuntimeTranslator — лишь ДУБЛИРУЮЩИЙ fallback для Modern UI, а сам
+                    // Modern UI уже покрыт хуком PatchUIElements (UIElements.TextElement.text). Поэтому
+                    // отключаем RT НАСОВСЕМ: 5 хуков остаются и дают почти весь перевод, а краша нет.
+                    const bool DIAG_DISABLE_RUNTIME_TRANSLATOR = true;
+                    if (!DIAG_DISABLE_RUNTIME_TRANSLATOR)
+                    {
+                        try { EnsureRuntimeTranslator(); } catch (Exception exR) { LogError("[RussianLocalization] EnsureRuntimeTranslator error: " + exR.ToString()); }
+                    }
 
                 }
 
@@ -867,17 +994,61 @@ namespace RussianLocalization
 
 
 
+        // Хоткей-обёртки нового UI: игра вставляет {{hotkey|X}} ВНУТРЬ слова (X — подсвеченная
+        // буква-клавиша), напр. {{hotkey|c}}ollect liquid, drin{{hotkey|k}}. Если оставить обёртку,
+        // получается «cсобрать»/«выпитьk». Просто убираем обёртку, возвращая букву X на место —
+        // тогда обычный конвейер переводит слово/фразу целиком. Клавиша остаётся в соседней
+        // [X]-скобке и привязана командой, так что хоткеи продолжают работать.
+        private static readonly System.Text.RegularExpressions.Regex HotkeyWrapperRegex =
+            new System.Text.RegularExpressions.Regex(@"\{\{hotkey\|(?<k>[^|}]+)\}\}", System.Text.RegularExpressions.RegexOptions.Compiled);
+
         public static string Translate(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
+            // Если перевод отключён хоткеем — возвращаем оригинал без кэширования,
+            // чтобы при включении сразу начали переводиться новые строки.
+            if (!IsEnabled) return text;
+            string cached;
+            if (translationCache.TryGetValue(text, out cached)) return cached;
 
-            // Если строка содержит кириллицу И не содержит английских букв, 
+            string originalText = text;
+            // Хоткей-обёртки нового UI убираем (буква возвращается в слово) ДО любой обработки.
+            if (text.IndexOf("{{hotkey|", System.StringComparison.Ordinal) >= 0)
+            {
+                text = HotkeyWrapperRegex.Replace(text, "${k}");
+            }
+            // Ранний выход: строки формата "Loading X.xml|txt|json" — технические логи загрузки ресурсов,
+            // никогда не должны переводиться. Возвращаем как есть.
+            if (text.StartsWith("Loading ") && (text.EndsWith(".xml") || text.EndsWith(".txt") || text.EndsWith(".json")))
+            {
+                translationCache[originalText] = text;
+                return text;
+            }
+            // Сначала обрабатываем «радужные» слова (каждая буква в своём цвете): переводим
+            // и распределяем исходные цвета по буквам перевода, сохраняя радужный эффект.
+            // То, что перевести не удалось, остаётся для обычной компактизации ниже.
+            text = ExpandRainbowWords(text);
+            text = CompactColorFragments(text);
+
+            // Если строка содержит кириллицу И не содержит английских букв,
             // значит она полностью переведена. Пропускаем.
-            if (ContainsCyrillic(text) && !ContainsEnglish(text)) return text;
+            // Один проход по строке вместо двух — частый hot path.
+            bool hasCyrillic, hasEnglish;
+            ScanAlpha(text, out hasCyrillic, out hasEnglish);
+            if (hasCyrillic && !hasEnglish)
+            {
+                translationCache[originalText] = text;
+                return text;
+            }
 
-            if (InternalGameKeys.Contains(text.Trim())) return text;
+            if (InternalGameKeys.Contains(text.Trim()))
+            {
+                translationCache[originalText] = text;
+                return text;
+            }
 
-            if (translationCache.Count > 50000) translationCache.Clear();
+            // if (translationCache.Count > 50000) translationCache.Clear();
+            // Кэш больше не сбрасывается — это вызывало повторный перевод одних и тех же строк и лаги.
 
             // Расширенное обнаружение credits-секции.
             // Игра может разбивать credits на отдельные строки-имена,
@@ -970,149 +1141,218 @@ namespace RussianLocalization
 
             }
 
-            if (result != null)
+            if (result != null && result != text && result.Length > 1)
             {
-                if (text == " serving]") 
+                bool needsCleanup =
+                    result.Contains("}}") || result.Contains("]]") ||
+                    result.Contains("[[") || result.Contains("{{") ||
+                    result.Contains("=now.dayOfYear=") || result.Contains("=now.year=") ||
+                    (result.Contains("&") && ContainsCyrillic(result)) ||
+                    result.Contains("<color=") ||
+                    (ContainsCyrillic(result) && result.Contains("%")) ||
+                    System.Text.RegularExpressions.Regex.IsMatch(result, @"\[[a-zA-Z]\].*\[[a-zA-Z]\]");
+
+                if (needsCleanup)
                 {
-                    // Console.WriteLine($"[DEBUG Translate] input: '{text}', initial result: '{result}'");
-                    // Console.WriteLine(Environment.StackTrace);
-                }
-                // Финальная очистка от "мусорных" скобок, которые могли остаться после процедурной сборки
-                if (result.Contains("}}") && !result.Contains("{{") && !text.Contains("}}"))
-                {
-                    result = result.Replace("}}", "");
-                }
-                
-                // Исправление 4-х скобок (результат двойного прохода)
-                if (result.Contains("{{{{"))
-                {
-                    result = result.Replace("{{{{", "{{").Replace("}}}}", "}}");
-                }
-
-                if (result.Contains("]]") && !text.Contains("]]"))
-                {
-                    result = result.Replace("]]", "]");
-                }
-
-                // Устраняем дублирование хоткеев в скобках (например, [L] [L] посмотреть -> [L] посмотреть)
-                result = System.Text.RegularExpressions.Regex.Replace(result, 
-                    @"((?:<color=[^>]+>)?\s*\[([a-zA-Z])\]\s*(?:</color>)?)\s*(?:<color=[^>]+>)?\s*(?:</color>)?\s*(?:<color=[^>]+>)?\s*\[\2\]\s*(?:</color>)?", 
-                    "$1", 
-                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-                // Устраняем дублирование открывающих скобок с закрывающими: [[a] -> [a]
-                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}([^\[\]\n]{1,20})\]", "[$1]");
-
-                // Устраняем дублирование открывающих скобок без закрывающих (только для клавиш и цветовых амперсандов)
-                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}([a-zA-Z])", "[$1");
-                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}\s*(&\s*[a-zA-Z])", "[$1");
-                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}(Esc|Tab|Enter|Space|Backspace|Num \d)", "[$1");
-
-
-
-                // Устраняем дублирование закрывающих скобок: [a]] -> [a]
-
-                result = System.Text.RegularExpressions.Regex.Replace(result, @"\[([^\[\]\n]{1,20})\]{2,}", "[$1]");
-
-
-
-                // Удаление дублирующих букв в НАЧАЛЕ слова (например, [r] rпереименовать -> [r] переименовать)
-                result = System.Text.RegularExpressions.Regex.Replace(result, 
-                    @"\b([a-zA-Z])\b(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)([а-яА-ЯёЁ])", 
-                    m => {
-                        if (m.Groups[2].Value.Length > 0 || m.Groups[4].Value.Length > 0 || m.Groups[6].Value.Length > 0)
-                        {
-                            return m.Value;
-                        }
-                        return m.Groups[3].Value + m.Groups[4].Value + m.Groups[5].Value + m.Groups[6].Value + m.Groups[7].Value;
-                    }, 
-                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-                // Удаление дублирующих букв в КОНЦЕ слова (например, атаковать k -> атаковать)
-                result = System.Text.RegularExpressions.Regex.Replace(result, 
-                    @"([а-яА-ЯёЁ])(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)\b([a-zA-Z])\b(\s*)(</color>)?", 
-                    m => {
-                        if (m.Groups[2].Value.Length > 0 || m.Groups[4].Value.Length > 0 || m.Groups[6].Value.Length > 0 || m.Groups[8].Value.Length > 0)
-                        {
-                            return m.Value;
-                        }
-                        return m.Groups[1].Value + m.Groups[2].Value + m.Groups[3].Value + m.Groups[4].Value + m.Groups[5].Value + m.Groups[6].Value + m.Groups[8].Value + m.Groups[9].Value;
-                    }, 
-                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-
-
-                // Восстановление оригинальных латинских тегов цвета Caves of Qud при случайной транслитерации символа цвета
-
-                result = result.Replace("&у", "&y").Replace("&У", "&Y")
-
-                               .Replace("&р", "&r").Replace("&Р", "&R")
-
-                               .Replace("&с", "&c").Replace("&С", "&C")
-
-                               .Replace("&в", "&w").Replace("&В", "&W")
-
-                               .Replace("&м", "&m").Replace("&М", "&M")
-
-                               .Replace("&г", "&g").Replace("&Г", "&G")
-
-                               .Replace("&б", "&b").Replace("&Б", "&B")
-
-                               .Replace("&д", "&d").Replace("&Д", "&D")
-
-                               .Replace("&к", "&k").Replace("&К", "&K")
-
-                               .Replace("&о", "&o").Replace("&О", "&O");
-
-
-
-                if (result.Contains("=now.dayOfYear="))
-
-                {
-
-                    result = result.Replace("=now.dayOfYear=", DateTime.Now.DayOfYear.ToString());
-
-                }
-
-
-
-                if (result.Contains("=now.year="))
-                {
-                    result = result.Replace("=now.year=", DateTime.Now.Year.ToString());
-                }
-
-                // --- ФИНАЛЬНАЯ ОЧИСТКА МУСОРА ---
-
-                // 1. Устраняем "франкенштейнов" и рост процентов: %%%WoundLevel% -> WoundLevel
-                // Убираем проценты из технических плейсхолдеров
-                // result = System.Text.RegularExpressions.Regex.Replace(result, 
-                //     @"%+(BodyText|DisplayName|ConText|LongDescription|WoundLevel|Name|Title|Description)%*", 
-                //     "$1", 
-                //     System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-                // 2. Убираем лидирующие и завершающие проценты (кроме числовых процентов в конце, типа "10%")
-                // Если в строке есть кириллица, считаем её переведенной и чистим технический мусор
-                if (ContainsCyrillic(result))
-                {
-                    // Убираем любые проценты в начале строки (паддинг UI)
-                    result = System.Text.RegularExpressions.Regex.Replace(result, @"^%+", "");
+                    if (text == " serving]") 
+                    {
+                        // Console.WriteLine($"[DEBUG Translate] input: '{text}', initial result: '{result}'");
+                        // Console.WriteLine(Environment.StackTrace);
+                    }
+                    // Финальная очистка от "мусорных" скобок, которые могли остаться после процедурной сборки
+                    if (result.Contains("}}") && !result.Contains("{{") && !text.Contains("}}"))
+                    {
+                        result = result.Replace("}}", "");
+                    }
                     
-                    // Убираем проценты в конце, ТОЛЬКО если перед ними нет цифры (чтобы не сломать "10%")
-                    result = System.Text.RegularExpressions.Regex.Replace(result, @"(?<!\d)%+$", "");
-                    
-                    // Схлопываем двойные проценты внутри строки
-                    result = result.Replace("%%", "%");
-                }
+                    // Исправление лишних фигурных скобок (результат двойного прохода или процедурной сборки)
+                    if (BrokenBraceRegex.IsMatch(result))
+                    {
+                        int openCount = CountSubstring(result, "{{");
+                        int closeCount = CountSubstring(result, "}}");
+                        if (openCount != closeCount)
+                        {
+                            result = BrokenBraceRegex.Replace(result, m => m.Value[0] == '{' ? "{{" : "}}");
+                        }
+                    }
 
-                // 3. Исправляем поврежденные теги цвета (результат DistributeColors)
-                // Удаляем пустые блоки <color=...></color>
-                result = System.Text.RegularExpressions.Regex.Replace(result, @"<color=[^>]+></color>", "");
-                // Удаляем висящий закрывающий тег в самом начале
-                if (result.StartsWith("</color>")) result = result.Substring(8);
+                    if (result.Contains("]]") && !text.Contains("]]"))
+                    {
+                        result = result.Replace("]]", "]");
+                    }
+
+                    // Устраняем дублирование хоткеев в скобках (например, [L] [L] посмотреть -> [L] посмотреть)
+                    result = System.Text.RegularExpressions.Regex.Replace(result, 
+                        @"((?:<color=[^>]+>)?\s*\[([a-zA-Z])\]\s*(?:</color>)?)\s*(?:<color=[^>]+>)?\s*(?:</color>)?\s*(?:<color=[^>]+>)?\s*\[\2\]\s*(?:</color>)?", 
+                        "$1", 
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                    // Устраняем дублирование открывающих скобок с закрывающими: [[a] -> [a]
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}([^\[\]\n]{1,20})\]", "[$1]");
+
+                    // Устраняем дублирование открывающих скобок без закрывающих (только для клавиш и цветовых амперсандов)
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}([a-zA-Z])", "[$1");
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}\s*(&\s*[a-zA-Z])", "[$1");
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"\[{2,}(Esc|Tab|Enter|Space|Backspace|Num \d)", "[$1");
+
+
+
+                    // Устраняем дублирование закрывающих скобок: [a]] -> [a]
+
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"\[([^\[\]\n]{1,20})\]{2,}", "[$1]");
+
+
+
+                    // Удаление дублирующих букв в НАЧАЛЕ слова (например, [r] rпереименовать -> [r] переименовать)
+                    result = System.Text.RegularExpressions.Regex.Replace(result, 
+                        @"\b([a-zA-Z])\b(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)([а-яА-ЯёЁ])", 
+                        m => {
+                            if (m.Groups[2].Value.Length > 0 || m.Groups[4].Value.Length > 0 || m.Groups[6].Value.Length > 0)
+                            {
+                                return m.Value;
+                            }
+                            return m.Groups[3].Value + m.Groups[4].Value + m.Groups[5].Value + m.Groups[6].Value + m.Groups[7].Value;
+                        }, 
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                    // Удаление дублирующих букв в КОНЦЕ слова (например, атаковать k -> атаковать)
+                    result = System.Text.RegularExpressions.Regex.Replace(result, 
+                        @"([а-яА-ЯёЁ])(\s*)(</color>)?(\s*)(<color=[^>]+>)?(\s*)\b([a-zA-Z])\b(\s*)(</color>)?", 
+                        m => {
+                            if (m.Groups[2].Value.Length > 0 || m.Groups[4].Value.Length > 0 || m.Groups[6].Value.Length > 0 || m.Groups[8].Value.Length > 0)
+                            {
+                                return m.Value;
+                            }
+                            return m.Groups[1].Value + m.Groups[2].Value + m.Groups[3].Value + m.Groups[4].Value + m.Groups[5].Value + m.Groups[6].Value + m.Groups[8].Value + m.Groups[9].Value;
+                        }, 
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+
+
+                    // Восстановление оригинальных латинских тегов цвета Caves of Qud при случайной транслитерации символа цвета
+                    // Используем regex с единым проходом вместо цепочки .Replace() (предыдущая версия не работала,
+                    // т.к. каждое .Replace() модифицирует строку и последующие не находят исходный паттерн).
+                    // Приоритет: транслитерация (ю→y, н→y) > клавиатура (н→h, у→e) > фонетика.
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"&([а-яА-ЯёЁ])",
+                        m => {
+                            char c = m.Groups[1].Value[0];
+                            // Самые частые случаи транслитерации (audit: Y→Ю, y→й, Y→Н)
+                            if (c == 'ю') return "&y";
+                            if (c == 'Ю') return "&Y";
+                            if (c == 'н') return "&y";
+                            if (c == 'Н') return "&Y";
+                            if (c == 'й') return "&q";
+                            if (c == 'Й') return "&Q";
+                            // ЙЦУКЕН-клавиатура
+                            if (c == 'ц' || c == 'Ц') return c == 'ц' ? "&w" : "&W";
+                            if (c == 'у' || c == 'У') return c == 'у' ? "&e" : "&E";
+                            if (c == 'е' || c == 'Е') return c == 'е' ? "&t" : "&T";
+                            if (c == 'г' || c == 'Г') return c == 'г' ? "&u" : "&U";
+                            if (c == 'ш' || c == 'Ш') return c == 'ш' ? "&i" : "&I";
+                            if (c == 'щ' || c == 'Щ') return c == 'щ' ? "&o" : "&O";
+                            if (c == 'з' || c == 'З') return c == 'з' ? "&p" : "&P";
+                            if (c == 'к' || c == 'К') return c == 'к' ? "&r" : "&R";
+                            if (c == 'х' || c == 'Х') return "[";
+                            if (c == 'ъ' || c == 'Ъ') return "]";
+                            if (c == 'ф' || c == 'Ф') return c == 'ф' ? "&a" : "&A";
+                            if (c == 'ы' || c == 'Ы') return c == 'ы' ? "&s" : "&S";
+                            if (c == 'а' || c == 'А') return c == 'а' ? "&f" : "&F";
+                            if (c == 'п' || c == 'П') return c == 'п' ? "&g" : "&G";
+                            if (c == 'р' || c == 'Р') return c == 'р' ? "&h" : "&H";
+                            if (c == 'о' || c == 'О') return c == 'о' ? "&j" : "&J";
+                            if (c == 'л' || c == 'Л') return c == 'л' ? "&k" : "&K";
+                            if (c == 'д' || c == 'Д') return c == 'д' ? "&l" : "&L";
+                            if (c == 'ж' || c == 'Ж') return ";";
+                            if (c == 'э' || c == 'Э') return "'";
+                            if (c == 'я' || c == 'Я') return c == 'я' ? "&z" : "&Z";
+                            if (c == 'ч' || c == 'Ч') return c == 'ч' ? "&x" : "&X";
+                            if (c == 'с' || c == 'С') return c == 'с' ? "&c" : "&C";
+                            if (c == 'м' || c == 'М') return c == 'м' ? "&v" : "&V";
+                            if (c == 'и' || c == 'И') return c == 'и' ? "&b" : "&B";
+                            if (c == 'т' || c == 'Т') return c == 'т' ? "&n" : "&N";
+                            if (c == 'ь' || c == 'Ь') return c == 'ь' ? "&m" : "&M";
+                            if (c == 'б' || c == 'Б') return ",";
+                            if (c == 'в' || c == 'В') return c == 'в' ? "&w" : "&W";
+                            if (c == 'ё' || c == 'Ё') return c == 'ё' ? "&`" : "&~";
+                            return m.Value;
+                        });
+
+
+
+                    if (result.Contains("=now.dayOfYear="))
+
+                    {
+
+                        result = result.Replace("=now.dayOfYear=", DateTime.Now.DayOfYear.ToString());
+
+                    }
+
+
+
+                    if (result.Contains("=now.year="))
+                    {
+                        result = result.Replace("=now.year=", DateTime.Now.Year.ToString());
+                    }
+
+                    // --- ФИНАЛЬНАЯ ОЧИСТКА МУСОРА ---
+
+                    // 1. Устраняем "франкенштейнов" и рост процентов: %%%WoundLevel% -> WoundLevel
+                    // Убираем проценты из технических плейсхолдеров
+                    // result = System.Text.RegularExpressions.Regex.Replace(result, 
+                    //     @"%+(BodyText|DisplayName|ConText|LongDescription|WoundLevel|Name|Title|Description)%*", 
+                    //     "$1", 
+                    //     System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                    // 2. Убираем лидирующие и завершающие проценты (кроме числовых процентов в конце, типа "10%")
+                    // Если в строке есть кириллица, считаем её переведенной и чистим технический мусор
+                    if (ContainsCyrillic(result))
+                    {
+                        // Убираем любые проценты в начале строки (паддинг UI)
+                        result = System.Text.RegularExpressions.Regex.Replace(result, @"^%+", "");
+                        
+                        // Убираем проценты в конце, ТОЛЬКО если перед ними нет цифры (чтобы не сломать "10%")
+                        result = System.Text.RegularExpressions.Regex.Replace(result, @"(?<!\d)%+$", "");
+                        
+                        // Схлопываем двойные проценты внутри строки
+                        result = result.Replace("%%", "%");
+                    }
+
+                    // 3. Исправляем поврежденные теги цвета (результат DistributeColors)
+                    // Удаляем пустые блоки <color=...></color> (без пробелов)
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"<color=[^>]+></color>", "");
+                    // Схлопываем последовательные одинаковые открывающие цветовые теги
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"(<color=[^>]+>)([ \t]*\1)+", "$1");
+                    // Схлопываем последовательные закрывающие теги
+                    result = System.Text.RegularExpressions.Regex.Replace(result, @"(</color>)([ \t]*\1)+", "$1");
+                    
+                    // Схлопываем идущие подряд блоки одинакового цвета: <color=X>A</color> <color=X>B</color> -> <color=X>A B</color>
+                    string prevResult;
+                    do
+                    {
+                        prevResult = result;
+                        result = System.Text.RegularExpressions.Regex.Replace(result, @"(?<tag><color=(?<c>[^>]+)>)(?<content>(?:(?!</color>).)*?)</color>(?<sp>\s*)<color=\k<c>>", "${tag}${content}${sp}", System.Text.RegularExpressions.RegexOptions.Singleline);
+                    } while (result != prevResult);
+
+                    // Удаляем висящий закрывающий тег в самом начале
+                    if (result.StartsWith("</color>")) result = result.Substring(8);
+                }
             }
 
+            // Финальная очистка пустых цветовых блоков ДО логирования и кэширования,
+            // чтобы лог all_gameplay_texts.txt не содержал мусора.
+            if (result != null) result = StripEmptyColorBlocks(result);
+            // Финальная нормализация русского текста: убираем накопление пробелов, лишние точки и т.д.
+            // Применяется ДО логирования, чтобы лог all_gameplay_texts.txt не накапливал артефакты.
+            if (result != null) result = NormalizeRussianText(result);
+
             // if (text == " serving]") // Console.WriteLine($"[DEBUG Translate] final returned result: '{result}'");
-            LogAllGameplayText(text, result);
+            LogAllGameplayText(originalText, result);
+
+            if (result != null)
+            {
+                translationCache[originalText] = result;
+                MaybeResetTranslationCache();
+            }
 
             return result;
         }
@@ -1518,6 +1758,24 @@ namespace RussianLocalization
                 }
             }
 
+            if (RelationInterestRegex.IsMatch(cleanText) ||
+                cleanText.StartsWith("don't care about ", StringComparison.OrdinalIgnoreCase) ||
+                cleanText.StartsWith("doesn't care about ", StringComparison.OrdinalIgnoreCase) ||
+                cleanText.StartsWith("despise ", StringComparison.OrdinalIgnoreCase) ||
+                cleanText.StartsWith("despises ", StringComparison.OrdinalIgnoreCase) ||
+                cleanText.StartsWith("dislike ", StringComparison.OrdinalIgnoreCase) ||
+                cleanText.StartsWith("dislikes ", StringComparison.OrdinalIgnoreCase) ||
+                cleanText.StartsWith("favor ", StringComparison.OrdinalIgnoreCase) ||
+                cleanText.StartsWith("favors ", StringComparison.OrdinalIgnoreCase))
+            {
+                string transRelation = TranslateRelationText(cleanText);
+                if (transRelation != cleanText)
+                {
+                    success = true;
+                    return lead + transRelation + (hasDot ? "." : "");
+                }
+            }
+
             return text;
         }
 
@@ -1530,50 +1788,84 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(text)) return text;
 
-            bool hasLogPrefix = text.StartsWith(":: ");
-            string matchText = hasLogPrefix ? text.Substring(3) : text;
+            if (text.Length > 350) return text;
 
-            for (int i = 0; i < patternDictionary.Count; i++)
+            // Префиксы строк лога/сводки: ":: " (журнал), "> " и "· " (экран смерти Game summary).
+            // Снимаем префикс перед матчингом и возвращаем обратно — так одни и те же паттерны
+            // работают и в обычном логе, и внутри блоков Game summary/Chronology/Final messages.
+            string logPrefix = "";
+            if (text.StartsWith(":: ")) logPrefix = ":: ";
+            else if (text.StartsWith("> ")) logPrefix = "> ";
+            else if (text.StartsWith("· ")) logPrefix = "· ";
+            string matchText = logPrefix.Length > 0 ? text.Substring(logPrefix.Length) : text;
 
+            if (text.Contains("Weight: 5 lbs"))
             {
+                Console.WriteLine($"[DEBUG C# TryTranslatePattern] text='{text}', matchText='{matchText}'");
+            }
 
-                var rule = patternDictionary[i];
+            // Кандидаты для матчинга: сначала исходный текст, затем — если есть переносы строк —
+            // его версия с \n, схлопнутыми в пробелы. Паттерны компилируются без Singleline, поэтому
+            // "." не матчит \n: фразы, перенесённые по ширине окна (например, длинный текст интересов
+            // фракций), иначе не находятся и уходят в пословный перевод. Нормализованный кандидат это чинит.
+            string[] candidates;
+            if (matchText.IndexOf('\n') >= 0)
+            {
+                string collapsed = matchText.Replace("\r", " ").Replace("\n", " ");
+                while (collapsed.Contains("  ")) collapsed = collapsed.Replace("  ", " ");
+                collapsed = collapsed.Trim();
+                candidates = new[] { matchText, collapsed };
+            }
+            else
+            {
+                candidates = new[] { matchText };
+            }
 
-                var regex = rule.Key;
+            var placeholderRegex = new System.Text.RegularExpressions.Regex(@"\{(?<name>[a-zA-Z0-9_]+)(?::(?<case>[a-z]+))?\}");
 
-                var match = regex.Match(matchText);
-
-                if (match.Success && match.Index == 0 && match.Length == matchText.Length)
-
+            foreach (string candidate in candidates)
+            {
+                for (int i = 0; i < patternDictionary.Count; i++)
                 {
+                    var rule = patternDictionary[i];
+                    var regex = rule.Key;
+                    var match = regex.Match(candidate);
 
-                    string template = rule.Value;
-                    var placeholderRegex = new System.Text.RegularExpressions.Regex(@"\{(?<name>[a-zA-Z0-9_]+)(?::(?<case>[a-z]+))?\}");
-
-                    string result = placeholderRegex.Replace(template, (placeholderMatch) =>
+                    if (text.Contains("Weight: 5 lbs"))
                     {
-                        string name = placeholderMatch.Groups["name"].Value;
-                        string caseName = placeholderMatch.Groups["case"].Value;
-                        var group = match.Groups[name];
-                        if (group.Success)
+                        Console.WriteLine($"  Checking regex='{regex}' -> Success={match.Success}, Index={match.Index}, Length={match.Length}, CandLength={candidate.Length}");
+                    }
+
+                    if (match.Success && match.Index == 0 && match.Length == candidate.Length)
+                    {
+                        string template = rule.Value;
+                        string result = placeholderRegex.Replace(template, (placeholderMatch) =>
                         {
-                            if (!string.IsNullOrEmpty(caseName))
+                            string name = placeholderMatch.Groups["name"].Value;
+                            string caseName = placeholderMatch.Groups["case"].Value;
+                            var group = match.Groups[name];
+                            if (group.Success)
                             {
-                                return TranslateFactionCase(group.Value, caseName);
+                                if (!string.IsNullOrEmpty(caseName))
+                                {
+                                    return TranslateFactionCase(group.Value, caseName);
+                                }
+                                else
+                                {
+                                    return TranslateText(group.Value, true);
+                                }
                             }
-                            else
+                            if (regex.GroupNumberFromName(name) >= 0)
                             {
-                                return TranslateText(group.Value, true);
+                                return "";
                             }
-                        }
-                        return placeholderMatch.Value;
-                    });
-                    
-                    success = true;
-                    return hasLogPrefix ? ":: " + result : result;
+                            return placeholderMatch.Value;
+                        });
 
+                        success = true;
+                        return logPrefix + result;
+                    }
                 }
-
             }
 
             return text;
@@ -1582,19 +1874,33 @@ namespace RussianLocalization
 
 
 
+        // Быстрая проверка имён клавиш через HashSet — избегаем повторных сравнений строк.
+        private static readonly HashSet<string> KeyNameSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "space", "enter", "esc", "escape", "tab", "backspace", "insert", "delete",
+            "home", "end", "pgup", "pgdn", "pageup", "pagedown"
+        };
+
         private static bool IsKeyName(string text)
         {
             if (string.IsNullOrEmpty(text)) return false;
-            string s = text.ToLower();
-            return s == "space" || s == "enter" || s == "esc" || s == "escape" || s == "tab" ||
-                   s == "backspace" || s == "insert" || s == "delete" || s == "home" || s == "end" ||
-                   s == "pgup" || s == "pgdn" || s == "pageup" || s == "pagedown" ||
-                   s.StartsWith("num ") || s.StartsWith("numpad") || s.StartsWith("f") && s.Length <= 3;
+            // Кэшируем lowercase-нормализованную строку, чтобы не делать ToLower несколько раз в горячих путях.
+            string s = text.Length <= 3 && text[0] == 'f' ? text : text.ToLowerInvariant();
+            if (KeyNameSet.Contains(s)) return true;
+            if (s.Length > 4 && (s.StartsWith("num ") || s.StartsWith("numpad"))) return true;
+            return false;
         }
 
         private static string TranslateInternal(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
+            string cached;
+            if (translationCache.TryGetValue(text, out cached)) return cached;
+
+            string originalText = text;
+            // Предварительно схлопываем посимвольные цветовые блоки английских слов,
+            // чтобы словарь мог перевести цельное слово вместо отдельных букв.
+            text = CompactColorFragments(text);
 
             // Восстановление битых кавычек из-за кодировок консоли
             text = text.Replace('½', '«').Replace('╗', '»');
@@ -1675,6 +1981,11 @@ namespace RussianLocalization
 
             if (leadTags.Count > 0) result = string.Join("", leadTags) + result;
             if (trailTags.Count > 0) result = result + string.Join("", trailTags);
+
+            if (result != null)
+            {
+                translationCache[originalText] = result;
+            }
             return result;
         }
 
@@ -1794,8 +2105,28 @@ namespace RussianLocalization
                 }
             }
 
+            // 1.5. Перед построчным разбиением: пробуем перевести весь блок как ОДНУ строку
+            // со схлопнутыми переносами. Длинные шаблонные фразы (текст интересов фракций
+            // "X are interested in sharing secrets about the locations of ...") разрываются
+            // переносом по ширине окна, и по отдельным строкам паттерн их не находит —
+            // строки уходят в пословный перевод ("are interested in обмен secrets ...").
+            // Если паттерн/словарь матчит схлопнутый блок целиком — берём его (игра сама перевернёт).
+            if (text.IndexOf('\n') >= 0)
+            {
+                string collapsed = System.Text.RegularExpressions.Regex.Replace(
+                    text.Replace("\r", " ").Replace("\n", " "), @"[ \t]{2,}", " ").Trim();
+                if (collapsed.Length > 0 && collapsed != text.Trim())
+                {
+                    bool pSucc;
+                    string pTrans = TryTranslatePattern(collapsed, out pSucc);
+                    if (pSucc && pTrans != collapsed) return pTrans;
+                    string exactC;
+                    if (staticDictionary.TryGetValue(collapsed, out exactC)) return exactC;
+                }
+            }
+
             // 2. Построчный перевод при наличии \n (для сохранения форматирования и каст)
-            bool isQuestDialog = text.Contains("Come, close! I have an errand") || 
+            bool isQuestDialog = text.Contains("Come, close! I have an errand") ||
                                  text.Contains("Friend, there was a time") ||
                                  text.Contains("welcome to the village of");
             if (text.Contains("\n") && !isQuestDialog)
@@ -2020,19 +2351,8 @@ namespace RussianLocalization
                 // ЗАЩИТА: Если оригинальный trimmed текст не в скобках,
                 // но его супер-нормализованная форма - это одиночная латинская буква или известное название клавиши,
                 // то мы запрещаем перевод через normalizedKeyDictionary, так как это ASCII-арт, тайл или граффити.
-                bool isKeyName = snFull.Length == 1 ||
-                                 snFull == "esc" ||
-                                 snFull == "tab" ||
-                                 snFull == "enter" ||
-                                 snFull == "space" ||
-                                 snFull == "backspace" ||
-                                 snFull == "insert" || 
-                                 snFull == "delete" ||
-                                 snFull == "up" ||
-                                 snFull == "down" ||
-                                 snFull == "left" ||
-                                 snFull == "right";
-                bool hasBrackets = trimmed.StartsWith("[") && trimmed.EndsWith("]");        
+                bool isKeyName = snFull.Length == 1 || KeyNameSet.Contains(snFull);
+                bool hasBrackets = trimmed.StartsWith("[") && trimmed.EndsWith("]");
 
                 if (!isKeyName || hasBrackets)
                 {
@@ -2198,6 +2518,14 @@ namespace RussianLocalization
 
                             }
 
+                            // Вложенная закрывающая }} — потребляем ОБА символа (фикс потери скобок)
+
+                            markupContent.Append("}}");
+
+                            i += 2;
+
+                            continue;
+
                         }
 
                         else if (i < len - 1 && text[i] == '{' && text[i + 1] == '{')
@@ -2205,6 +2533,12 @@ namespace RussianLocalization
                         {
 
                             braceCount++;
+
+                            markupContent.Append("{{");
+
+                            i += 2;
+
+                            continue;
 
                         }
 
@@ -2471,6 +2805,26 @@ namespace RussianLocalization
 
             {
 
+                if (text[end] == '.' && end >= start + 3)
+
+                {
+
+                    char c1 = char.ToLowerInvariant(text[end - 1]);
+
+                    char c2 = char.ToLowerInvariant(text[end - 2]);
+
+                    char c3 = char.ToLowerInvariant(text[end - 3]);
+
+                    if (c1 == 's' && c2 == 'b' && c3 == 'l')
+
+                    {
+
+                        break;
+
+                    }
+
+                }
+
                 end--;
 
             }
@@ -2506,6 +2860,8 @@ namespace RussianLocalization
 
             if (InternalGameKeys.Contains(text.Trim())) return text;
 
+
+
             if (text.Contains("serving"))
             {
                 // Console.WriteLine($"[DEBUG TranslateText] Contains serving: text='{text}', length={text.Length}");
@@ -2524,6 +2880,16 @@ namespace RussianLocalization
             {
 
                 return modernUITranslated;
+
+            }
+
+            string factionTranslated = TryTranslateFactionReputation(text, out success);
+
+            if (success)
+
+            {
+
+                return factionTranslated;
 
             }
 
@@ -2587,12 +2953,10 @@ namespace RussianLocalization
 
 
 
-            string normalizedCore = core.Replace('\u00A0', ' ')
-
+            string normalizedCore = core.Replace("\r\n", "\n")
+                                        .Replace('\u00A0', ' ')
                                         .Replace('\u2007', ' ')
-
                                         .Replace('\u200B', ' ')
-
                                         .Replace('\u202F', ' ');
 
 
@@ -2618,18 +2982,7 @@ namespace RussianLocalization
                 // Попытка найти нормализованный ключ для ядра текста
                 string sn = SuperNormalize(trimmedCore);
                 
-                bool isKeyName = sn.Length == 1 || 
-                                 sn == "esc" || 
-                                 sn == "tab" || 
-                                 sn == "enter" || 
-                                 sn == "space" || 
-                                 sn == "backspace" || 
-                                 sn == "insert" || 
-                                 sn == "delete" || 
-                                 sn == "up" || 
-                                 sn == "down" || 
-                                 sn == "left" || 
-                                 sn == "right";
+                bool isKeyName = sn.Length == 1 || KeyNameSet.Contains(sn);
                 bool hasBrackets = trimmedCore.StartsWith("[") && trimmedCore.EndsWith("]");
                 
                 if (!isKeyName || hasBrackets)
@@ -2681,6 +3034,16 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(translatedCore))
             {
+                bool patSuccess;
+                string patTrans = TryTranslatePattern(trimmedCore, out patSuccess);
+                if (patSuccess)
+                {
+                    translatedCore = patTrans;
+                }
+            }
+
+            if (string.IsNullOrEmpty(translatedCore))
+            {
                 // Защита от "Франкенштейнов": не пытаемся переводить пословно длинные предложения,
                 // так как это портит грамматику и делает текст нечитаемым.
                 // Пословный перевод разрешен только для коротких фраз (до 3 слов).
@@ -2699,7 +3062,27 @@ namespace RussianLocalization
                 }
                 else
                 {
-                    if (trimmedCore.Contains(", "))
+                    // Многострочные блоки (например, содержимое {{rules|...}}): переводим построчно.
+                    // Это покрывает блоки характеристик предметов вида
+                    // "Strength Bonus Cap: 2\nWeapon Class: Cudgel (...)", которые целиком в словаре
+                    // не найти, но каждая строка — отдельная словарная запись.
+                    if (normalizedCore.Contains("\n"))
+                    {
+                        string[] nlParts = normalizedCore.Split('\n');
+                        List<string> translatedNl = new List<string>();
+                        bool anyNlChanged = false;
+                        foreach (var np in nlParts)
+                        {
+                            string tnp = TranslateText(np);
+                            translatedNl.Add(tnp);
+                            if (tnp != np)
+                            {
+                                anyNlChanged = true;
+                            }
+                        }
+                        translatedCore = anyNlChanged ? string.Join("\n", translatedNl) : normalizedCore;
+                    }
+                    else if (trimmedCore.Contains(", "))
                     {
                         string[] parts = trimmedCore.Split(new[] { ", " }, StringSplitOptions.None);
                         List<string> translatedParts = new List<string>();
@@ -2793,184 +3176,168 @@ namespace RussianLocalization
 
 
         private static string TryWordReplacement(string text)
-
         {
+            if (string.IsNullOrEmpty(text)) return text;
 
-            string result = text;
+            string[] words = text.Split(' ');
+            if (words.Length == 0) return text;
 
+            var sb = new StringBuilder(text.Length * 2);
+            int wordIdx = 0;
 
-
-            for (int i = 0; i < sortedWordKeys.Count; i++)
-
+            while (wordIdx < words.Length)
             {
+                string bestMatch = null;
+                int bestLen = 0;
 
-                string key = sortedWordKeys[i];
-
-                if (string.IsNullOrEmpty(key)) continue;
-
-
-
-                string translation;
-
-                if (wordDictionary.TryGetValue(key, out translation))
-
+                for (int seqLen = 3; seqLen >= 1; seqLen--)
                 {
+                    if (wordIdx + seqLen > words.Length) continue;
 
-                    int index = result.IndexOf(key, StringComparison.OrdinalIgnoreCase);
-
-                    while (index != -1)
-
+                    string candidate = string.Join(" ", words, wordIdx, seqLen);
+                    int start = 0;
+                    while (start < candidate.Length && !char.IsLetterOrDigit(candidate[start]))
                     {
-
-                        // Защита границ слов: предотвращает ложные совпадения (например, "int" внутри "points")
-
-                        bool isWordBoundaryStart = true;
-
-                        if (index > 0)
-
-                        {
-
-                            char prev = result[index - 1];
-
-                            if (char.IsLetterOrDigit(prev) && char.IsLetterOrDigit(key[0]))
-
-                            {
-
-                                isWordBoundaryStart = false;
-
-                            }
-
-                        }
-
-
-
-                        bool isWordBoundaryEnd = true;
-
-                        if (index + key.Length < result.Length)
-
-                        {
-
-                            char next = result[index + key.Length];
-
-                            if (char.IsLetterOrDigit(next) && char.IsLetterOrDigit(key[key.Length - 1]))
-
-                            {
-
-                                isWordBoundaryEnd = false;
-
-                            }
-
-                        }
-
-
-
-                        if (isWordBoundaryStart && isWordBoundaryEnd)
-
-                        {
-
-                            if (translation.Length > 0)
-
-                            {
-
-                                string finalTrans = translation;
-                                string matchedWord = result.Substring(index, key.Length);
-                                bool isAllLower = true;
-                                bool isAllUpper = true;
-                                for (int c = 0; c < matchedWord.Length; c++)
-                                {
-                                    if (char.IsUpper(matchedWord[c])) isAllLower = false;
-                                    if (char.IsLower(matchedWord[c])) isAllUpper = false;
-                                }
-
-                                if (isAllLower)
-                                {
-                                    finalTrans = finalTrans.ToLower();
-                                }
-                                else if (isAllUpper)
-                                {
-                                    finalTrans = finalTrans.ToUpper();
-                                }
-                                else if (char.IsUpper(matchedWord[0]))
-                                {
-                                    finalTrans = char.ToUpper(finalTrans[0]) + finalTrans.Substring(1);
-                                }
-
-
-
-                                result = result.Remove(index, key.Length).Insert(index, finalTrans);
-
-                                index = result.IndexOf(key, index + finalTrans.Length, StringComparison.OrdinalIgnoreCase);
-
-                            }
-
-                            else
-                            {
-                                result = result.Remove(index, key.Length);
-                                index = result.IndexOf(key, index, StringComparison.OrdinalIgnoreCase);
-                            }
-
-                        }
-
-                        else
-
-                        {
-
-                            index = result.IndexOf(key, index + 1, StringComparison.OrdinalIgnoreCase);
-
-                        }
-
+                        start++;
+                    }
+                    int end = candidate.Length;
+                    while (end > start && !char.IsLetterOrDigit(candidate[end - 1]))
+                    {
+                        end--;
                     }
 
+                    if (start >= end) continue; // Only punctuation/symbols, skip core lookup
+
+                    string leadingPunct = candidate.Substring(0, start);
+                    string trailingPunct = candidate.Substring(end);
+                    string core = candidate.Substring(start, end - start);
+
+                    string translation = null;
+                    if (wordDictionary.TryGetValue(core, out translation) || 
+                        wordDictionary.TryGetValue(core.ToLower(), out translation))
+                    {
+                        if (translation != null)
+                        {
+                            // Match case of the core
+                            bool isAllLower = true, isAllUpper = true;
+                            for (int c = 0; c < core.Length; c++)
+                            {
+                                if (char.IsUpper(core[c])) isAllLower = false;
+                                if (char.IsLower(core[c])) isAllUpper = false;
+                            }
+
+                            string finalCoreTrans = translation;
+                            if (isAllLower) finalCoreTrans = finalCoreTrans.ToLower();
+                            else if (isAllUpper) finalCoreTrans = finalCoreTrans.ToUpper();
+                            else if (finalCoreTrans.Length > 0 && char.IsUpper(core[0]))
+                                finalCoreTrans = char.ToUpper(finalCoreTrans[0]) + finalCoreTrans.Substring(1);
+
+                            bestMatch = leadingPunct + finalCoreTrans + trailingPunct;
+                            bestLen = seqLen;
+                            break;
+                        }
+                    }
                 }
 
+                if (bestMatch != null)
+                {
+                    if (sb.Length > 0) sb.Append(' ');
+                    sb.Append(bestMatch);
+                    wordIdx += bestLen;
+                }
+                else
+                {
+                    if (sb.Length > 0) sb.Append(' ');
+                    sb.Append(words[wordIdx]);
+                    wordIdx++;
+                }
             }
 
-
-
-            return result;
-
+            return sb.ToString();
         }
 
 
 
         private static bool ContainsCyrillic(string text)
         {
-            if (string.IsNullOrEmpty(text)) return false;
-            for (int i = 0; i < text.Length; i++)
+            bool hasCyrillic, hasEnglish;
+            ScanAlpha(text, out hasCyrillic, out hasEnglish);
+            return hasCyrillic;
+        }
+
+        /// <summary>
+        /// Internal-доступ к ContainsCyrillic для других классов внутри сборки (FontUtils).
+        /// </summary>
+        internal static bool ContainsCyrillicInternal(string text) => ContainsCyrillic(text);
+
+        /// <summary>
+        /// Однопроходное определение наличия кириллических и латинских букв в строке.
+        /// Заменяет два вызова ContainsCyrillic + ContainsEnglish в горячих путях.
+        /// Пропускает XML-теги цвета и фигурные скобки Qud разметки, чтобы не ломать
+        /// определение языка для переведенного текста.
+        /// </summary>
+        private static void ScanAlpha(string text, out bool hasCyrillic, out bool hasEnglish)
+        {
+            hasCyrillic = false;
+            hasEnglish = false;
+            if (string.IsNullOrEmpty(text)) return;
+
+            int i = 0;
+            int len = text.Length;
+            while (i < len)
             {
-                char c = text[i];
-                if ((c >= '\u0430' && c <= '\u044f') || (c >= '\u0410' && c <= '\u042f') || c == '\u0451' || c == '\u0401')
+                // Skip XML-like tags <color=...> or </color>
+                if (text[i] == '<')
                 {
-                    return true;
+                    int closeIdx = text.IndexOf('>', i);
+                    if (closeIdx > i)
+                    {
+                        i = closeIdx + 1;
+                        continue;
+                    }
                 }
+                // Skip Qud markup tag prefix {{tag|
+                if (i < len - 1 && text[i] == '{' && text[i + 1] == '{')
+                {
+                    int pipeIdx = text.IndexOf('|', i + 2);
+                    int closeBraceIdx = text.IndexOf("}}", i + 2);
+                    if (pipeIdx > i && (closeBraceIdx == -1 || pipeIdx < closeBraceIdx))
+                    {
+                        i = pipeIdx + 1;
+                        continue;
+                    }
+                    else if (closeBraceIdx > i)
+                    {
+                        i = closeBraceIdx + 2;
+                        continue;
+                    }
+                }
+                // Skip closing }}
+                if (i < len - 1 && text[i] == '}' && text[i + 1] == '}')
+                {
+                    i += 2;
+                    continue;
+                }
+
+                char c = text[i];
+                if (!hasCyrillic && ((c >= '\u0430' && c <= '\u044f') || (c >= '\u0410' && c <= '\u042f') || c == '\u0451' || c == '\u0401'))
+                {
+                    hasCyrillic = true;
+                }
+                else if (!hasEnglish && ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')))
+                {
+                    hasEnglish = true;
+                }
+                if (hasCyrillic && hasEnglish) return;
+                i++;
             }
-            return false;
         }
 
         private static bool ContainsEnglish(string text)
-
         {
-
-            if (string.IsNullOrEmpty(text)) return false;
-
-            for (int i = 0; i < text.Length; i++)
-
-            {
-
-                char c = text[i];
-
-                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-
-                {
-
-                    return true;
-
-                }
-
-            }
-
-            return false;
-
+            bool hasCyrillic, hasEnglish;
+            ScanAlpha(text, out hasCyrillic, out hasEnglish);
+            return hasEnglish;
         }
 
         public static string RestoreStrippedPunctuation(string original, string key, string translation)
@@ -3106,13 +3473,9 @@ namespace RussianLocalization
 
 
         private static void LogUntranslated(string text)
-
         {
-
             try
-
             {
-
                 if (string.IsNullOrEmpty(text)) return;
 
                 string trimmed = text.Trim();
@@ -3121,76 +3484,37 @@ namespace RussianLocalization
 
                 if (IsJunkText(trimmed)) return;
 
-                
-
                 if (trimmed.StartsWith("<") && trimmed.EndsWith(">")) return;
 
                 if (trimmed.StartsWith("{{") && trimmed.EndsWith("}}")) return;
 
-
-
-                lock (LogLock)
-
+                // ConcurrentDictionary.TryAdd атомарен и не требует lock.
+                if (loggedStrings.TryAdd(trimmed, 0))
                 {
-
-                    if (!loggedStrings.Contains(trimmed))
-
-                    {
-
-                        loggedStrings.Add(trimmed);
-
-                        AppendToLogFile("untranslated.txt", trimmed + Environment.NewLine);
-
-                    }
-
+                    AppendToLogFile("untranslated.txt", trimmed + Environment.NewLine);
                 }
-
             }
-
             catch {}
-
         }
 
 
 
         private static void LogWordReplacement(string original, string replaced)
-
         {
-
             try
-
             {
-
                 if (string.IsNullOrEmpty(original) || original == replaced) return;
 
-
-
-                lock (ReplacementLogLock)
-
+                // ConcurrentDictionary.TryAdd атомарен и не требует lock.
+                if (loggedReplacements.TryAdd(original, 0))
                 {
-
-                    if (!loggedReplacements.Contains(original))
-
-                    {
-
-                        loggedReplacements.Add(original);
-
-                        string logEntry = "[Original]: " + original + Environment.NewLine +
-
-                                          "[Replaced]: " + replaced + Environment.NewLine +
-
-                                          "--------------------------------------------------" + Environment.NewLine;
-
-                        AppendToLogFile("word_replacements.txt", logEntry);
-
-                    }
-
+                    string logEntry = "[Original]: " + original + Environment.NewLine +
+                                      "[Replaced]: " + replaced + Environment.NewLine +
+                                      "--------------------------------------------------" + Environment.NewLine;
+                    AppendToLogFile("word_replacements.txt", logEntry);
                 }
-
             }
-
             catch {}
-
         }
 
 
@@ -3202,16 +3526,15 @@ namespace RussianLocalization
                 if (IsJunkText(original)) return;
                 string trimmed = original.Trim();
 
-                lock (AllTextLogLock)
+                // Потокобезопасная проверка и добавление без lock благодаря ConcurrentDictionary.
+                if (loggedAllTexts.TryAdd(trimmed, 0))
                 {
-                    if (!loggedAllTexts.Contains(trimmed))
-                    {
-                        loggedAllTexts.Add(trimmed);
-                        string fullEntry = "---" + Environment.NewLine + 
-                                           "[RAW]: " + original + Environment.NewLine + 
-                                           "[RES]: " + translated + Environment.NewLine;
-                        AppendToLogFile("all_gameplay_texts.txt", fullEntry);
-                    }
+                    string logOriginal = original.Replace("\r\n", "\n").Trim();
+                    string logTranslated = translated.Replace("\r\n", "\n").Trim();
+                    string fullEntry = "---" + Environment.NewLine +
+                                       "[RAW]: " + logOriginal + Environment.NewLine +
+                                       "[RES]: " + logTranslated + Environment.NewLine;
+                    AppendToLogFile("all_gameplay_texts.txt", fullEntry);
                 }
             }
             catch {}
@@ -3219,16 +3542,47 @@ namespace RussianLocalization
 
 
 
+        // Мемоизация IsJunkText для повторяющихся коротких строк (UUID, hotkey, MB-размеры и т.п.).
+        // Ограничиваем размер кэша, чтобы не рос бесконтрольно.
+        private const int JunkTextCacheMaxEntries = 4096;
+        private static readonly ConcurrentDictionary<string, bool> junkTextCache = new ConcurrentDictionary<string, bool>();
+        private static int junkTextCacheOverflow;
+
         private static bool IsJunkText(string text)
         {
             if (string.IsNullOrEmpty(text)) return true;
             string trimmed = text.Trim();
             if (trimmed.Length <= 1) return true;
 
-            if (trimmed == "WoundLevel" || 
-                trimmed == "WoundLevel2" || 
-                trimmed == "DisplayName" || 
-                trimmed == "ConText" || 
+            // Быстрый путь: для коротких строк (<=64) ищем в кэше.
+            if (trimmed.Length <= 64)
+            {
+                bool cached;
+                if (junkTextCache.TryGetValue(trimmed, out cached)) return cached;
+                bool result = IsJunkTextCore(trimmed);
+                // Кэшируем, но только пока не превышен лимит.
+                if (System.Threading.Interlocked.CompareExchange(ref junkTextCacheOverflow, 0, 0) == 0)
+                {
+                    if (junkTextCache.Count < JunkTextCacheMaxEntries)
+                    {
+                        junkTextCache[trimmed] = result;
+                    }
+                    else
+                    {
+                        System.Threading.Interlocked.Exchange(ref junkTextCacheOverflow, 1);
+                    }
+                }
+                return result;
+            }
+            return IsJunkTextCore(trimmed);
+        }
+
+        private static bool IsJunkTextCore(string trimmed)
+        {
+            if (trimmed == "WoundLevel" ||
+                trimmed == "WoundLevel2" ||
+                trimmed == "DisplayName" ||
+                trimmed == "ConText" ||
                 trimmed == "LongDescription" ||
                 trimmed == "Esc]" ||
                 trimmed == "PgDown" ||
@@ -3243,6 +3597,15 @@ namespace RussianLocalization
             if (trimmed.EndsWith(" MB")) return true;
             if (trimmed == "DevAssets" || trimmed == "_DevAssets") return true;
 
+            // Технические сообщения загрузки ресурсов игры — не переводим, не логируем как непереведённые.
+            if (trimmed.StartsWith("Loading ")) return true;
+
+            // Размеры экрана вида "640x480" / "1920x1080" — числовые метки, не переводим.
+            if (IsScreenResolution(trimmed)) return true;
+
+            // Одиночные ANSI-цветовые маркеры CoQ (&y, &y^b, &W, &K, &w, &yX, &WX и т.п.) — не переводим.
+            if (IsAnsiColorMarker(trimmed)) return true;
+
             if (IsUUID(trimmed)) return true;
             if (IsDiceNotation(trimmed)) return true;
             if (IsHotkeyOnly(trimmed)) return true;
@@ -3250,33 +3613,20 @@ namespace RussianLocalization
             bool hasLetters = false;
 
             for (int i = 0; i < trimmed.Length; i++)
-
             {
-
                 char c = trimmed[i];
-
                 if (char.IsLetter(c))
-
                 {
-
                     hasLetters = true;
-
                     break;
-
                 }
-
             }
 
             if (!hasLetters) return true;
 
-
-
             if (trimmed.StartsWith("<") && trimmed.EndsWith(">") && !trimmed.Contains("</color>")) return true;
 
-
-
             return false;
-
         }
 
         private static bool IsUUID(string text)
@@ -3305,7 +3655,198 @@ namespace RussianLocalization
             return false;
         }
 
+        // Регулярка для распознавания ANSI-цветовых маркеров Caves of Qud (&y, &y^b, &W, &K, &w, &wX, &WX и т.п.).
+        // Это управляющие последовательности терминала, не осмысленный текст.
+        private static readonly System.Text.RegularExpressions.Regex AnsiColorRegex =
+            new System.Text.RegularExpressions.Regex(@"^&[a-zA-Z\^]+[a-zA-Z]?$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
+        private static bool IsAnsiColorMarker(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+            if (!text.StartsWith("&")) return false;
+            return AnsiColorRegex.IsMatch(text);
+        }
+
+        // Разрешение экрана вида "640x480", "1920x1080", "2560x1600".
+        private static readonly System.Text.RegularExpressions.Regex ScreenResolutionRegex =
+            new System.Text.RegularExpressions.Regex(@"^\d{3,4}x\d{3,4}$", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        private static bool IsScreenResolution(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+            return ScreenResolutionRegex.IsMatch(text);
+        }
+
+        // Whitelist игровых сокращений Caves of Qud, которые должны переводиться
+        // (атрибуты, статы, направления, форматы).
+        // Защитный фильтр в staticDictionary отбрасывает 1-2 буквенные ключи,
+        // но эти сокращения — исключения, они НЕ ломают другие слова.
+        private static readonly HashSet<string> GameAbbreviations = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            // Атрибуты
+            "HP", "MP", "SP", "AP", "AV", "DV", "XP", "MA", "LV", "QN", "UR", "UI", "MS",
+            // Направления
+            "NE", "NW", "SE", "SW", "NO", "SO", "EA", "WE",
+            // Управление / устройства
+            "PS", "OK", "CR", "ER", "HR", "Eq", "PC", "VR", "AR",
+            // Игровые / мод-специфичные
+            "Ud", "Ut", "Ux", "No", "on",
+        };
+
+        private static bool IsGameAbbreviation(string key)
+        {
+            if (string.IsNullOrEmpty(key)) return false;
+            return GameAbbreviations.Contains(key);
+        }
+
+        // Регулярки для финальной очистки цветовых блоков (постпроцессинг).
+        // Применяются ДО записи в translationCache и в LogAllGameplayText,
+        // чтобы лог и кэш не содержали визуального мусора.
+        // Не затрагивают текст внутри блоков, только удаляют пустые и висящие теги.
+        private static readonly System.Text.RegularExpressions.Regex EmptyColorBlockRegex =
+            new System.Text.RegularExpressions.Regex(@"<color=[^>]+>[ \t]*</color>", System.Text.RegularExpressions.RegexOptions.Compiled);
+        // Подряд идущие одинаковые открывающие теги: <color=X><color=X> -> <color=X>
+        // (?![ \t]*</color>) — не схлопываем, если после тега идёт закрывающий (это валидный пустой блок).
+        private static readonly System.Text.RegularExpressions.Regex DoubleOpenColorRegex =
+            new System.Text.RegularExpressions.Regex(@"<color=([^>]+)>(?![ \t]*</color>)(<color=\1>(?![ \t]*</color>))+", System.Text.RegularExpressions.RegexOptions.Compiled);
+        // Подряд идущие закрывающие теги: </color></color> -> </color>
+        private static readonly System.Text.RegularExpressions.Regex DoubleCloseColorRegex =
+            new System.Text.RegularExpressions.Regex(@"(?:</color>[ \t]*){2,}", System.Text.RegularExpressions.RegexOptions.Compiled);
+        // Висящий открывающий тег в самом конце строки: <color=X> (без </color> в конце).
+        // Это безопасно удалять: TMP_Text всё равно отбросит непарный тег, а лог станет чище.
+        private static readonly System.Text.RegularExpressions.Regex TrailingOpenColorRegex =
+            new System.Text.RegularExpressions.Regex(@"<color=[^>]+>[ \t]*$", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        /// <summary>
+        /// Удаляет пустые цветовые блоки <color=...></color> и схлопывает подряд
+        /// идущие одинаковые открывающие/закрывающие теги.
+        /// Безопасно для UI: не трогает блоки с непустым содержимым и не меняет цвета.
+        /// </summary>
+        internal static string StripEmptyColorBlocks(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            if (text.IndexOf("<color=", StringComparison.OrdinalIgnoreCase) < 0 &&
+                text.IndexOf("</color>", StringComparison.OrdinalIgnoreCase) < 0) return text;
+            // 1. Удаляем блоки только с пробелами <color=X>   </color>
+            text = EmptyColorBlockRegex.Replace(text, "");
+            // 2. Схлопываем 2+ подряд идущих одинаковых открывающих тегов.
+            //    НЕ схлопываем разные цвета, чтобы не сломать валидные переходы.
+            //    НЕ схлопываем если после тега идёт </color> (валидный пустой блок).
+            text = DoubleOpenColorRegex.Replace(text, "<color=$1>");
+            // 3. Схлопываем подряд идущие </color>
+            text = DoubleCloseColorRegex.Replace(text, "</color>");
+            // 4. Удаляем висящий открывающий тег в самом конце строки (без пары).
+            text = TrailingOpenColorRegex.Replace(text, "");
+            return text;
+        }
+
+        // Регулярки для нормализации текста
+        private static readonly System.Text.RegularExpressions.Regex MultiSpaceRegex =
+            new System.Text.RegularExpressions.Regex(@"[ \t]{2,}", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex MultiNewlineRegex =
+            new System.Text.RegularExpressions.Regex(@"(\r?\n){3,}", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex DoubleDotRegex =
+            new System.Text.RegularExpressions.Regex(@"(?<!http:|https:)(?<!\d)\.\.(?!\d)", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex SpaceBeforePunctRegex =
+            new System.Text.RegularExpressions.Regex(@"[ \t]+([,;.!?]|:(?!:))", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex SpaceAfterPunctRegex =
+            new System.Text.RegularExpressions.Regex(@"([,;:.!?])(?=[А-ЯЁA-Z][а-яёa-z])", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex NoSpaceAfterPunctRegex =
+            new System.Text.RegularExpressions.Regex(@"([,;:.!?])(?=[а-яёa-z])", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        /// <summary>
+        /// Финальная нормализация русского текста: схлопывает множественные пробелы,
+        /// убирает лишние переносы строк, исправляет двойные точки на троеточие,
+        /// убирает пробелы перед знаками препинания.
+        /// Вызывается ПОСЛЕ StripEmptyColorBlocks, но ДО записи в лог all_gameplay_texts.txt.
+        /// </summary>
+        internal static string NormalizeRussianText(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            if (!ContainsCyrillic(text) && !ContainsEnglish(text)) return text;
+
+            string result = text;
+
+            // 1. Заменяем все Unicode-пробелы на обычный ASCII пробел (неразрывные и т.д.)
+            result = result.Replace('\u00A0', ' ')
+                           .Replace('\u2007', ' ')
+                           .Replace('\u200B', ' ')
+                           .Replace('\u202F', ' ');
+
+            // 2. Схлопываем 2+ подряд идущих пробела/таба в один
+            // ВАЖНО: пропускаем содержимое внутри <color=...>...</color>, чтобы не сломать структуру
+            result = NormalizeOutsideColorBlocks(result, MultiSpaceRegex, " ");
+
+            // 3. Схлопываем 3+ подряд идущих переноса строк в 2 (\n\n)
+            result = MultiNewlineRegex.Replace(result, "\n\n");
+
+            // 4. Двойные точки -> троеточие (только если не URL и не диапазон)
+            // 5+ точек — также троеточие
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"\.{4,}", "…");
+            result = DoubleDotRegex.Replace(result, "…");
+
+            // 5. Убираем пробелы перед знаками препинания: " ," -> ",", " ." -> "." и т.д.
+            result = SpaceBeforePunctRegex.Replace(result, "$1");
+
+            // 6. Добавляем пробел после запятой/точки/троеточия, если после идёт буква
+            // Шаблон: .,[а-яёa-zА-ЯЁA-Z] без пробела
+            // Сначала после запятой/точки с запятой
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"([,;:])([а-яёa-zА-ЯЁA-Z])", "$1 $2");
+            // После точки — ТОЛЬКО перед заглавной буквой (граница предложения).
+            // НЕ трогаем точку перед строчной, иначе ломаются имена файлов/URL: Mods.csproj, Colors.xml, qud.com
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"(?<!\d)\.([А-ЯЁA-Z])", ". $1");
+            // После троеточия
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"…([а-яёa-zА-ЯЁA-Z])", "… $1");
+
+            // 7. Чистим пробелы вокруг тегов: " </color> " -> "</color> ", "<color=X>  " -> "<color=X> "
+            // и " </color>" -> "</color>", "<color=X> " без изменений (теги должны быть в начале)
+            // ВАЖНО: НЕ убираем пробел перед </color>, если сразу за ним идёт новый <color=...>,
+            // потому что этот пробел — разделитель слов между цветными блоками
+            // (иначе "скоростью </color><color>2x" склеивается в "скоростью2x").
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"[ \t]+</color>(?!<color=)", "</color>");
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"<color=[^>]+>[ \t]+", m => m.Value.TrimEnd() + " ");
+
+            // 8. Пробел после метки клавиши/опции "[x]" перед цветным текстом.
+            // DistributeColors теряет пробел на границе цветных блоков:
+            // "<color=A>[c]</color><color=B>Назначение</color>" -> рендерится "[c]Назначение".
+            // Вставляем пробел между "]</color>" и "<color=...>Буква", чтобы кнопки читались "[c] Назначение".
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"(\]</color>)(<color=[^>]+>)(?=[A-Za-zА-Яа-яЁё])", "$1 $2");
+            // То же без тегов между: "[c]Буква" -> "[c] Буква" (только латиница в скобках = клавиша/опция).
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"(\[[A-Za-z0-9]{1,6}\])(?=[A-Za-zА-Яа-яЁё])", "$1 ");
+
+            return result;
+        }
+
+        /// <summary>
+        /// Применяет regex-замену только к тексту ВНЕ цветовых блоков <color=X>...</color>,
+        /// чтобы не сломать структуру (внутри тегов могут быть валидные пробелы).
+        /// </summary>
+        private static string NormalizeOutsideColorBlocks(string text, System.Text.RegularExpressions.Regex regex, string replacement)
+        {
+            var colorBlockRegex = new System.Text.RegularExpressions.Regex(@"<color=[^>]+>.*?</color>", System.Text.RegularExpressions.RegexOptions.Singleline);
+            var matches = colorBlockRegex.Matches(text);
+            if (matches.Count == 0) return regex.Replace(text, replacement);
+
+            var sb = new System.Text.StringBuilder(text.Length);
+            int lastIdx = 0;
+            for (int i = 0; i < matches.Count; i++)
+            {
+                var m = matches[i];
+                if (m.Index > lastIdx)
+                {
+                    string between = text.Substring(lastIdx, m.Index - lastIdx);
+                    sb.Append(regex.Replace(between, replacement));
+                }
+                sb.Append(m.Value);
+                lastIdx = m.Index + m.Length;
+            }
+            if (lastIdx < text.Length)
+            {
+                string rest = text.Substring(lastIdx);
+                sb.Append(regex.Replace(rest, replacement));
+            }
+            return sb.ToString();
+        }
 
         // --- ТРАНСЛИТЕРАЦИЯ КИРИЛЛИЦЫ В ЛАТИНИЦУ (ДЛЯ КЛАССИЧЕСКОГО ASCII-ТЕРМИНАЛА) ---
 
@@ -3524,6 +4065,157 @@ namespace RussianLocalization
 
                 }
 
+
+
+                // 4. Патч INotifyValueChanged<T>.SetValueWithoutNotify (Postfix) — мгновенный перевод
+                // ------------------------------------------------------------------------------------
+                // Modern UI обновляет текст в TextElement не через свойство text (которое мы
+                // уже патчим), а напрямую через SetValueWithoutNotify<T>(T value) из
+                // INotifyValueChanged<T>. Этот метод специально обходит setter-патчи,
+                // потому что записывает значение в backing field без нотификации.
+                //
+                // Решение: Harmony Prefix на SetValueWithoutNotify — подменяем value на
+                // переведённый текст ПЕРЕД записью в поле. Это срабатывает мгновенно,
+                // без задержки RuntimeTranslator-полллинга.
+
+                if (textElementType != null)
+
+                {
+
+                    System.Type[] interfaces;
+
+                    try { interfaces = textElementType.GetInterfaces(); }
+
+                    catch { interfaces = System.Array.Empty<System.Type>(); }
+
+
+
+                    foreach (var iface in interfaces)
+
+                    {
+
+                        if (iface == null) continue;
+
+                        if (!iface.IsGenericType) continue;
+
+                        if (iface.GetGenericTypeDefinition().FullName != "UnityEngine.UIElements.INotifyValueChanged`1") continue;
+
+
+
+                        System.Type[] typeArgs = iface.GetGenericArguments();
+
+                        if (typeArgs == null || typeArgs.Length != 1) continue;
+
+                        if (typeArgs[0] != typeof(string)) continue;
+
+
+
+                        // Нашли INotifyValueChanged<string> — ищем метод SetValueWithoutNotify на ИНТЕРФЕЙСЕ.
+                        // (Реализация в BindableElement — internal, мы патчим интерфейсный метод,
+                        //  а Harmony навешивается на concrete-implementation через ResolveMethod.)
+                        var ifaceMethod = iface.GetMethod("SetValueWithoutNotify");
+
+                        if (ifaceMethod == null) continue;
+
+
+
+                        // Ищем concrete-реализацию этого метода на textElementType.
+                        System.Reflection.MethodInfo implMethod = null;
+
+                        try
+
+                        {
+
+                            // GetInterfaceMap даёт прямое соответствие iface-метода → реализации.
+                            var map = textElementType.GetInterfaceMap(iface);
+
+                            for (int mi = 0; mi < map.InterfaceMethods.Length; mi++)
+
+                            {
+
+                                if (map.InterfaceMethods[mi] == ifaceMethod)
+
+                                {
+
+                                    implMethod = map.TargetMethods[mi];
+
+                                    break;
+
+                                }
+
+                            }
+
+                        }
+
+                        catch { }
+
+
+
+                        if (implMethod == null) continue;
+
+
+
+                        // Проверяем, не запатчили ли уже.
+                        var existingSvc = Harmony.GetPatchInfo(implMethod);
+
+                        bool alreadySvc = false;
+
+                        if (existingSvc != null && existingSvc.Prefixes != null)
+
+                        {
+
+                            foreach (var pf in existingSvc.Prefixes)
+
+                            {
+
+                                if (pf != null && pf.owner == "com.russianlocalization.uielements")
+
+                                {
+
+                                    alreadySvc = true; break;
+
+                                }
+
+                            }
+
+                        }
+
+                        if (alreadySvc) continue;
+
+
+
+                        var prefixSvc = typeof(UIElementsDynamicPatch).GetMethod("INotifyValueChanged_SetValueWithoutNotify_Prefix", BindingFlags.Public | BindingFlags.Static);
+
+                        if (prefixSvc == null) continue;
+
+
+
+                        try
+
+                        {
+
+                            harmony.Patch(implMethod, prefix: new HarmonyMethod(prefixSvc));
+
+                            UnityEngine.Debug.Log("[RussianLocalization] TextElement.SetValueWithoutNotify(string) patched dynamically — мгновенный перевод Modern UI.");
+
+                        }
+
+                        catch (Exception exSvc)
+
+                        {
+
+                            UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch SetValueWithoutNotify: " + exSvc.Message);
+
+                        }
+
+
+
+                        break; // хватит одной реализации
+
+                    }
+
+                }
+
             }
 
             catch (Exception ex)
@@ -3531,6 +4223,999 @@ namespace RussianLocalization
                 UnityEngine.Debug.LogError("[RussianLocalization] UIElements dynamic patch error: " + ex.ToString());
             }
             }
+
+        // --- ДИНАМИЧЕСКИЙ ПАТЧ QudTranslator.dll (ОФИЦИАЛЬНЫЙ ПЕРЕВОД РАЗРАБОТЧИКА) ---
+        //
+        // В Caves of Qud ≥ 2.0.214 появилась отдельная сборка QudTranslator с методом Translate,
+        // через которую Modern UI тянет переведённые строки. Чтобы наш словарь выигрывал у встроенного,
+        // перехватываем любые публичные методы Translate(string, ...) этого типа.
+        //
+        // Подход: Reflection + Harmony.Patch на найденный MethodInfo. Это совместимо с тем,
+        // что имя класса/пространства имён может меняться между патчами игры (QudTranslator.Translate,
+        // XRL.Translation.Translator.Translate и т.п.).
+
+        public static void PatchQudTranslator()
+        {
+            try
+            {
+                int patched = 0;
+                var ourAssembly = System.Reflection.Assembly.GetExecutingAssembly();
+
+                // Принудительно загружаем QudTranslator.dll, если он ещё не подгружен.
+                try { System.Reflection.Assembly.Load("QudTranslator"); }
+                catch { /* не страшно — проверим в цикле */ }
+
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    System.Type[] types;
+                    try { types = asm.GetTypes(); }
+                    catch (System.Reflection.ReflectionTypeLoadException rtle) { types = rtle.Types; }
+                    catch { continue; }
+
+                    foreach (var t in types)
+                    {
+                        if (t == null) continue;
+                        // Пропускаем свою же сборку — патчить самих себя бессмысленно.
+                        if (t.Assembly == ourAssembly) continue;
+                        // Эвристика: класс из сборки, в названии есть "Translator" / "Translation".
+                        // Это покрывает и "QudTranslator", и "XRL.Translation.Translator", и будущие рефакторы.
+                        string tn = t.Name ?? string.Empty;
+                        string ns = t.Namespace ?? string.Empty;
+                        bool looksLikeTranslator =
+                            tn.IndexOf("Translator", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+                            tn.IndexOf("Translation", System.StringComparison.OrdinalIgnoreCase) >= 0;
+                        if (!looksLikeTranslator) continue;
+
+                        System.Reflection.MethodInfo[] methods;
+                        try { methods = t.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static); }
+                        catch { continue; }
+
+                        foreach (var m in methods)
+                        {
+                            if (m == null) continue;
+                            if (!string.Equals(m.Name, "Translate", System.StringComparison.Ordinal)) continue;
+
+                            var parameters = m.GetParameters();
+                            if (parameters == null || parameters.Length == 0) continue;
+
+                            // Нас интересуют перегрузки, у которых хотя бы один параметр — string,
+                            // и строка входит первой (основной текст для перевода).
+                            bool firstIsString = parameters[0].ParameterType == typeof(string);
+                            if (!firstIsString) continue;
+
+                            // ВАЖНО: метод обязан возвращать string. Постфикс ниже объявлен как
+                            // (ref string __result, string text) — если реальная сигнатура метода
+                            // возвращает void/bool/другой тип, Harmony всё равно может принять патч
+                            // при регистрации, но сгенерированный IL окажется рассинхронизирован
+                            // с реальным возвращаемым типом и упадёт при первом реальном вызове —
+                            // нативный краш (access violation) без единой строки в managed-логе.
+                            // Эвристика по имени класса ("...Translator...") слишком широкая и легко
+                            // цепляет чужой метод Translate(string, ...), не имеющий отношения к
+                            // языковому переводу (например, служебный маппинг тегов/ключей).
+                            if (m.ReturnType != typeof(string)) continue;
+
+                            // Пропускаем generic-методы — Harmony их не умеет патчить.
+                            if (m.IsGenericMethodDefinition) continue;
+
+                            // Пропускаем, если уже есть Postfix с нашим ID (защита от двойной установки).
+                            var existing = Harmony.GetPatchInfo(m);
+                            if (existing != null && existing.Postfixes != null)
+                            {
+                                bool alreadyPatched = false;
+                                foreach (var pf in existing.Postfixes)
+                                {
+                                    if (pf != null && pf.owner == "com.russianlocalization.qudtranslator")
+                                    {
+                                        alreadyPatched = true; break;
+                                    }
+                                }
+                                if (alreadyPatched) continue;
+                            }
+
+                            try
+                            {
+                                var postfix = typeof(TranslationEngine).GetMethod(
+                                    "QudTranslator_Translate_Postfix",
+                                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+                                if (postfix == null) continue;
+
+                                var harmony = new Harmony("com.russianlocalization.qudtranslator");
+                                harmony.Patch(m, postfix: new HarmonyMethod(postfix));
+
+                                UnityEngine.Debug.Log("[RussianLocalization] Patched QudTranslator.Translate on " + t.FullName + " :: " +
+                                    m.Name + "(" + parameters.Length + " params).");
+                                patched++;
+                            }
+                            catch (Exception exInner)
+                            {
+                                UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch " + t.FullName + "." + m.Name + ": " + exInner.Message);
+                            }
+                        }
+                    }
+                }
+
+                if (patched == 0)
+                {
+                    UnityEngine.Debug.Log("[RussianLocalization] QudTranslator.Translate not found (no compatible types/methods). Native translator path will be untouched.");
+                }
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("[RussianLocalization] PatchQudTranslator error: " + ex.ToString());
+            }
+        }
+
+        // Постфикс для QudTranslator.Translate: после того, как родной транслятор вернул результат,
+        // пропускаем его через наш движок. Если родной транслятор ничего не вернул/вернул исходник —
+        // наш словарь всё равно отработает.
+        //
+        // Сигнатура намеренно максимально общая: первый параметр — входной текст (string),
+        // второй — возвращаемый результат (ref string). Harmony нормально склеивает это с любой
+        // перегрузкой Translate(string, ...). Дополнительные параметры передаются как обычные
+        // аргументы и игнорируются телом метода.
+        private static bool HasCyrillic(string s)
+        {
+            for (int i = 0; i < s.Length; i++)
+            {
+                char c = s[i];
+                if ((c >= 'Ѐ' && c <= 'ӿ') || c == 'ё' || c == 'Ё')
+                    return true;
+            }
+            return false;
+        }
+
+        public static void QudTranslator_Translate_Postfix(ref string __result, string text)
+        {
+            try
+            {
+                if (!TranslationEngine.Initialized) return;
+                if (__result == null) return;
+
+                // Если родной транслятор уже вернул что-то осмысленное на русском — оставляем.
+                if (HasCyrillic(__result)) return;
+
+                // Быстрый пропуск: слишком короткие строки (1-2 символа) не тратим время на словарь.
+                if (string.IsNullOrEmpty(text) || text.Length <= 2) return;
+
+                // Пробуем наш словарь.
+                string our = TranslationEngine.Translate(text);
+                if (!string.IsNullOrEmpty(our) && our != text)
+                {
+                    __result = our;
+                }
+            }
+            catch { /* не ломаем чужой транслятор */ }
+        }
+
+        // --- ГЛАВНЫЙ ХУК MODERN UI: XRL.UI.UITextSkin ---
+        //
+        // В Caves of Qud ≥ 2.0.211 текст нового интерфейса (лист персонажа, инвентарь,
+        // сайдбар, тултипы) рисуется НЕ через TMP_Text и НЕ через UIElements.TextElement,
+        // а через собственный MonoBehaviour XRL.UI.UITextSkin, метод SetText(string).
+        // Поэтому все прежние хуки мода его не видят. Перехватываем SetText() и SetTheText()
+        // динамически (рефлексия + try/catch, чтобы не уронить PatchAll при смене сигнатуры).
+        private static System.Reflection.FieldInfo _utsTextField;
+
+        public static void PatchUITextSkin()
+        {
+            try
+            {
+                System.Type t = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { t = asm.GetType("XRL.UI.UITextSkin"); } catch { }
+                    if (t != null) break;
+                }
+                if (t == null)
+                {
+                    UnityEngine.Debug.Log("[RussianLocalization] XRL.UI.UITextSkin not found — Modern UI hook skipped.");
+                    return;
+                }
+
+                _utsTextField = t.GetField("text",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                var harmony = new Harmony("com.russianlocalization.uitextskin");
+                int patched = 0;
+
+                var setText = t.GetMethod("SetText",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+                    null, new System.Type[] { typeof(string) }, null);
+                if (setText != null)
+                {
+                    var pre = typeof(TranslationEngine).GetMethod("UITextSkin_SetText_Prefix",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                    if (pre != null) { harmony.Patch(setText, prefix: new HarmonyMethod(pre)); patched++; }
+                }
+
+                if (_utsTextField != null)
+                {
+                    var setTheText = t.GetMethod("SetTheText",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+                        null, System.Type.EmptyTypes, null);
+                    if (setTheText != null)
+                    {
+                        var pre2 = typeof(TranslationEngine).GetMethod("UITextSkin_SetTheText_Prefix",
+                            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        if (pre2 != null) { harmony.Patch(setTheText, prefix: new HarmonyMethod(pre2)); patched++; }
+                    }
+                }
+
+                UnityEngine.Debug.Log("[RussianLocalization] Patched XRL.UI.UITextSkin (Modern UI core hook), methods patched = " + patched + ".");
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("[RussianLocalization] PatchUITextSkin error: " + ex.ToString());
+            }
+        }
+
+        // ============================================================
+        // ПАТЧ XRL.UI.Popup — popup-сообщения, меню, запросы (≥ 2.0.211)
+        // 40+ методов, ~277 вызовов в коде. ShowYesNo=108, PickOption=84 и т.д.
+        // Динамически находим все методы со string-параметрами и патчим.
+        // ============================================================
+        public static void PatchPopup()
+        {
+            try
+            {
+                System.Type t = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { t = asm.GetType("XRL.UI.Popup"); } catch { }
+                    if (t != null) break;
+                }
+                if (t == null)
+                {
+                    UnityEngine.Debug.Log("[RussianLocalization] XRL.UI.Popup not found — popup hook skipped.");
+                    return;
+                }
+
+                var harmony = new Harmony("com.russianlocalization.popup");
+                int patched = 0;
+
+                var prefixMethod = typeof(TranslationEngine).GetMethod("Popup_Generic_Prefix",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+                var methods = t.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                foreach (var m in methods)
+                {
+                    if (m == null) continue;
+                    if (m.IsGenericMethodDefinition) continue;
+
+                    // Пропускаем get/set properties (имена вида get_X / set_X)
+                    if (m.Name.StartsWith("get_") || m.Name.StartsWith("set_")) continue;
+
+                    // Пропускаем, если уже есть prefix с нашим ID
+                    var existing = Harmony.GetPatchInfo(m);
+                    if (existing != null && existing.Prefixes != null)
+                    {
+                        bool alreadyPatched = false;
+                        foreach (var pf in existing.Prefixes)
+                        {
+                            if (pf != null && pf.owner == "com.russianlocalization.popup")
+                            {
+                                alreadyPatched = true; break;
+                            }
+                        }
+                        if (alreadyPatched) continue;
+                    }
+
+                    // Патчим только методы, у которых хотя бы один параметр — string
+                    // или которые возвращают string (AskString, AskNumber возвращают string).
+                    var parameters = m.GetParameters();
+                    bool hasStringParam = false;
+                    foreach (var p in parameters)
+                    {
+                        if (p.ParameterType == typeof(string) || p.ParameterType == typeof(System.Collections.Generic.IReadOnlyList<string>))
+                        {
+                            hasStringParam = true; break;
+                        }
+                    }
+                    if (!hasStringParam) continue;
+
+                    try
+                    {
+                        harmony.Patch(m, prefix: new HarmonyMethod(prefixMethod));
+                        patched++;
+                    }
+                    catch (Exception exPatch)
+                    {
+                        UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch Popup." + m.Name + ": " + exPatch.Message);
+                    }
+                }
+
+                // Также патчим методы, возвращающие string (AskString, AskNumber) — postfix для __result
+                var postfixMethod = typeof(TranslationEngine).GetMethod("Popup_Generic_Postfix",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                if (postfixMethod != null)
+                {
+                    foreach (var m in methods)
+                    {
+                        if (m == null || m.IsGenericMethodDefinition) continue;
+                        if (m.ReturnType != typeof(string)) continue;
+
+                        var existing = Harmony.GetPatchInfo(m);
+                        if (existing != null && existing.Postfixes != null)
+                        {
+                            bool alreadyPatched = false;
+                            foreach (var pf in existing.Postfixes)
+                            {
+                                if (pf != null && pf.owner == "com.russianlocalization.popup")
+                                {
+                                    alreadyPatched = true; break;
+                                }
+                            }
+                            if (alreadyPatched) continue;
+                        }
+
+                        try
+                        {
+                            harmony.Patch(m, postfix: new HarmonyMethod(postfixMethod));
+                        }
+                        catch (Exception exPatch)
+                        {
+                            // Игнорируем — prefix уже покрывает основные случаи
+                        }
+                    }
+                }
+
+                UnityEngine.Debug.Log("[RussianLocalization] Patched XRL.UI.Popup, methods patched = " + patched + ".");
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("[RussianLocalization] PatchPopup error: " + ex.ToString());
+            }
+        }
+
+        // Универсальный prefix: переводит все string-параметры Popup-методов.
+        // __originalMethod — MethodInfo текущего метода (магическое имя Harmony 2.x).
+        // __args — массив всех аргументов; модификация __args[i] меняет то, что получит оригинал.
+        public static void Popup_Generic_Prefix(System.Reflection.MethodBase __originalMethod, object[] __args)
+        {
+            try
+            {
+                if (!Initialized || !IsEnabled) return;
+                if (__args == null || __args.Length == 0) return;
+                if (__originalMethod == null) return;
+
+                var parameters = __originalMethod.GetParameters();
+                for (int i = 0; i < parameters.Length && i < __args.Length; i++)
+                {
+                    if (parameters[i].ParameterType == typeof(string))
+                    {
+                        string s = __args[i] as string;
+                        if (string.IsNullOrEmpty(s)) continue;
+                        if (ContainsCyrillic(s)) continue;
+                        string tr = Translate(s);
+                        if (!string.IsNullOrEmpty(tr) && tr != s)
+                            __args[i] = tr;
+                    }
+                    else if (parameters[i].ParameterType == typeof(System.Collections.Generic.IReadOnlyList<string>))
+                    {
+                        var list = __args[i] as System.Collections.Generic.IReadOnlyList<string>;
+                        if (list == null || list.Count == 0) continue;
+                        var newList = new System.Collections.Generic.List<string>(list.Count);
+                        bool changed = false;
+                        for (int j = 0; j < list.Count; j++)
+                        {
+                            string s = list[j];
+                            if (string.IsNullOrEmpty(s) || ContainsCyrillic(s))
+                            {
+                                newList.Add(s);
+                                continue;
+                            }
+                            string tr = Translate(s);
+                            if (!string.IsNullOrEmpty(tr) && tr != s)
+                            {
+                                newList.Add(tr);
+                                changed = true;
+                            }
+                            else
+                                newList.Add(s);
+                        }
+                        if (changed)
+                            __args[i] = newList.AsReadOnly();
+                    }
+                    else if (parameters[i].ParameterType == typeof(System.Collections.Generic.List<string>))
+                    {
+                        var list = __args[i] as System.Collections.Generic.List<string>;
+                        if (list == null || list.Count == 0) continue;
+                        for (int j = 0; j < list.Count; j++)
+                        {
+                            string s = list[j];
+                            if (string.IsNullOrEmpty(s) || ContainsCyrillic(s)) continue;
+                            string tr = Translate(s);
+                            if (!string.IsNullOrEmpty(tr) && tr != s)
+                                list[j] = tr;
+                        }
+                    }
+                }
+            }
+            catch { /* не ломаем popup */ }
+        }
+
+        // Postfix: переводит возвращаемую строку (AskString, AskNumber возвращают string).
+        public static void Popup_Generic_Postfix(ref string __result)
+        {
+            try
+            {
+                if (!Initialized || !IsEnabled) return;
+                if (string.IsNullOrEmpty(__result)) return;
+                if (ContainsCyrillic(__result)) return;
+                string tr = Translate(__result);
+                if (!string.IsNullOrEmpty(tr) && tr != __result)
+                    __result = tr;
+            }
+            catch { /* не ломаем popup */ }
+        }
+
+        // ============================================================
+        // ПАТЧ XRL.GameText.VariableReplace — подстановка плейсхолдеров (≥ 2.0.211)
+        // 11 перегрузок, 78 вызовов в коде. Все возвращают string.
+        // Postfix переводит __result, если в нём остался английский.
+        // ============================================================
+        public static void PatchGameText()
+        {
+            try
+            {
+                System.Type t = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { t = asm.GetType("XRL.GameText"); } catch { }
+                    if (t != null) break;
+                }
+                if (t == null)
+                {
+                    UnityEngine.Debug.Log("[RussianLocalization] XRL.GameText not found — GameText hook skipped.");
+                    return;
+                }
+
+                var harmony = new Harmony("com.russianlocalization.gametext");
+                int patched = 0;
+
+                var postfixMethod = typeof(TranslationEngine).GetMethod("GameText_VariableReplace_Postfix",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+                var methods = t.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                foreach (var m in methods)
+                {
+                    if (m == null) continue;
+                    if (m.IsGenericMethodDefinition) continue;
+                    if (m.Name != "VariableReplace") continue;
+                    if (m.ReturnType != typeof(string)) continue;
+
+                    // Пропускаем, если уже есть postfix с нашим ID
+                    var existing = Harmony.GetPatchInfo(m);
+                    if (existing != null && existing.Postfixes != null)
+                    {
+                        bool alreadyPatched = false;
+                        foreach (var pf in existing.Postfixes)
+                        {
+                            if (pf != null && pf.owner == "com.russianlocalization.gametext")
+                            {
+                                alreadyPatched = true; break;
+                            }
+                        }
+                        if (alreadyPatched) continue;
+                    }
+
+                    try
+                    {
+                        harmony.Patch(m, postfix: new HarmonyMethod(postfixMethod));
+                        patched++;
+                    }
+                    catch (Exception exPatch)
+                    {
+                        UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch GameText." + m.Name + ": " + exPatch.Message);
+                    }
+                }
+
+                // Также патчим ReplaceBuilder.Execute() и ReplaceBuilder.ToString()
+                // — если код использует ReplaceBuilder напрямую (минуя VariableReplace).
+                System.Type rbType = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { rbType = asm.GetType("XRL.World.Text.ReplaceBuilder"); } catch { }
+                    if (rbType != null) break;
+                }
+                if (rbType != null)
+                {
+                    // Execute() возвращает ReplaceBuilder (this), не string — пропускаем.
+                    // ToString() возвращает string — патчим postfix.
+                    // ВАЖНО: DeclaredOnly обязателен. Без него, если ReplaceBuilder не
+                    // переопределяет ToString(), GetMethod вернёт унаследованный
+                    // System.Object.ToString(), и Harmony пропатчит его ГЛОБАЛЬНО —
+                    // postfix будет вызываться на каждый ToString() во всём процессе,
+                    // включая вызовы внутри самого Translate(), что даёт бесконечную
+                    // рекурсию → StackOverflowException (нативный краш без записи в лог).
+                    var toString = rbType.GetMethod("ToString",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly,
+                        null, System.Type.EmptyTypes, null);
+                    if (toString != null && toString.DeclaringType == rbType && toString.ReturnType == typeof(string) && postfixMethod != null)
+                    {
+                        var existing = Harmony.GetPatchInfo(toString);
+                        if (existing == null || existing.Postfixes == null || existing.Postfixes.Count == 0)
+                        {
+                            try
+                            {
+                                harmony.Patch(toString, postfix: new HarmonyMethod(postfixMethod));
+                                patched++;
+                            }
+                            catch { }
+                        }
+                    }
+                }
+
+                UnityEngine.Debug.Log("[RussianLocalization] Patched XRL.GameText.VariableReplace, methods patched = " + patched + ".");
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("[RussianLocalization] PatchGameText error: " + ex.ToString());
+            }
+        }
+
+        // Postfix для всех перегрузок GameText.VariableReplace и ReplaceBuilder.ToString().
+        // Переводит __result, если в нём остался непереведённый английский.
+        public static void GameText_VariableReplace_Postfix(ref string __result)
+        {
+            try
+            {
+                if (!Initialized || !IsEnabled) return;
+                if (string.IsNullOrEmpty(__result)) return;
+                // Быстрый пропуск: если уже есть кириллица и нет английского — переведено.
+                if (ContainsCyrillic(__result))
+                {
+                    bool hasCyr, hasEng;
+                    ScanAlpha(__result, out hasCyr, out hasEng);
+                    if (hasCyr && !hasEng) return;
+                }
+                string tr = Translate(__result);
+                if (!string.IsNullOrEmpty(tr) && tr != __result)
+                    __result = tr;
+            }
+            catch { /* не ломаем GameText */ }
+        }
+
+        // Перехват входящего текста до отрисовки в новом UI.
+        public static void UITextSkin_SetText_Prefix(ref string text)
+        {
+            try
+            {
+                if (!TranslationEngine.Initialized || string.IsNullOrEmpty(text)) return;
+                if (TranslationEngine.ContainsCyrillicInternal(text)) return;
+                // Полный пайплайн (faction + паттерны по целой строке + радужные слова + кэш),
+                // как у остальных хуков. TranslateMarkup дробил по цвету и терял паттерны → франкенштейны.
+                string tr = TranslationEngine.Translate(text);
+                if (!string.IsNullOrEmpty(tr) && tr != text) text = tr;
+            }
+            catch { /* никогда не ломаем UI */ }
+        }
+
+        // Фолбэк: если текст записали прямо в поле .text, минуя SetText — переводим перед применением.
+        public static void UITextSkin_SetTheText_Prefix(object __instance)
+        {
+            try
+            {
+                if (!TranslationEngine.Initialized || _utsTextField == null || __instance == null) return;
+                string cur = _utsTextField.GetValue(__instance) as string;
+                if (string.IsNullOrEmpty(cur) || TranslationEngine.ContainsCyrillicInternal(cur)) return;
+                string tr = TranslationEngine.Translate(cur);
+                if (!string.IsNullOrEmpty(tr) && tr != cur) _utsTextField.SetValue(__instance, tr);
+            }
+            catch { /* никогда не ломаем UI */ }
+        }
+
+        // --- ОПТИМИЗИРОВАННЫЙ RuntimeTranslator ДЛЯ MODERN UI ---
+        //
+        // Modern UI в Caves of Qud 2.0.211.46 записывает текст в TextElement через путь,
+        // который Harmony-патчи не перехватывают (прямой binding через Unity Localization
+        // или аналогичный internal API). Только активный обход VisualElement-дерева даёт
+        // перевод. Делаем его лёгким:
+        //
+        //   - Интервал 1.5с — Modern UI меняет текст редко.
+        //   - Кеш по identity элемента (System.Object) — повторно не переводим.
+        //   - Только активный UIDocument (он один на сцену во время Modern UI).
+        //   - Жёсткий try/catch — один битый элемент не ломает весь обход.
+
+        private static RuntimeTranslator _runtimeTranslator;
+        private static GameObject _runtimeTranslatorGO;
+
+        public static void EnsureRuntimeTranslator()
+        {
+            try
+            {
+                if (_runtimeTranslator != null && _runtimeTranslatorGO != null) return;
+
+                _runtimeTranslatorGO = new GameObject("RussianLocalization_RuntimeTranslator");
+                UnityEngine.Object.DontDestroyOnLoad(_runtimeTranslatorGO);
+                _runtimeTranslator = _runtimeTranslatorGO.AddComponent<RuntimeTranslator>();
+                UnityEngine.Debug.Log("[RussianLocalization] RuntimeTranslator spawned (catch-async-UIToolkit fallback).");
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("[RussianLocalization] EnsureRuntimeTranslator error: " + ex.ToString());
+            }
+        }
+
+        public class RuntimeTranslator : MonoBehaviour
+        {
+            private static readonly HashSet<int> _translatedRefs = new HashSet<int>(1024);
+            private static RuntimeTranslator _instance;
+            private static System.Type _cachedTextElementType;
+            private static System.Type _cachedUIDocumentType;
+            private static System.Reflection.PropertyInfo _rootProp;
+            private static System.Reflection.MethodInfo _findDocumentMethod;
+            private static bool _typesResolved;
+            private bool _fullScanDone;
+
+            // --- Оптимизация: троттлинг + кэш рефлексии (фикс просадки FPS) ---
+            private float _scanAccum;
+            private const float ScanIntervalSeconds = 0.25f;
+            private static System.Reflection.PropertyInfo _textPropInfo;
+            private static System.Reflection.PropertyInfo _childrenPropInfo;
+            private static readonly object[] EmptyArgs = new object[0];
+            private static bool _scanDiagLogged;
+            private static int _diagTranslatedCount;
+
+            public static void TriggerRescan()
+            {
+                if (_instance != null)
+                {
+                    _instance._fullScanDone = false;
+                }
+            }
+
+            private void Start()
+            {
+                _instance = this;
+                ResolveUITypes();
+            }
+
+            private static void ResolveUITypes()
+            {
+                if (_typesResolved) return;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try
+                    {
+                        if (_cachedUIDocumentType == null) _cachedUIDocumentType = asm.GetType("UnityEngine.UIElements.UIDocument");
+                        if (_cachedTextElementType == null) _cachedTextElementType = asm.GetType("UnityEngine.UIElements.TextElement");
+                        if (_cachedUIDocumentType != null && _cachedTextElementType != null)
+                        {
+                            _rootProp = _cachedUIDocumentType.GetProperty("rootVisualElement",
+                                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                            ResolveFindMethod();
+                            _typesResolved = true;
+                            break;
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            private static void ResolveFindMethod()
+            {
+                var findMethods = typeof(UnityEngine.Object).GetMethods(
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                for (int i = 0; i < findMethods.Length; i++)
+                {
+                    var m = findMethods[i];
+                    if (m.Name != "FindObjectsOfType" || !m.IsGenericMethodDefinition) continue;
+                    if (m.GetParameters().Length == 0)
+                    {
+                        _findDocumentMethod = m.MakeGenericMethod(_cachedUIDocumentType);
+                        break;
+                    }
+                }
+            }
+
+            private void LateUpdate()
+            {
+                if (!TranslationEngine.Initialized || !_typesResolved) return;
+
+                // Полный разовый проход по TMP_Text при старте; UIElements ловим ниже по таймеру.
+                if (!_fullScanDone)
+                {
+                    try { ScanAllTMPText(); } catch { }
+                    _fullScanDone = true;
+                }
+
+                // Троттлинг: обходим дерево UI не каждый кадр, а раз в ScanIntervalSeconds.
+                // Это убирает просадку FPS — задержка 0.25с глазу незаметна.
+                _scanAccum += Time.unscaledDeltaTime;
+                if (_scanAccum < ScanIntervalSeconds) return;
+                _scanAccum = 0f;
+
+                try { ScanAllActiveUIDocuments(); } catch { }
+            }
+
+            private static void ScanAllTMPText()
+            {
+                var all = Resources.FindObjectsOfTypeAll<TMPro.TMP_Text>();
+                if (all == null || all.Length == 0) return;
+
+                foreach (var t in all)
+                {
+                    if (t == null) continue;
+                    int id;
+                    try { id = System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(t); }
+                    catch { id = t.GetInstanceID(); }
+                    if (_translatedRefs.Contains(id)) continue;
+
+                    string cur;
+                    try { cur = t.text; }
+                    catch { continue; }
+                    if (string.IsNullOrEmpty(cur)) { _translatedRefs.Add(id); continue; }
+                    if (!HasEnglish(cur)) { _translatedRefs.Add(id); continue; }
+
+                    string translated;
+                    try { translated = TranslationEngine.TranslateMarkup(cur); }
+                    catch { continue; }
+                    if (!string.IsNullOrEmpty(translated) && translated != cur)
+                    {
+                        try { t.text = translated; } catch { }
+                    }
+                    _translatedRefs.Add(id);
+                }
+            }
+
+            // Обходит ВСЕ активные UIDocument'ы (док, лист персонажа, оверлеи) раз в тик.
+            // Вечный кэш _translatedRefs здесь НЕ используется: вместо него — дешёвая проверка
+            // HasEnglish (уже переведённый кириллический текст пропускается без перевода),
+            // чтобы динамически обновляемый текст (лог, HP, описания) тоже подхватывался.
+            private static void ScanAllActiveUIDocuments()
+            {
+                if (_rootProp == null || _cachedUIDocumentType == null) return;
+
+                UnityEngine.Object[] docs = null;
+
+                // 1. Предпочтительно: генерик FindObjectsOfType<UIDocument>() — все активные документы.
+                if (_findDocumentMethod != null)
+                {
+                    try { docs = _findDocumentMethod.Invoke(null, EmptyArgs) as UnityEngine.Object[]; }
+                    catch { docs = null; }
+                }
+
+                // 2. Фолбэк (в Unity 6 параметрless-генерик может отсутствовать): не-генерик плюрал.
+                if (docs == null || docs.Length == 0)
+                {
+                    try { docs = UnityEngine.Object.FindObjectsOfType(_cachedUIDocumentType); }
+                    catch { docs = null; }
+                }
+
+                // 3. Последний фолбэк: один активный документ (проверенный старый путь).
+                if (docs == null || docs.Length == 0)
+                {
+                    try
+                    {
+                        var one = UnityEngine.Object.FindObjectOfType(_cachedUIDocumentType);
+                        if (one != null) docs = new UnityEngine.Object[] { one };
+                    }
+                    catch { docs = null; }
+                }
+
+                int docCount = (docs == null) ? 0 : docs.Length;
+                if (docs != null)
+                {
+                    foreach (var doc in docs)
+                    {
+                        if (doc == null) continue;
+                        object root;
+                        try { root = _rootProp.GetValue(doc); }
+                        catch { continue; }
+                        if (root == null) continue;
+                        WalkVisualTree(root, 0);
+                    }
+                }
+
+                // Однократная диагностика после первого прохода: сколько документов и переводов.
+                if (!_scanDiagLogged)
+                {
+                    _scanDiagLogged = true;
+                    UnityEngine.Debug.Log("[RussianLocalization] RuntimeTranslator scan: docs=" + docCount +
+                        ", generic=" + (_findDocumentMethod != null) +
+                        ", textElementType=" + (_cachedTextElementType != null) +
+                        ", translatedThisPass=" + _diagTranslatedCount);
+                }
+            }
+
+            // Жёсткий предел глубины рекурсии. Реальные UI-деревья Modern UI редко глубже
+            // 40-50 уровней; 512 — заведомо безопасный потолок. Без него транзиентный цикл
+            // в дереве (узел, чьи children содержат предка — возможно во время загрузки,
+            // когда дерево в промежуточном состоянии) уводил рекурсию в бесконечность и ронял
+            // нативный стек → access violation 0xc0000005 в ntdll.dll без managed-исключения.
+            private const int MaxWalkDepth = 512;
+
+            private static void WalkVisualTree(object element, int depth)
+            {
+                if (element == null || _cachedTextElementType == null) return;
+                if (depth >= MaxWalkDepth) return;
+
+                if (_cachedTextElementType.IsInstanceOfType(element))
+                {
+                    if (_textPropInfo == null)
+                    {
+                        _textPropInfo = _cachedTextElementType.GetProperty("text",
+                            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                    }
+                    if (_textPropInfo != null && _textPropInfo.CanRead && _textPropInfo.CanWrite)
+                    {
+                        try
+                        {
+                            string cur = _textPropInfo.GetValue(element) as string;
+                            if (!string.IsNullOrEmpty(cur) && HasEnglish(cur))
+                            {
+                                string translated = TranslationEngine.TranslateMarkup(cur);
+                                if (!string.IsNullOrEmpty(translated) && translated != cur)
+                                {
+                                    _textPropInfo.SetValue(element, translated);
+                                    _diagTranslatedCount++;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+
+                // children объявлено на VisualElement — PropertyInfo один и тот же для всех узлов,
+                // поэтому резолвим один раз и переиспользуем (без рефлексии на каждом узле — это и был
+                // главный источник просадки FPS).
+                if (_childrenPropInfo == null)
+                {
+                    _childrenPropInfo = element.GetType().GetProperty("children",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                }
+                if (_childrenPropInfo == null) return;
+
+                System.Collections.IEnumerable children;
+                try { children = _childrenPropInfo.GetValue(element) as System.Collections.IEnumerable; }
+                catch { return; }
+                if (children == null) return;
+
+                foreach (var child in children)
+                {
+                    WalkVisualTree(child, depth + 1);
+                }
+            }
+
+            private static bool HasEnglish(string s)
+            {
+                if (string.IsNullOrEmpty(s)) return false;
+                int latin = 0, cyr = 0;
+                for (int i = 0; i < s.Length; i++)
+                {
+                    char c = s[i];
+                    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) latin++;
+                    else if ((c >= 'Ѐ' && c <= 'ӿ') || c == 'ё' || c == 'Ё') cyr++;
+                    if (latin >= 2) return true;
+                }
+                if (cyr > 0 && latin == 0) return false;
+                return latin >= 2 && cyr == 0;
+            }
+        }
+
+        // --- ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С ЦВЕТОВЫМИ ФРАГМЕНТАМИ ---
+        private static readonly System.Text.RegularExpressions.Regex BrokenBraceRegex =
+            new System.Text.RegularExpressions.Regex(@"\{{3,}|\}{3,}", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        private static readonly System.Text.RegularExpressions.Regex ColorLetterFragmentRegex =
+            new System.Text.RegularExpressions.Regex(@"(<color=([^>]+)>)([a-zA-Z])</color>", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        // Радужный прогон: 3+ подряд идущих однобуквенных латинских цветовых блока.
+        private static readonly System.Text.RegularExpressions.Regex RainbowRunRegex =
+            new System.Text.RegularExpressions.Regex(@"(?:<color=#[0-9A-Fa-f]+>[A-Za-z]</color>){3,}", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex RainbowLetterRegex =
+            new System.Text.RegularExpressions.Regex(@"<color=(#[0-9A-Fa-f]+)>([A-Za-z])</color>", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        /// <summary>
+        /// Обрабатывает «радужные» слова (каждая буква в своём цвете, напр. lacquered/engraved/painted):
+        /// собирает слово, переводит его, и РАСПРЕДЕЛЯЕТ исходные цвета по буквам перевода,
+        /// сохраняя радужный эффект даже при другой длине русского слова.
+        /// Непереводимое (процедурные имена) оставляет нетронутым — его подхватит CompactColorFragments.
+        /// </summary>
+        private static string ExpandRainbowWords(string text)
+        {
+            if (string.IsNullOrEmpty(text) || !text.Contains("<color=")) return text;
+            if (text.Length > 1000) return text;
+
+            return RainbowRunRegex.Replace(text, m =>
+            {
+                var letters = RainbowLetterRegex.Matches(m.Value);
+                if (letters.Count < 3) return m.Value;
+
+                var colors = new List<string>(letters.Count);
+                var wordSb = new StringBuilder(letters.Count);
+                foreach (System.Text.RegularExpressions.Match lm in letters)
+                {
+                    colors.Add(lm.Groups[1].Value);
+                    wordSb.Append(lm.Groups[2].Value);
+                }
+                string word = wordSb.ToString();
+
+                string translated = TranslateText(word, true);
+                // Если не перевели (процедурное имя и т.п.) — оставляем как было.
+                if (string.IsNullOrEmpty(translated) || translated == word || !ContainsCyrillic(translated))
+                    return m.Value;
+
+                // Распределяем N исходных цветов по M буквам перевода (пропорционально).
+                int n = colors.Count;
+                int mlen = translated.Length;
+                var outSb = new StringBuilder(mlen * 24);
+                for (int i = 0; i < mlen; i++)
+                {
+                    int ci = (int)((long)i * n / mlen);
+                    if (ci >= n) ci = n - 1;
+                    outSb.Append("<color=").Append(colors[ci]).Append('>').Append(translated[i]).Append("</color>");
+                }
+                return outSb.ToString();
+            });
+        }
+
+        /// <summary>
+        /// Схлопывает последовательности вида <color=C1>L</color><color=C2>e</color>... в единый цветовой блок.
+        /// Игнорирует меняющиеся цвета: используется цвет первой буквы, так как перевод
+        /// цельного слова важнее сохранения посимвольной раскраски.
+        /// </summary>
+        private static string CompactColorFragments(string text)
+        {
+            if (string.IsNullOrEmpty(text) || !text.Contains("<color=")) return text;
+
+            // Оптимизация: для длинных текстов компактизация цветовых фрагментов слишком дорогая
+            // и не даёт заметного визуального эффекта. Ограничиваем только короткими UI-строками.
+            if (text.Length > 1000) return text;
+
+            bool changed;
+            int iterations = 0;
+            do
+            {
+                changed = false;
+                var matches = ColorLetterFragmentRegex.Matches(text);
+                if (matches.Count < 2) break;
+
+                var sb = new System.Text.StringBuilder();
+                int lastIdx = 0;
+                for (int i = 0; i < matches.Count; i++)
+                {
+                    var m = matches[i];
+                    if (m.Index < lastIdx) continue;
+
+                    string firstColor = m.Groups[2].Value;
+                    int chainEnd = m.Index + m.Length;
+                    var wordChars = new System.Text.StringBuilder();
+                    wordChars.Append(m.Groups[3].Value);
+
+                    // Схлопываем любые подряд идущие однобуквенные цветовые латинские фрагменты
+                    while (i + 1 < matches.Count)
+                    {
+                        var next = matches[i + 1];
+                        if (next.Index != chainEnd) break;
+                        wordChars.Append(next.Groups[3].Value);
+                        chainEnd = next.Index + next.Length;
+                        i++;
+                    }
+
+                    if (wordChars.Length > 1)
+                    {
+                        sb.Append(text.Substring(lastIdx, m.Index - lastIdx));
+                        sb.Append("<color=" + firstColor + ">" + wordChars.ToString() + "</color>");
+                        lastIdx = chainEnd;
+                        changed = true;
+                    }
+                    else
+                    {
+                        sb.Append(text.Substring(lastIdx, m.Index - lastIdx));
+                        sb.Append(m.Value);
+                        lastIdx = m.Index + m.Length;
+                    }
+                }
+                sb.Append(text.Substring(lastIdx));
+                text = sb.ToString();
+                iterations++;
+            } while (changed && iterations < 10);
+
+            return text;
+        }
 
             public static string DistributeColors(string originalTextWithTags, string translatedText)
             {
@@ -3654,6 +5339,13 @@ namespace RussianLocalization
             foreach (var kvp in colorCounts)
             {
                 if (kvp.Value > maxCount) { maxCount = kvp.Value; dominantColor = kvp.Key; }
+            }
+
+            // Оптимизация: для длинных текстов пословное распределение цветов слишком дорого.
+            // Если доминирующий цвет покрывает большинство символов, оборачиваем весь текст в него.
+            if (dominantColor != null && translatedText.Length > 1500 && maxCount >= colors.Count * 0.80)
+            {
+                return "<color=" + dominantColor + ">" + translatedText + "</color>";
             }
 
             // Если один цвет >= 95% — красим весь текст одним цветом.
@@ -3798,7 +5490,8 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(core)) return text;
 
-            string normalizedCore = core.Replace('\u00A0', ' ')
+            string normalizedCore = core.Replace("\r\n", "\n")
+                                        .Replace('\u00A0', ' ')
                                         .Replace('\u2007', ' ')
                                         .Replace('\u200B', ' ')
                                         .Replace('\u202F', ' ');
@@ -3813,7 +5506,7 @@ namespace RussianLocalization
             else
             {
                 string sn = SuperNormalize(trimmedCore);
-                bool isKeyName = sn.Length == 1 || sn == "esc" || sn == "tab" || sn == "enter" || sn == "space" || sn == "backspace" || sn == "insert" || sn == "delete" || sn == "up" || sn == "down" || sn == "left" || sn == "right";
+                bool isKeyName = sn.Length == 1 || KeyNameSet.Contains(sn);
                 bool hasBrackets = trimmedCore.StartsWith("[") && trimmedCore.EndsWith("]");
 
                 if (!isKeyName || hasBrackets)
@@ -3902,19 +5595,7 @@ namespace RussianLocalization
 
 
 
-                        public static bool ContainsRussian(string text)
-        {
-            if (string.IsNullOrEmpty(text)) return false;
-            for (int i = 0; i < text.Length; i++)
-            {
-                char c = text[i];
-                if ((c >= '\u0430' && c <= '\u044f') || (c >= '\u0410' && c <= '\u042f') || c == '\u0451' || c == '\u0401')
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        public static bool ContainsRussian(string text) => TranslationEngine.ContainsCyrillicInternal(text);
 
 
 
@@ -4207,6 +5888,7 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(TMPro.TMP_Text), "text", MethodType.Setter)]
+    [HarmonyPriority(100)]
 
     public static class TMPText_Patch
 
@@ -4245,6 +5927,7 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string) })]
+    [HarmonyPriority(100)]
 
     public static class TMPText_SetText_Patch
 
@@ -4283,6 +5966,7 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string), typeof(bool) })]
+    [HarmonyPriority(100)]
 
     public static class TMPText_SetText_Bool_Patch
 
@@ -4321,6 +6005,7 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string), typeof(float) })]
+    [HarmonyPriority(100)]
 
     public static class TMPText_SetText_Float1_Patch
 
@@ -4359,6 +6044,7 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string), typeof(float), typeof(float) })]
+    [HarmonyPriority(100)]
 
     public static class TMPText_SetText_Float2_Patch
 
@@ -4397,6 +6083,7 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(string), typeof(float), typeof(float), typeof(float) })]
+    [HarmonyPriority(100)]
 
     public static class TMPText_SetText_Float3_Patch
 
@@ -4435,6 +6122,7 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(TMPro.TMP_Text), "SetText", new Type[] { typeof(StringBuilder) })]
+    [HarmonyPriority(100)]
 
     public static class TMPText_SetTextStringBuilder_Patch
 
@@ -4555,6 +6243,54 @@ namespace RussianLocalization
     public static class UIElementsDynamicPatch
 
     {
+
+        // Prefix для SetValueWithoutNotify(string) — переводим ДО записи в backing field.
+// Это срабатывает мгновенно (без 0.5с задержки), потому что Harmony перехватывает
+// вызов метода до того, как значение уйдёт в поле.
+//
+// Сигнатура в Unity 6: SetValueWithoutNotify(System.String newValue). Harmony требует
+// ТОЧНОГО совпадения имени параметра с целевым методом — поэтому пишем "newValue",
+// а не "value". (Если переименовать в "value", Harmony не найдёт параметр в целевом
+// методе и выбросит "Parameter 'value' not found in method" — именно это было в логе.)
+        public static void INotifyValueChanged_SetValueWithoutNotify_Prefix(ref string newValue)
+
+        {
+
+            if (!TranslationEngine.Initialized) return;
+
+            if (string.IsNullOrEmpty(newValue)) return;
+
+            // Пропускаем уже переведённые строки (содержат кириллицу) — экономим CPU.
+            bool alreadyCyr = false;
+
+            for (int i = 0; i < newValue.Length; i++)
+
+            {
+
+                char c = newValue[i];
+
+                if ((c >= 'Ѐ' && c <= 'ӿ') || c == 'ё' || c == 'Ё') { alreadyCyr = true; break; }
+
+            }
+
+            if (alreadyCyr) return;
+
+
+
+            // Переводим через markup-aware путь (Modern UI часто оборачивает текст в <color=…>).
+            string translated = TranslationEngine.TranslateMarkup(newValue);
+
+            if (!string.IsNullOrEmpty(translated) && translated != newValue)
+
+            {
+
+                newValue = translated;
+
+            }
+
+        }
+
+
 
         public static void TextElement_Prefix(ref string value)
 
@@ -4812,7 +6548,53 @@ namespace RussianLocalization
 
     {
 
+        // Диагностический кэш для лога "уже-кириллица-в-ScreenBuffer". Ограничен по размеру,
+        // чтобы не разрастаться бесконтрольно при длинных сессиях.
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _asciiInCyrSeen
+            = new System.Collections.Concurrent.ConcurrentDictionary<string, byte>();
+        private const int AsciiInCyrSeenCap = 2048;
+
+        // Записывает в <ModPath>/ascii_input_cyrillic.txt строки, пришедшие в ScreenBuffer.Write
+        // уже содержащими кириллицу. Это диагностика: если лог пуст — движок сначала зовёт наш Translate,
+        // если непуст — игра где-то по дороге уже сама частично перевела / подмешала кириллицу.
+        private static void LogAsciiInputAlreadyCyrillic(string marker, string value)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(value)) return;
+                bool hasCyr = false;
+                for (int i = 0; i < value.Length; i++)
+                {
+                    char c = value[i];
+                    if ((c >= 'Ѐ' && c <= 'ӿ') || c == 'ё' || c == 'Ё')
+                    {
+                        hasCyr = true; break;
+                    }
+                }
+                if (!hasCyr) return;
+
+                string trimmed = value.Trim();
+                if (trimmed.Length < 2) return;
+
+                if (_asciiInCyrSeen.Count > AsciiInCyrSeenCap) return;
+                if (!_asciiInCyrSeen.TryAdd(trimmed, 0)) return;
+
+                string entry = "[" + marker + "] " + trimmed + Environment.NewLine;
+                if (!string.IsNullOrEmpty(TranslationEngine.CachedModPath))
+                {
+                    try
+                    {
+                        string p = System.IO.Path.Combine(TranslationEngine.CachedModPath, "ascii_input_cyrillic.txt");
+                        System.IO.File.AppendAllText(p, entry, System.Text.Encoding.UTF8);
+                    }
+                    catch { /* некритично — диагностика */ }
+                }
+            }
+            catch { /* никогда не ломаем игровой цикл из-за лога */ }
+        }
+
         [HarmonyPrefix]
+        [HarmonyPriority(100)]
 
         [HarmonyPatch("Write", new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool) })]
 
@@ -4823,6 +6605,8 @@ namespace RussianLocalization
             if (TranslationEngine.Initialized)
 
             {
+
+                LogAsciiInputAlreadyCyrillic("Write(tile)", RenderString);
 
                 string trans = TranslationEngine.Translate(RenderString);
 
@@ -4835,6 +6619,7 @@ namespace RussianLocalization
 
 
         [HarmonyPrefix]
+        [HarmonyPriority(100)]
 
         [HarmonyPatch("Write", new Type[] { typeof(string), typeof(bool), typeof(bool), typeof(bool), typeof(System.Collections.Generic.List<string>), typeof(int) })]
 
@@ -4846,6 +6631,8 @@ namespace RussianLocalization
 
             {
 
+                LogAsciiInputAlreadyCyrillic("Write", s);
+
                 string trans = TranslationEngine.Translate(s);
 
                 s = TranslationEngine.Transliterate(trans);
@@ -4857,6 +6644,7 @@ namespace RussianLocalization
 
 
         [HarmonyPrefix]
+        [HarmonyPriority(100)]
 
         [HarmonyPatch("WriteAt", new Type[] { typeof(int), typeof(int), typeof(string), typeof(bool) })]
 
@@ -4868,6 +6656,8 @@ namespace RussianLocalization
 
             {
 
+                LogAsciiInputAlreadyCyrillic("WriteAt", s);
+
                 string trans = TranslationEngine.Translate(s);
 
                 s = TranslationEngine.Transliterate(trans);
@@ -4879,6 +6669,7 @@ namespace RussianLocalization
 
 
         [HarmonyPrefix]
+        [HarmonyPriority(100)]
 
         [HarmonyPatch("WriteAt", new Type[] { typeof(XRL.World.Cell), typeof(string), typeof(bool) })]
 
@@ -4890,6 +6681,8 @@ namespace RussianLocalization
 
             {
 
+                LogAsciiInputAlreadyCyrillic("WriteAt(Cell)", s);
+
                 string trans = TranslationEngine.Translate(s);
 
                 s = TranslationEngine.Transliterate(trans);
@@ -4901,6 +6694,7 @@ namespace RussianLocalization
 
 
         [HarmonyPrefix]
+        [HarmonyPriority(100)]
 
         [HarmonyPatch("WriteAt", new Type[] { typeof(XRL.World.GameObject), typeof(string), typeof(bool) })]
 
@@ -4911,6 +6705,8 @@ namespace RussianLocalization
             if (TranslationEngine.Initialized)
 
             {
+
+                LogAsciiInputAlreadyCyrillic("WriteAt(GO)", s);
 
                 string trans = TranslationEngine.Translate(s);
 
@@ -5077,19 +6873,22 @@ namespace RussianLocalization
         }
     }
 
-    [HarmonyPatch(typeof(XRL.MutationFactory))]
-    public static class MutationFactory_Patch
-    {
-    }
-
     [HarmonyPatch(typeof(XRL.World.Skills.SkillFactory))]
     public static class SkillFactory_Patch
     {
+        private static bool hasTranslated = false;
+        private static readonly object translateLock = new object();
+
         [HarmonyPostfix]
         [HarmonyPatch("Factory", MethodType.Getter)]
         public static void Factory_Getter_Postfix(XRL.World.Skills.SkillFactory __result)
         {
             if (!TranslationEngine.Initialized || __result == null) return;
+            lock (translateLock)
+            {
+                if (hasTranslated) return;
+                hasTranslated = true;
+            }
             try
             {
                 var skills = __result.SkillList;
@@ -5169,37 +6968,68 @@ namespace RussianLocalization
     [HarmonyPatch(typeof(XRL.SubtypeFactory))]
     public static class SubtypeFactory_Patch
     {
+        // __result типизирован как object, а не List<SubtypeEntry>: в разных версиях игры
+        // геттер Classes возвращает разный тип (SubtypeEntry vs SubtypeClass). Жёсткий тип
+        // ломает привязку Harmony ("Cannot assign method return type"), а это прерывает весь
+        // PatchAll и отключает все патчи, объявленные ниже (история, деревни, хоткей F1).
+        // Поэтому работаем через рефлексию — это совместимо с любой версией.
         [HarmonyPostfix]
         [HarmonyPatch("Classes", MethodType.Getter)]
-        public static void Classes_Getter_Postfix(List<XRL.SubtypeEntry> __result)
+        public static void Classes_Getter_Postfix(object __result)
         {
             TranslateSubtypes(__result);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch("Subtypes", MethodType.Getter)]
-        public static void Subtypes_Getter_Postfix(List<XRL.SubtypeEntry> __result)
+        public static void Subtypes_Getter_Postfix(object __result)
         {
             TranslateSubtypes(__result);
         }
 
-        private static void TranslateSubtypes(List<XRL.SubtypeEntry> subtypes)
+        private static string GetStr(object obj, string member)
         {
-            if (!TranslationEngine.Initialized || subtypes == null) return;
+            var t = obj.GetType();
+            var f = t.GetField(member);
+            if (f != null && f.FieldType == typeof(string)) return f.GetValue(obj) as string;
+            var p = t.GetProperty(member);
+            if (p != null && p.PropertyType == typeof(string) && p.CanRead) return p.GetValue(obj) as string;
+            return null;
+        }
+
+        private static void SetStr(object obj, string member, string value)
+        {
+            var t = obj.GetType();
+            var f = t.GetField(member);
+            if (f != null && f.FieldType == typeof(string)) { f.SetValue(obj, value); return; }
+            var p = t.GetProperty(member);
+            if (p != null && p.PropertyType == typeof(string) && p.CanWrite) p.SetValue(obj, value);
+        }
+
+        private static void TranslateSubtypes(object resultObj)
+        {
+            if (!TranslationEngine.Initialized) return;
+            var subtypes = resultObj as System.Collections.IEnumerable;
+            if (subtypes == null) return;
             try
             {
                 foreach (var entry in subtypes)
                 {
                     if (entry == null) continue;
-                    if (!string.IsNullOrEmpty(entry.DisplayName))
-                        entry.DisplayName = TranslationEngine.TranslateTextStrict(entry.DisplayName);
-                    if (entry.ExtraInfo != null)
+                    string dn = GetStr(entry, "DisplayName");
+                    if (!string.IsNullOrEmpty(dn))
+                        SetStr(entry, "DisplayName", TranslationEngine.TranslateTextStrict(dn));
+
+                    var ei = entry.GetType().GetField("ExtraInfo");
+                    if (ei != null)
                     {
-                        for (int i = 0; i < entry.ExtraInfo.Count; i++)
+                        var lst = ei.GetValue(entry) as System.Collections.Generic.List<string>;
+                        if (lst != null)
                         {
-                            if (!string.IsNullOrEmpty(entry.ExtraInfo[i]))
+                            for (int i = 0; i < lst.Count; i++)
                             {
-                                entry.ExtraInfo[i] = TranslationEngine.TranslateTextStrict(entry.ExtraInfo[i]);
+                                if (!string.IsNullOrEmpty(lst[i]))
+                                    lst[i] = TranslationEngine.TranslateTextStrict(lst[i]);
                             }
                         }
                     }
@@ -5212,32 +7042,82 @@ namespace RussianLocalization
         }
     }
 
+    [HarmonyPatch(typeof(XRL.MutationFactory))]
+    public static class MutationFactory_Patch
+    {
+        private static bool _done;
+
+        // Переводит строковый член (поле ИЛИ записываемое свойство) на месте.
+        // Безопасно: если члена нет или он не записываемая строка — ничего не делает.
+        private static void TrMember(object obj, string member)
+        {
+            if (obj == null) return;
+            var t = obj.GetType();
+            var f = t.GetField(member);
+            if (f != null && f.FieldType == typeof(string))
+            {
+                var v = f.GetValue(obj) as string;
+                if (!string.IsNullOrEmpty(v))
+                    f.SetValue(obj, TranslationEngine.TranslateTextStrict(v));
+                return;
+            }
+            var p = t.GetProperty(member);
+            if (p != null && p.PropertyType == typeof(string) && p.CanRead && p.CanWrite)
+            {
+                var v = p.GetValue(obj) as string;
+                if (!string.IsNullOrEmpty(v))
+                    p.SetValue(obj, TranslationEngine.TranslateTextStrict(v));
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("MutationsByName", MethodType.Getter)]
+        public static void MutationsByName_Getter_Postfix(object __result)
+        {
+            if (_done || !TranslationEngine.Initialized) return;
+            try
+            {
+                // Категории мутаций (заголовки в пикере): только описание/заголовок, не id.
+                var cats = XRL.MutationFactory.CategoriesByName as System.Collections.IDictionary;
+                if (cats != null)
+                {
+                    foreach (System.Collections.DictionaryEntry de in cats)
+                    {
+                        TrMember(de.Value, "DisplayName");
+                        TrMember(de.Value, "Help");
+                    }
+                }
+
+                // Записи мутаций: имя (XMLDisplayName) + описания. Name/Class/Type НЕ трогаем (это id).
+                var byName = __result as System.Collections.IDictionary;
+                if (byName != null)
+                {
+                    foreach (System.Collections.DictionaryEntry de in byName)
+                    {
+                        var e = de.Value;
+                        TrMember(e, "XMLDisplayName");
+                        TrMember(e, "DisplayName");
+                        TrMember(e, "Help");
+                        TrMember(e, "Snippet");
+                        TrMember(e, "BearerDescription");
+                    }
+                    _done = true;
+                    UnityEngine.Debug.Log("[RussianLocalization] Translated loaded Mutations in memory.");
+                }
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("[RussianLocalization] Mutation translation error: " + ex.ToString());
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(HistoryKit.HistoricStringExpander))]
     public static class HistoricStringExpander_Patch
     {
         [HarmonyPostfix]
         [HarmonyPatch("ExpandString", new Type[] { typeof(string), typeof(System.Random) })]
         public static void ExpandString_Postfix1(ref string __result)
-        {
-            if (TranslationEngine.Initialized && !string.IsNullOrEmpty(__result))
-            {
-                __result = TranslationEngine.Translate(__result);
-            }
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch("ExpandString", new Type[] { typeof(string), typeof(HistoryKit.HistoricEntitySnapshot), typeof(HistoryKit.History), typeof(Dictionary<string, object>), typeof(System.Random) })]
-        public static void ExpandString_Postfix2(ref string __result)
-        {
-            if (TranslationEngine.Initialized && !string.IsNullOrEmpty(__result))
-            {
-                __result = TranslationEngine.Translate(__result);
-            }
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch("ExpandQuery", new Type[] { typeof(string), typeof(HistoryKit.HistoricEntitySnapshot), typeof(HistoryKit.History), typeof(Dictionary<string, object>), typeof(Dictionary<string, object>), typeof(System.Random) })]
-        public static void ExpandQuery_Postfix(ref string __result)
         {
             if (TranslationEngine.Initialized && !string.IsNullOrEmpty(__result))
             {
@@ -5273,6 +7153,38 @@ namespace RussianLocalization
                     Text.Append(translated);
                 }
             }
+        }
+    }
+
+    // --- ХОТКЕЙ ДЛЯ ВКЛ/ВЫКЛ ПЕРЕВОДА ---
+    // По умолчанию F1. Использует WinAPI GetAsyncKeyState — работает на уровне ОС,
+    // не зависит от игровой системы ввода.
+    [HarmonyPatch]
+    public static class ToggleHotkey_Patch
+    {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(int vKey);
+
+        private const int VK_F1 = 0x70;
+        private static bool _wasPressed = false;
+
+        // Вешаемся на ScreenBuffer.Write — он вызывается каждый кадр при отрисовке.
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ConsoleLib.Console.ScreenBuffer), "Write",
+            new System.Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool) })]
+        public static void Write_Prefix()
+        {
+            if (!TranslationEngine.Initialized) return;
+
+            bool isPressed = (GetAsyncKeyState(VK_F1) & 0x8000) != 0;
+            if (isPressed && !_wasPressed)
+            {
+                TranslationEngine.IsEnabled = !TranslationEngine.IsEnabled;
+                UnityEngine.Debug.Log("[RussianLocalization] перевод " +
+                    (TranslationEngine.IsEnabled ? "включён" : "отключён") +
+                    " (F1)");
+            }
+            _wasPressed = isPressed;
         }
     }
 }
