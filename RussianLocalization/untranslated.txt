@@ -1,0 +1,74 @@
+﻿Quit
+quit
+ABA
+ABAN
+ABAND
+ABANDO
+Quit
+quit
+ABA
+ABAN
+ABAND
+ABANDO
+Quit
+quit
+ABA
+ABAN
+ABAND
+ABANDO
+ABA
+ABAN
+ABAND
+ABANDO
+ABA
+ABAN
+ABAND
+ABANDO
+ABA
+ABAN
+ABAND
+ABANDO
+ABA
+ABAN
+ABAND
+ABANDO
+ABA
+ABAN
+ABAND
+ABANDO
+ABA
+ABAN
+ABAND
+ABANDO
+ABA
+ABAN
+ABAND
+ABANDO
+ABA
+ABAN
+ABAND
+ABANDO
+QUI
+QUI
+pig farmer slouches in the heat. A beaten, leather hat is pulled low over his eyes and sweat glistens on the scruffs
+hair on his cheeks. His hands are caked in mud and salt
+A beaten
+кожаный шляпа is pulled низкий над своим глаза и пот glistens на scruffs волосы на своим щёки. Своим руки caked in грязь и соль
+A beaten, кожаный шляпа is pulled низкий над своим глаза и пот glistens на scruffs волосы на своим щёки. Своим руки caked in грязь и соль
+A beaten, кожаный шляпа is pulled низкий над своим глаза и пот glistens на scruffs волосы на своим щёки. Своим руки caked in грязь и соль.
+g|docile}}
+{{&Y|Ancemoss the Wise, the village mayor-plant}} [N]
+pig farmer and Mechanimist convert [E]
+Qimnil, dromad merchant [E]
+{{&Y|Tarn, the village tinker}} [E]
+{{&Y|Uushwaraq, village apothecary}} [E]
+{{&Y|Warden Amanosaitaagaric Aman-Erellemold}} [E]
+{{&Y|Yla, legendary apple farmer's daughter}} [E]
+CmdMoveToPointOfInterestMenu
+friend! Вы уже были на ходулях и видели Священный колодец
+friend! Вы уже были на ходулях и видели Священный колодец??
+grenade mk II
+You pet the herding dog
+You pet the herding dog.
+:: You pet the herding dog.
+QUI

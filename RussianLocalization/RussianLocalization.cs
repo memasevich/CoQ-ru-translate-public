@@ -54,12 +54,28 @@ namespace RussianLocalization
 
         public static bool Initialized = false;
 
+        // 2026-07-06 (v17): захватываем ID главного потока Unity при инициализации мода — нужно
+        // проверить гипотезу, что после патча 1.0.5/211.45 XRL.UI.UITextSkin.SetText() стал
+        // вызываться не только из главного потока (например, из воркера построения UI Toolkit),
+        // и наш тяжёлый Translate() внутри Harmony-префикса небезопасен в этом контексте.
+        public static int MainThreadId = -1;
+
         /// <summary>
         /// Флаг вкл/выкл перевода. Можно переключать хоткеем (по умолч. F1).
         /// </summary>
         public static bool IsEnabled = true;
 
         public static string CachedModPath = null;
+        
+        // Имя файла лога с датой для записи в Documents
+        public static string GameplayLogFileName = null;
+
+        // 2026-07-06 (v19): диагностический флаг — пропускает весь блок regex-очистки внутри
+        // Translate() (включая do/while со схлопыванием цветовых блоков через back-reference regex),
+        // чтобы проверить гипотезу катастрофического backtracking как причины краша в торговле.
+        // 2026-07-06 (v20): блок очистки НЕ был виноват (краш пережил его отключение) — возвращаем
+        // обратно. Настоящий кандидат — рекурсия TranslateInternal без лимита глубины (см. выше).
+        public const bool Translate_DIAG_SKIP_CLEANUP_REGEX = false;
 
         public static int disableWordReplacementCounter;
 
@@ -745,8 +761,12 @@ namespace RussianLocalization
                     }
 
                     Initialized = true;
+                    MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
                     translationCache.Clear();
                     CachedModPath = modPath;
+                    
+                    // Генерируем имя файла лога с датой
+                    GameplayLogFileName = $"all_gameplay_texts_{DateTime.Now:dd_MM_yyyy}.txt";
 
                     LogInfo("[RussianLocalization] Initialized successfully. Loaded " + staticDictionary.Count + " phrases, " + wordDictionary.Count + " words, " + patternDictionary.Count + " patterns, and " + factionCases.Count + " faction case entries.");
 
@@ -783,27 +803,73 @@ namespace RussianLocalization
                     // 2026-07-02 (v3): бисекция показала, что 5 хуков НЕ виноваты (краш был при
                     // них отключённых), причина — RuntimeTranslator без лимита глубины рекурсии.
                     // Хуки снова включены (флаг = false).
+                    // 2026-07-05: НОВЫЙ краш (0xc0000005 в ntdll.dll, тот же паттерн) при открытии
+                    // торговли с большим ассортиментом. RuntimeTranslator уже отключён насовсем,
+                    // отключение TranslateVisualTree в UIDocument_OnEnable_Postfix не помогло —
+                    // значит причина этого краша НЕ там же, где была причина краша на загрузке.
+                    // Бисекция для СТАРТОВОГО краша (выше) не покрывает этот кейс: отключение
+                    // всех 5 хуков подтвердило (2026-07-05), что краш пропадает без них — то
+                    // есть виноват один из них. Найдено: INotifyValueChanged_SetValueWithoutNotify_
+                    // Prefix (часть PatchUIElements) переводит текст описания предмета через
+                    // TranslateMarkup — рекурсия по вложенным {{color|...}} блокам БЕЗ лимита
+                    // глубины. Добавлен MaxMarkupDepth=48 (см. TranslateMarkup), хуки включены
+                    // обратно (флаг = false).
+                    // 2026-07-05 (v7, ИСПРАВЛЕНО в v9): предыдущая версия этого комментария
+                    // ошибочно заявляла, что все 5 хуков сняты с подозрения — Description_Patches
+                    // действительно виноват в краше НА ОПИСАНИИ, но включение всех 5 хуков обратно
+                    // вернуло ДРУГОЙ, ранее уже описанный краш (см. запись выше про
+                    // INotifyValueChanged_SetValueWithoutNotify_Prefix/TranslateMarkup) — теперь
+                    // на самом первом кадре после загрузки (хоткей-плашки способностей). Это ДВА
+                    // независимых бага в разных хуках. Оставляем общий флаг выключенным (=false,
+                    // группа включена), но добавляем отдельный переключатель ТОЛЬКО для
+                    // PatchUIElements — самого подозреваемого по старому диагнозу — чтобы отключить
+                    // именно его, сохранив QudTranslator/UITextSkin/Popup/GameText.
+                    // 2026-07-05 (v11): отключение PatchUIElements НЕ остановило краш в торговле —
+                    // гипотеза опровергнута. Реальная причина найдена через WinDbg-анализ дампа:
+                    // gameoverlayrenderer64.dll (Steam Overlay), см. комментарий у
+                    // UITextReentrancyGuard.DIAG_DISABLE_TMP_HOOKS выше. Флаг возвращён в false.
+                    // 2026-07-06 (v22): ПЕРВОПРИЧИНА КРАША УСТРАНЕНА на уровне движка
+                    // (числовые плейсхолдеры {0} в TryTranslatePattern → бесконечная рекурсия).
+                    // Все хуки маршрутизируются через тот же Translate(), теперь он безопасен —
+                    // возвращаем ВСЕ хуки для полного покрытия перевода.
                     const bool DIAG_DISABLE_20260701_HOOKS = false;
+                    const bool DIAG_DISABLE_UIELEMENTS_HOOK = false;
+                    // 2026-07-05 (v12): пользователь настаивает, что причина в коде мода (раньше тем
+                    // же модом краша не было), и он прав закрывать вопрос на Steam-оверлее рано —
+                    // порча памяти нашим кодом вполне может проявляться как краш в постороннем коде.
+                    // Известный чистый результат (v8): Description + все 5 хуков выключены = НЕТ краша.
+                    // Включение всех 4 оставшихся (QudTranslator/UITextSkin/Popup/GameText) разом
+                    // вернуло краш в торговле (v10/v11). Сужаем по одному.
+                    // v12 шаг 1: только PatchPopup — краша НЕТ. Popup очищен.
+                    // v12 шаг 2: только PatchQudTranslator — краша НЕТ (подтверждено). Тоже чист.
+                    // v12 шаг 3: только PatchUITextSkin — КРАШ ВОСПРОИЗВЁЛСЯ. Виновник найден.
+                    // v13: добавлен EnsureSufficientExecutionStack() в UITextSkin_SetText_Prefix /
+                    // UITextSkin_SetTheText_Prefix (см. их код ниже). Проверяем фикс с тем же
+                    // изолированным набором (только UITextSkin), прежде чем включать остальные.
+                    const bool DIAG_DISABLE_QUDTRANSLATOR_HOOK = false;
+                    const bool DIAG_DISABLE_UITEXTSKIN_HOOK = false;
+                    const bool DIAG_DISABLE_POPUP_HOOK = false;
+                    const bool DIAG_DISABLE_GAMETEXT_HOOK = false;
                     if (!DIAG_DISABLE_20260701_HOOKS)
                     {
                     // Динамический патч для Modern UI (UI Toolkit / UIElements)
 
-                    PatchUIElements();
+                    if (!DIAG_DISABLE_UIELEMENTS_HOOK) PatchUIElements();
 
                     // Динамический патч для встроенного транслятора QudTranslator (≥ 2.0.214).
                     // Запускаем ПОСЛЕ PatchUIElements, чтобы QudTranslator.dll уже был загружен.
-                    try { PatchQudTranslator(); } catch (Exception exQ) { LogError("[RussianLocalization] PatchQudTranslator dispatch error: " + exQ.ToString()); }
+                    if (!DIAG_DISABLE_QUDTRANSLATOR_HOOK) { try { PatchQudTranslator(); } catch (Exception exQ) { LogError("[RussianLocalization] PatchQudTranslator dispatch error: " + exQ.ToString()); } }
 
                     // Главный хук Modern UI: текст нового интерфейса рисуется через XRL.UI.UITextSkin.SetText().
-                    try { PatchUITextSkin(); } catch (Exception exT) { LogError("[RussianLocalization] PatchUITextSkin dispatch error: " + exT.ToString()); }
+                    if (!DIAG_DISABLE_UITEXTSKIN_HOOK) { try { PatchUITextSkin(); } catch (Exception exT) { LogError("[RussianLocalization] PatchUITextSkin dispatch error: " + exT.ToString()); } }
 
                     // Патч XRL.UI.Popup — popup-сообщения, меню выбора, запросы строки/числа.
                     // ~277 вызовов в коде (ShowYesNo=108, PickOption=84, AskString=23, AskNumber=13...).
-                    try { PatchPopup(); } catch (Exception exP) { LogError("[RussianLocalization] PatchPopup dispatch error: " + exP.ToString()); }
+                    if (!DIAG_DISABLE_POPUP_HOOK) { try { PatchPopup(); } catch (Exception exP) { LogError("[RussianLocalization] PatchPopup dispatch error: " + exP.ToString()); } }
 
                     // Патч XRL.GameText.VariableReplace — подстановка плейсхолдеров (=subject.X=, =verb:X=).
                     // 11 перегрузок, 78 вызовов в коде.
-                    try { PatchGameText(); } catch (Exception exG) { LogError("[RussianLocalization] PatchGameText dispatch error: " + exG.ToString()); }
+                    if (!DIAG_DISABLE_GAMETEXT_HOOK) { try { PatchGameText(); } catch (Exception exG) { LogError("[RussianLocalization] PatchGameText dispatch error: " + exG.ToString()); } }
                     }
 
                     // ДИАГНОСТИКА КРАША (2026-07-02, шаг 2): с отключёнными 5 хуками игра
@@ -1002,6 +1068,48 @@ namespace RussianLocalization
         private static readonly System.Text.RegularExpressions.Regex HotkeyWrapperRegex =
             new System.Text.RegularExpressions.Regex(@"\{\{hotkey\|(?<k>[^|}]+)\}\}", System.Text.RegularExpressions.RegexOptions.Compiled);
 
+        // 2026-07-06 (v23): распознаёт технические ID-строки без пробелов вида "Xxx:571",
+        // "InventoryActionMenu:(noid)" — идентификатор, затем ':' , затем цифры или "(...)".
+        // Такие строки не переводим и не логируем как непереведённые.
+        private static bool IsInternalIdString(string text)
+        {
+            int colon = text.IndexOf(':');
+            // Требуем длинный идентификатор-класс (≥8 символов) до двоеточия, чтобы НЕ задеть
+            // короткие статус-префиксы с паттернами перевода: "T:5ø", "HP:10/20", "XP:5/10".
+            if (colon < 8 || colon >= text.Length - 1) return false;
+            for (int i = 0; i < colon; i++)
+            {
+                char c = text[i];
+                if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_')) return false;
+            }
+            char after = text[colon + 1];
+            return (after >= '0' && after <= '9') || after == '(';
+        }
+
+        // 2026-07-06 (v24): формат меню Modern UI "{{W|N}}ew game" — первая буква-хоткей выделена
+        // цветом в {{X|N}}, а остаток слова ("ew game") идёт СНАРУЖИ разметки. Раньше markup-парсер
+        // дробил их и переводил порознь → "Новаяновая игра", "Qкостюм", "Mкоэффициенты". Собираем
+        // слово целиком, переводим через словарь ("New game"→"Новая игра"), затем выделяем первую
+        // букву перевода той же цветовой разметкой → "{{W|Н}}овая игра".
+        private static readonly System.Text.RegularExpressions.Regex MenuHotkeyWordRegex =
+            new System.Text.RegularExpressions.Regex(
+                @"^\{\{(?<c>[A-Za-z0-9])\|(?<L>[A-Za-z])\}\}(?<rest>[A-Za-z][A-Za-z ]*)$",
+                System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        private static string TryTranslateMenuHotkeyWord(string text, out bool success)
+        {
+            success = false;
+            if (string.IsNullOrEmpty(text) || text.IndexOf("{{", System.StringComparison.Ordinal) != 0) return text;
+            var m = MenuHotkeyWordRegex.Match(text);
+            if (!m.Success) return text;
+            string plain = m.Groups["L"].Value + m.Groups["rest"].Value; // "New game"
+            string translated = TranslateInternal(plain);
+            if (string.IsNullOrEmpty(translated) || translated == plain || !ContainsCyrillic(translated)) return text;
+            success = true;
+            string color = m.Groups["c"].Value;
+            return "{{" + color + "|" + translated.Substring(0, 1) + "}}" + translated.Substring(1);
+        }
+
         public static string Translate(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
@@ -1017,9 +1125,18 @@ namespace RussianLocalization
             {
                 text = HotkeyWrapperRegex.Replace(text, "${k}");
             }
-            // Ранний выход: строки формата "Loading X.xml|txt|json" — технические логи загрузки ресурсов,
-            // никогда не должны переводиться. Возвращаем как есть.
-            if (text.StartsWith("Loading ") && (text.EndsWith(".xml") || text.EndsWith(".txt") || text.EndsWith(".json")))
+            // Commented out to allow translating resource loading logs (e.g., "Loading Bodies.xml" -> "Загрузка Bodies.xml")
+            // if (text.StartsWith("Loading ") && (text.EndsWith(".xml") || text.EndsWith(".txt") || text.EndsWith(".json")))
+            // {
+            //     translationCache[originalText] = text;
+            //     return text;
+            // }
+            // 2026-07-06 (v23): технические строки-идентификаторы, которые НИКОГДА не должны
+            // переводиться и не должны попадать в untranslated.txt как «непереведённые»:
+            //   - пути ресурсов: "Sounds/UI/ui_notification", "Creatures/sw_beetle" и т.п.
+            //   - внутренние ID меню: "InventoryActionMenu:571", "InventoryActionMenu:(noid)"
+            // Признак: нет пробелов и есть '/' или ':(' или ведущий сегмент вида "Xxx:number".
+            if (text.IndexOf(' ') < 0 && (text.IndexOf('/') >= 0 || IsInternalIdString(text)))
             {
                 translationCache[originalText] = text;
                 return text;
@@ -1028,7 +1145,17 @@ namespace RussianLocalization
             // и распределяем исходные цвета по буквам перевода, сохраняя радужный эффект.
             // То, что перевести не удалось, остаётся для обычной компактизации ниже.
             text = ExpandRainbowWords(text);
+            text = ExpandAmpRainbowWords(text);
             text = CompactColorFragments(text);
+
+            // 2026-07-06 (v24): меню-хоткей "{{W|N}}ew game" — собираем слово и переводим целиком.
+            bool menuHotkeyOk;
+            string menuHotkeyTr = TryTranslateMenuHotkeyWord(text, out menuHotkeyOk);
+            if (menuHotkeyOk)
+            {
+                translationCache[originalText] = menuHotkeyTr;
+                return menuHotkeyTr;
+            }
 
             // Если строка содержит кириллицу И не содержит английских букв,
             // значит она полностью переведена. Пропускаем.
@@ -1041,7 +1168,7 @@ namespace RussianLocalization
                 return text;
             }
 
-            if (InternalGameKeys.Contains(text.Trim()))
+            if (InternalGameKeys.Contains(text.Trim()) || IsKeyInBrackets(text))
             {
                 translationCache[originalText] = text;
                 return text;
@@ -1152,9 +1279,18 @@ namespace RussianLocalization
                     (ContainsCyrillic(result) && result.Contains("%")) ||
                     System.Text.RegularExpressions.Regex.IsMatch(result, @"\[[a-zA-Z]\].*\[[a-zA-Z]\]");
 
+                // 2026-07-06 (v19): проверяем гипотезу катастрофического regex backtracking —
+                // ниже есть do/while с regex на back-reference (\k<c>) и ленивым negative lookahead
+                // ((?:(?!</color>).)*?), схлопывающий одинаковые цветовые блоки. .NET regex-движок
+                // рекурсивно использует нативный стек для backtracking — при большом числе цветовых
+                // блоков подряд (как в списке предметов торговли) это может переполнить стек ПОСЛЕ
+                // нашей проверки EnsureSufficientExecutionStack() в самом начале префикса (которая
+                // проверяется один раз при входе, а не во время самого regex).
+                if (Translate_DIAG_SKIP_CLEANUP_REGEX) { /* пропускаем весь блок очистки для теста */ }
+                else
                 if (needsCleanup)
                 {
-                    if (text == " serving]") 
+                    if (text == " serving]")
                     {
                         // Console.WriteLine($"[DEBUG Translate] input: '{text}', initial result: '{result}'");
                         // Console.WriteLine(Environment.StackTrace);
@@ -1344,6 +1480,17 @@ namespace RussianLocalization
             // Финальная нормализация русского текста: убираем накопление пробелов, лишние точки и т.д.
             // Применяется ДО логирования, чтобы лог all_gameplay_texts.txt не накапливал артефакты.
             if (result != null) result = NormalizeRussianText(result);
+            if (result != null)
+            {
+                try
+                {
+                    result = MorphologyService.ApplyMorphMarkers(result);
+                }
+                catch (Exception ex)
+                {
+                    LogError("[RussianLocalization] Morphology marker processing failed: " + ex.Message);
+                }
+            }
 
             // if (text == " serving]") // Console.WriteLine($"[DEBUG Translate] final returned result: '{result}'");
             LogAllGameplayText(originalText, result);
@@ -1780,6 +1927,12 @@ namespace RussianLocalization
         }
 
 
+        // 2026-07-06 (v22): страховочный лимит глубины взаимной рекурсии TryTranslatePattern ↔
+        // TranslateText. Первопричину краша уже устранил фикс числовых плейсхолдеров выше, но этот
+        // guard гарантирует, что ЛЮБОЙ будущий кривой паттерн не сможет переполнить нативный стек.
+        private const int MaxPatternDepth = 16;
+        [ThreadStatic]
+        private static int _patternDepth;
         public static string TryTranslatePattern(string text, out bool success)
 
         {
@@ -1789,6 +1942,15 @@ namespace RussianLocalization
             if (string.IsNullOrEmpty(text)) return text;
 
             if (text.Length > 350) return text;
+
+            if (_patternDepth >= MaxPatternDepth) return text;
+            _patternDepth++;
+            try { return TryTranslatePatternBody(text, ref success); }
+            finally { _patternDepth--; }
+        }
+
+        private static string TryTranslatePatternBody(string text, ref bool success)
+        {
 
             // Префиксы строк лога/сводки: ":: " (журнал), "> " и "· " (экран смерти Game summary).
             // Снимаем префикс перед матчингом и возвращаем обратно — так одни и те же паттерны
@@ -1839,13 +2001,40 @@ namespace RussianLocalization
                     if (match.Success && match.Index == 0 && match.Length == candidate.Length)
                     {
                         string template = rule.Value;
+                        string candidateForClosure = candidate;
                         string result = placeholderRegex.Replace(template, (placeholderMatch) =>
                         {
                             string name = placeholderMatch.Groups["name"].Value;
                             string caseName = placeholderMatch.Groups["case"].Value;
-                            var group = match.Groups[name];
+                            // 2026-07-06 (v22 — ПЕРВОПРИЧИНА КРАША В ТОРГОВЛЕ): числовые плейсхолдеры
+                            // {0},{1},... в шаблонах — это 0-ИНДЕКСИРОВАННЫЕ ссылки на CAPTURE-ГРУППЫ
+                            // (т.е. {0} = первая группа = match.Groups[1]), как задумано авторами шаблонов
+                            // (напр. "^HP: (\d+)/(\d+)$" -> "ОЗ: {0}/{1}"). РАНЬШЕ здесь бралась
+                            // match.Groups["0"], а в .NET группа "0" = ВСЯ совпавшая строка. Из-за этого
+                            // TranslateText получал на вход всё совпадение целиком, оно снова матчило тот
+                            // же паттерн -> бесконечная рекурсия -> нативный stack overflow (0xc0000005 в
+                            // ntdll, без managed-исключения). Триггер — новый Modern UI вывод боезапаса
+                            // "lead slug x69 {{c|}}4 {{r|}}1d2": фрагмент "1d2" по паттерну "^(\d+)d(\d+)$"
+                            // -> шаблон "{0}d{1}" -> {0}=вся строка "1d2" -> TranslateText("1d2") -> ...
+                            System.Text.RegularExpressions.Group group;
+                            int numIdx;
+                            if (int.TryParse(name, out numIdx))
+                            {
+                                group = match.Groups[numIdx + 1];
+                            }
+                            else
+                            {
+                                group = match.Groups[name];
+                            }
                             if (group.Success)
                             {
+                                // Дополнительная защита: НИКОГДА не переводим значение, равное всей
+                                // совпавшей строке (или исходному тексту) — иначе оно снова сматчит тот
+                                // же паттерн и получится та же бесконечная рекурсия. Возвращаем как есть.
+                                if (group.Value == candidateForClosure || group.Value == text)
+                                {
+                                    return group.Value;
+                                }
                                 if (!string.IsNullOrEmpty(caseName))
                                 {
                                     return TranslateFactionCase(group.Value, caseName);
@@ -1891,12 +2080,78 @@ namespace RussianLocalization
             return false;
         }
 
+        private static bool IsKeyNameEx(string word)
+        {
+            if (string.IsNullOrEmpty(word)) return false;
+            string lower = word.ToLowerInvariant();
+            if (lower == "end") return false; // Exclude "end" action
+            if (KeyNameSet.Contains(lower)) return true;
+            if (lower == "ctrl" || lower == "control" || lower == "alt" || lower == "shift" ||
+                lower == "up" || lower == "down" || lower == "left" || lower == "right" ||
+                lower == "page up" || lower == "page down" || lower == "pgup" || lower == "pgdn") return true;
+            if (lower.Length > 4 && (lower.StartsWith("num ") || lower.StartsWith("numpad"))) return true;
+            if (lower.Length == 1) return true; // Single char key indicators / hotkeys
+            if (lower.Length >= 2 && lower[0] == 'f' && char.IsDigit(lower[1]))
+            {
+                int fVal;
+                if (int.TryParse(lower.Substring(1), out fVal) && fVal >= 1 && fVal <= 12) return true;
+            }
+            return false;
+        }
+
+        private static bool IsKeyInBrackets(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+            // Check if it's bracketed (even with color markup like <color...>[</color>...<color...>]</color>)
+            if (text.Contains("[") && text.Contains("]"))
+            {
+                string prefix, core, suffix;
+                ExtractCoreText(text, out prefix, out core, out suffix);
+                
+                string cleaned = core.Trim();
+                if (cleaned.StartsWith("[") && cleaned.EndsWith("]"))
+                {
+                    cleaned = cleaned.Substring(1, cleaned.Length - 2).Trim();
+                }
+                
+                // Strip Qud custom markup like {{W|Delete}} -> Delete
+                cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"\{\{[^|]+\|", "");
+                cleaned = cleaned.Replace("}}", "").Trim();
+                
+                return IsKeyNameEx(cleaned);
+            }
+            return false;
+        }
+
+        // 2026-07-06 (v20 — ВОЗМОЖНАЯ НАСТОЯЩАЯ ПРИЧИНА): TranslateInternal() вызывает сам себя
+        // (через TranslateInternalClean) БЕЗ КАКОГО-ЛИБО лимита глубины сразу в 4 местах: разбор
+        // одного цветового тега вокруг всей строки, перевод по абзацам, перевод по строкам при
+        // переносах, и цикл по всем цветовым блокам (ColorBlockRegex). В отличие от TranslateMarkup
+        // (MaxMarkupDepth=48) и Description_Patches (MaxDescriptionRecursionDepth=24), эта рекурсия
+        // никогда не была защищена. Список предметов в торговле с несколькими цветовыми тегами
+        // (качество, цена и т.д.) — ровно то, что могло дать существенную глубину именно тут.
+        private const int MaxTranslateInternalDepth = 24;
+        [ThreadStatic]
+        private static int _translateInternalDepth;
         private static string TranslateInternal(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
             string cached;
             if (translationCache.TryGetValue(text, out cached)) return cached;
+            if (_translateInternalDepth >= MaxTranslateInternalDepth) return text;
+            _translateInternalDepth++;
+            try
+            {
+                return TranslateInternalBody(text);
+            }
+            finally
+            {
+                _translateInternalDepth--;
+            }
+        }
 
+        private static string TranslateInternalBody(string text)
+        {
             string originalText = text;
             // Предварительно схлопываем посимвольные цветовые блоки английских слов,
             // чтобы словарь мог перевести цельное слово вместо отдельных букв.
@@ -1912,13 +2167,21 @@ namespace RussianLocalization
             {
                 return text; // Не переводим одиночные буквы/цифры (хоткеи)
             }
-            if (IsKeyName(sn))
+            if (IsKeyName(sn) || IsKeyInBrackets(text))
             {
                 return text; // Не переводим системные имена клавиш
             }
 
             // Очищаем \r для предотвращения поломки ключей при переносах строк в Windows
             text = text.Replace("\r", "");
+
+            // Обработка цветовых префиксов Caves of Qud: &K, &C, &Y, &y, &g, &r, &W, &B, &R, &M и т.д.
+            string colorPrefix = "";
+            if (text.Length >= 2 && text[0] == '&' && char.IsLetter(text[1]))
+            {
+                colorPrefix = text.Substring(0, 2);
+                text = text.Substring(2);
+            }
 
             // Рекурсивный сбор и очистка unmatched ведущих/ведомых тегов цвета
             List<string> leadTags = new List<string>();
@@ -1982,6 +2245,12 @@ namespace RussianLocalization
             if (leadTags.Count > 0) result = string.Join("", leadTags) + result;
             if (trailTags.Count > 0) result = result + string.Join("", trailTags);
 
+            // Возвращаем цветовой префикс
+            if (!string.IsNullOrEmpty(colorPrefix))
+            {
+                result = colorPrefix + result;
+            }
+
             if (result != null)
             {
                 translationCache[originalText] = result;
@@ -2001,7 +2270,7 @@ namespace RussianLocalization
             {
                 return text; // Не переводим одиночные буквы/цифры (хоткеи)
             }
-            if (IsKeyName(sn))
+            if (IsKeyName(sn) || IsKeyInBrackets(text))
             {
                 return text; // Не переводим системные имена клавиш
             }
@@ -2009,11 +2278,27 @@ namespace RussianLocalization
             // Очищаем \r для предотвращения поломки ключей при переносах строк в Windows
             text = text.Replace("\r", "");
 
+            // Обработка цветовых префиксов Caves of Qud: &K, &C, &Y, &y, &g, &r, &W, &B, &R, &M и т.д.
+            // Извлекаем префикс, переводим текст, возвращаем префикс обратно.
+            string colorPrefix = "";
+            if (text.Length >= 2 && text[0] == '&' && char.IsLetter(text[1]))
+            {
+                colorPrefix = text.Substring(0, 2);
+                text = text.Substring(2);
+            }
+
             string earlyTrimmed = text.Replace('\u00A0', ' ')
                                       .Replace('\u2007', ' ')
                                       .Replace('\u200B', ' ')
                                       .Replace('\u202F', ' ')
                                       .Trim();
+
+            // Case-sensitive check for uppercase confirmation keys only.
+            if (earlyTrimmed == "QUIT" || earlyTrimmed == "ABANDON" || earlyTrimmed == "RETIRE" || earlyTrimmed == "ABANDONED" || earlyTrimmed == "DELETE" ||
+                earlyTrimmed == "Q U I T" || earlyTrimmed == "A B A N D O N" || earlyTrimmed == "R E T I R E" || earlyTrimmed == "A B A N D O N E D" || earlyTrimmed == "D E L E T E")
+            {
+                return text;
+            }
 
             if (!string.IsNullOrEmpty(earlyTrimmed))
             {
@@ -2029,7 +2314,7 @@ namespace RussianLocalization
                     string prefix = text.Substring(0, startSpaces);
                     string suffix = text.Substring(text.Length - endSpaces);
 
-                    string result = prefix + earlyExactMatch + suffix;
+                    string result = colorPrefix + prefix + earlyExactMatch + suffix;
                     translationCache[text] = result;
                     return result;
                 }
@@ -2299,7 +2584,7 @@ namespace RussianLocalization
 
                 string translatedEng = TranslateInternal(engPart);
 
-                string result = rusPrefix + translatedEng;
+                string result = colorPrefix + rusPrefix + translatedEng;
 
                 translationCache[text] = result;
 
@@ -2335,7 +2620,7 @@ namespace RussianLocalization
 
 
 
-                string result = prefix + exactMatch + suffix;
+                string result = colorPrefix + prefix + exactMatch + suffix;
 
                 translationCache[text] = result;
 
@@ -2371,7 +2656,7 @@ namespace RussianLocalization
                             string suffix = text.Substring(text.Length - endSpaces);
 
                             string restoredExact = RestoreStrippedPunctuation(trimmed, originalKey, exactMatch);
-                            string result = prefix + restoredExact + suffix;
+                            string result = colorPrefix + prefix + restoredExact + suffix;
                             translationCache[text] = result;
                             return result;
                         }
@@ -2409,8 +2694,8 @@ namespace RussianLocalization
                     if (staticDictionary.TryGetValue(strippedText, out strippedExact))
                     {
                         string result = text.Contains("<color=") ? DistributeColors(text, strippedExact) : strippedExact;
-                        translationCache[text] = result;
-                        return result;
+                        translationCache[text] = colorPrefix + result;
+                        return colorPrefix + result;
                     }
 
                     string strippedSn = SuperNormalize(strippedText);
@@ -2420,8 +2705,8 @@ namespace RussianLocalization
                         if (staticDictionary.TryGetValue(strippedOrigKey, out strippedExact))
                         {
                             string result = text.Contains("<color=") ? DistributeColors(text, strippedExact) : strippedExact;
-                            translationCache[text] = result;
-                            return result;
+                            translationCache[text] = colorPrefix + result;
+                            return colorPrefix + result;
                         }
                     }
                 }
@@ -2442,9 +2727,9 @@ namespace RussianLocalization
 
             }
 
-            translationCache[text] = processedText;
+            translationCache[text] = colorPrefix + processedText;
 
-            return processedText;
+            return colorPrefix + processedText;
 
         }
 
@@ -2454,7 +2739,26 @@ namespace RussianLocalization
 
         {
 
+            return TranslateMarkup(text, 0);
+
+        }
+
+        // 2026-07-05: лимит глубины рекурсии для вложенных {{color|...}} блоков. Сама функция
+        // рекурсивно вызывает себя на содержимом справа от "|" (см. ниже) без ограничения —
+        // при аномально глубоко вложенной разметке (например, в описании предмета в магазине)
+        // это стабильно давало access violation 0xc0000005 в ntdll.dll (нативный стек-оверфлоу,
+        // без managed-исключения в логе) — тот же класс бага, что уже чинили для WalkVisualTree
+        // (MaxWalkDepth=512) и для TranslateVisualTree. На глубине MaxMarkupDepth дальнейшую
+        // вложенную разметку не переводим (возвращаем как есть), чтобы никогда не переполнить стек.
+        private const int MaxMarkupDepth = 48;
+
+        private static string TranslateMarkup(string text, int depth)
+
+        {
+
             if (string.IsNullOrEmpty(text)) return text;
+
+            if (depth >= MaxMarkupDepth) return text;
 
 
 
@@ -2562,7 +2866,7 @@ namespace RussianLocalization
 
                         string right = content.Substring(pipeIdx + 1);
 
-                        result.Append("{{" + left + "|" + TranslateMarkup(right) + "}}");
+                        result.Append("{{" + left + "|" + TranslateMarkup(right, depth + 1) + "}}");
 
                     }
 
@@ -2858,7 +3162,14 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(text)) return text;
 
-            if (InternalGameKeys.Contains(text.Trim())) return text;
+            string trimmedText = text.Trim();
+            // CRITICAL: DO NOT TOUCH, MODIFY, OR REMOVE THE PROTECTION BELOW!
+            // It prevents the game from translating confirmation hold keys (QUIT, ABANDON, RETIRE) to Russian.
+            // If they are translated, it breaks the game's confirmation checks (e.g. key-hold to quit/abandon),
+            // and the game will NOT register the hold action, falling through to gameplay.
+            if (trimmedText == "QUIT" || trimmedText == "ABANDON" || trimmedText == "RETIRE" || trimmedText == "DELETE") return text;
+
+            if (InternalGameKeys.Contains(trimmedText) || IsKeyInBrackets(text)) return text;
 
 
 
@@ -2962,6 +3273,15 @@ namespace RussianLocalization
 
 
             string trimmedCore = normalizedCore.Trim();
+            // Case-sensitive check for uppercase confirmation keys only.
+            // This prevents translating QUIT / ABANDON / RETIRE while allowing
+            // title-case (Abandon / Quit) and lowercase (abandon / quit) in menus to be translated.
+            if (trimmedCore == "QUIT" || trimmedCore == "ABANDON" || trimmedCore == "RETIRE" || trimmedCore == "ABANDONED" ||
+                trimmedCore == "Q U I T" || trimmedCore == "A B A N D O N" || trimmedCore == "R E T I R E" || trimmedCore == "A B A N D O N E D")
+            {
+                translationCache[text] = text;
+                return text;
+            }
 
             string translatedCore = "";
 
@@ -3175,6 +3495,20 @@ namespace RussianLocalization
 
 
 
+        // 2026-07-06 (v25): вырезает цветокоды классического UI Qud "&X" (& + буква) из строки.
+        // Escaped "&&" (литеральный амперсанд) и "& " (амперсанд-пробел) НЕ трогаем.
+        private static string StripAmpColorCodes(string s)
+        {
+            if (string.IsNullOrEmpty(s) || s.IndexOf('&') < 0) return s;
+            var sb = new StringBuilder(s.Length);
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (s[i] == '&' && i + 1 < s.Length && char.IsLetter(s[i + 1])) { i++; continue; }
+                sb.Append(s[i]);
+            }
+            return sb.ToString();
+        }
+
         private static string TryWordReplacement(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
@@ -3195,15 +3529,28 @@ namespace RussianLocalization
                     if (wordIdx + seqLen > words.Length) continue;
 
                     string candidate = string.Join(" ", words, wordIdx, seqLen);
+                    // 2026-07-06 (v25): цветокоды классического UI "&X" (& + буква) раньше прилипали
+                    // к слову — "&Ysteel&y" давало core="Ysteel&y" (буква цвета 'Y' не срезалась как
+                    // пунктуация) → нет в словаре → материал/слово не переводились (это ~73% франкенов
+                    // в боевом логе и названиях предметов). Теперь на краях потребляем "&X" как
+                    // пунктуацию, а внутренние коды вырезаем из ключа словаря (StripAmpColorCodes).
                     int start = 0;
-                    while (start < candidate.Length && !char.IsLetterOrDigit(candidate[start]))
+                    while (start < candidate.Length)
                     {
-                        start++;
+                        char sc = candidate[start];
+                        if (sc == '&' && start + 1 < candidate.Length && candidate[start + 1] == '&') { start += 2; continue; } // экранированный &&
+                        if (sc == '&' && start + 1 < candidate.Length && char.IsLetter(candidate[start + 1])) { start += 2; continue; } // цветокод &X
+                        if (!char.IsLetterOrDigit(sc)) { start++; continue; }
+                        break;
                     }
                     int end = candidate.Length;
-                    while (end > start && !char.IsLetterOrDigit(candidate[end - 1]))
+                    while (end > start)
                     {
-                        end--;
+                        char ec = candidate[end - 1];
+                        if (end - 2 >= start && candidate[end - 2] == '&' && candidate[end - 1] == '&') { end -= 2; continue; } // экранированный &&
+                        if (end - 2 >= start && candidate[end - 2] == '&' && char.IsLetter(ec)) { end -= 2; continue; } // цветокод &X
+                        if (!char.IsLetterOrDigit(ec)) { end--; continue; }
+                        break;
                     }
 
                     if (start >= end) continue; // Only punctuation/symbols, skip core lookup
@@ -3211,25 +3558,27 @@ namespace RussianLocalization
                     string leadingPunct = candidate.Substring(0, start);
                     string trailingPunct = candidate.Substring(end);
                     string core = candidate.Substring(start, end - start);
+                    // Ключ поиска — без внутренних "&X" кодов (например "steel&y long" → "steel long").
+                    string lookupCore = core.IndexOf('&') >= 0 ? StripAmpColorCodes(core) : core;
 
                     string translation = null;
-                    if (wordDictionary.TryGetValue(core, out translation) || 
-                        wordDictionary.TryGetValue(core.ToLower(), out translation))
+                    if (wordDictionary.TryGetValue(lookupCore, out translation) ||
+                        wordDictionary.TryGetValue(lookupCore.ToLower(), out translation))
                     {
                         if (translation != null)
                         {
-                            // Match case of the core
+                            // Match case of the core (по очищенному от цветокодов ключу)
                             bool isAllLower = true, isAllUpper = true;
-                            for (int c = 0; c < core.Length; c++)
+                            for (int c = 0; c < lookupCore.Length; c++)
                             {
-                                if (char.IsUpper(core[c])) isAllLower = false;
-                                if (char.IsLower(core[c])) isAllUpper = false;
+                                if (char.IsUpper(lookupCore[c])) isAllLower = false;
+                                if (char.IsLower(lookupCore[c])) isAllUpper = false;
                             }
 
                             string finalCoreTrans = translation;
                             if (isAllLower) finalCoreTrans = finalCoreTrans.ToLower();
                             else if (isAllUpper) finalCoreTrans = finalCoreTrans.ToUpper();
-                            else if (finalCoreTrans.Length > 0 && char.IsUpper(core[0]))
+                            else if (finalCoreTrans.Length > 0 && lookupCore.Length > 0 && char.IsUpper(lookupCore[0]))
                                 finalCoreTrans = char.ToUpper(finalCoreTrans[0]) + finalCoreTrans.Substring(1);
 
                             bestMatch = leadingPunct + finalCoreTrans + trailingPunct;
@@ -3403,7 +3752,8 @@ namespace RussianLocalization
 
         {
 
-            if (!string.IsNullOrEmpty(CachedModPath))
+            // Не пишем all_gameplay_texts.txt в папку мода — только в Documents
+            if (filename != "all_gameplay_texts.txt" && !string.IsNullOrEmpty(CachedModPath))
 
             {
 
@@ -3429,7 +3779,7 @@ namespace RussianLocalization
 
 
 
-            // Пишем в Документы пользователя ТОЛЬКО all_gameplay_texts.txt
+            // Пишем в Документы пользователя ТОЛЬКО all_gameplay_texts.txt с датой в имени
 
             if (filename != "all_gameplay_texts.txt") return;
 
@@ -3455,7 +3805,10 @@ namespace RussianLocalization
 
                     }
 
-                    string logPath = Path.Combine(targetFolder, filename);
+                    
+                    // Используем имя файла с датой
+                    string logFileName = !string.IsNullOrEmpty(GameplayLogFileName) ? GameplayLogFileName : filename;
+                    string logPath = Path.Combine(targetFolder, logFileName);
 
                     File.AppendAllText(logPath, content, Encoding.UTF8);
 
@@ -4455,6 +4808,7 @@ namespace RussianLocalization
         // 40+ методов, ~277 вызовов в коде. ShowYesNo=108, PickOption=84 и т.д.
         // Динамически находим все методы со string-параметрами и патчим.
         // ============================================================
+        // ============================================================
         public static void PatchPopup()
         {
             try
@@ -4501,13 +4855,15 @@ namespace RussianLocalization
                         if (alreadyPatched) continue;
                     }
 
-                    // Патчим только методы, у которых хотя бы один параметр — string
-                    // или которые возвращают string (AskString, AskNumber возвращают string).
+                    // Патчим только методы, у которых хотя бы один параметр — string, IReadOnlyList<string>, List<string> или string[]
                     var parameters = m.GetParameters();
                     bool hasStringParam = false;
                     foreach (var p in parameters)
                     {
-                        if (p.ParameterType == typeof(string) || p.ParameterType == typeof(System.Collections.Generic.IReadOnlyList<string>))
+                        if (p.ParameterType == typeof(string) || 
+                            p.ParameterType == typeof(System.Collections.Generic.IReadOnlyList<string>) ||
+                            p.ParameterType == typeof(System.Collections.Generic.List<string>) ||
+                            p.ParameterType == typeof(string[]))
                         {
                             hasStringParam = true; break;
                         }
@@ -4628,6 +4984,19 @@ namespace RussianLocalization
                             string tr = Translate(s);
                             if (!string.IsNullOrEmpty(tr) && tr != s)
                                 list[j] = tr;
+                        }
+                    }
+                    else if (parameters[i].ParameterType == typeof(string[]))
+                    {
+                        var arr = __args[i] as string[];
+                        if (arr == null || arr.Length == 0) continue;
+                        for (int j = 0; j < arr.Length; j++)
+                        {
+                            string s = arr[j];
+                            if (string.IsNullOrEmpty(s) || ContainsCyrillic(s)) continue;
+                            string tr = Translate(s);
+                            if (!string.IsNullOrEmpty(tr) && tr != s)
+                                arr[j] = tr;
                         }
                     }
                 }
@@ -4777,33 +5146,139 @@ namespace RussianLocalization
             catch { /* не ломаем GameText */ }
         }
 
+        // 2026-07-06 (v13 — НАЙДЕН РЕАЛЬНЫЙ ВИНОВНИК): бисекция по одному хуку (PatchPopup,
+        // PatchQudTranslator, PatchUITextSkin, PatchGameText) показала, что краш в торговле
+        // воспроизводится ТОЛЬКО когда включён PatchUITextSkin — единственный из четырёх хуков,
+        // чьи префиксы вызывали тяжёлый TranslationEngine.Translate() БЕЗ какой-либо защиты от
+        // глубины стека (в отличие от Description_Patches/ScreenBuffer_Patch/TMP-группы, где такая
+        // защита уже была добавлена ранее). UITextSkin.SetText — самый "горячий" путь перевода
+        // Modern UI (вызывается на КАЖДЫЙ текстовый элемент), и при построении большого списка
+        // предметов в торговле UI Toolkit строит глубокое дерево элементов рекурсивно — каждый
+        // вызов Translate() добавляет стек поверх и без того глубокого стека движка. Дело не в
+        // рекурсии САМОГО патча (guard с [ThreadStatic] тут не поможет и не нужен), а в суммарной
+        // глубине стека к моменту вызова — поэтому используем RuntimeHelpers.EnsureSufficientExecutionStack(),
+        // которая кидает ПЕРЕХВАТЫВАЕМОЕ исключение заранее, пока стек ещё не переполнен целиком
+        // (в отличие от жёсткого access violation, который ловить/логировать невозможно).
+        // 2026-07-06 (v14 — ДИАГНОСТИКА): фикс EnsureSufficientExecutionStack НЕ помог, краш
+        // идентичен побайтово (те же смещения в gameoverlayrenderer64.dll/mono/UnityPlayer каждый
+        // раз) — это не похоже на переполнение стека (которое давало бы разброс по глубине).
+        // Тестируем радикальную гипотезу: сам факт патчинга Harmony-трамплином UITextSkin.SetText
+        // (независимо от того, что делает наш код внутри) меняет тайминг вызова и задевает гонку
+        // в потоке рендера Unity (kGfxThreadingModeThreaded) или в хуке Steam-оверлея. Временно
+        // делаем тело патча ПОЛНОСТЬЮ пустым (return сразу, без Translate/рефлексии) — если краш
+        // всё равно происходит, виноват сам факт патчинга метода, а не наша логика внутри.
+        // 2026-07-06 (v15): пустое тело ОБОИХ методов — краша НЕТ. Значит дело в логике, не в
+        // самом факте патчинга. Разделяем на два отдельных флага: включаем логику только в
+        // SetText_Prefix (самый частый путь — вызывается на каждый текстовый элемент), оставляя
+        // SetTheText_Prefix (редкий фолбэк через рефлексию) пустым, чтобы понять, кто из двух виноват.
+        public const bool DIAG_NOOP_SETTEXT_BODY = false;
+        public const bool DIAG_NOOP_SETTHETEXT_BODY = false;
+        // 2026-07-06 (v16): SetText_Prefix с полной логикой (EnsureSufficientExecutionStack +
+        // Translate) — краш ВОСПРОИЗВЁЛСЯ (тот же offset). SetTheText_Prefix пустой, значит виноват
+        // либо EnsureSufficientExecutionStack, либо сам Translate(). Другие хуки (GameText,
+        // QudTranslator) тоже зовут Translate() и не крашились — значит либо дело именно в
+        // Translate()'s поведении с ТЕКСТОМ ИЗ ТОРГОВЛИ конкретно (не общее свойство функции), либо
+        // в том, что тяжёлая обработка внутри PREFIX (до вызова оригинального SetText) удерживает
+        // что-то (лок/синхронизацию с потоком рендера) дольше обычного. Тестируем самый дешёвый
+        // возможный путь — только проверка стека + быстрая ContainsCyrillicInternal, БЕЗ Translate().
+        public const bool DIAG_SKIP_TRANSLATE_CALL = false;
+        // 2026-07-06 (v17): DIAG_SKIP_TRANSLATE_CALL=true — краша НЕТ. Подтверждено: виноват именно
+        // вызов Translate(), не сам факт патчинга SetText. Пользователь указал, что краша не было
+        // до апдейта 1.0.5 (build 211.45), где патчноут явно упоминает переделку Modern UI
+        // ("Fixed a bug that caused the Modern UI option not to be shown"). Гипотеза: в новой версии
+        // UITextSkin.SetText может вызываться НЕ ТОЛЬКО из главного потока Unity (например, из
+        // воркера построения дерева UI Toolkit), и наш тяжёлый Translate() внутри Harmony-префикса
+        // становится небезопасным именно в этом контексте (не в главном потоке). Логируем один раз
+        // при первом вызове не из главного потока, и пропускаем Translate() в этом случае —
+        // единственный "правильный" перевод в фоновом потоке всё равно рискован.
+        private static volatile bool _loggedOffMainThread = false;
+        // 2026-07-06 (v21): диагностическое логирование входных строк SetText для поимки
+        // конкретной строки, вызывающей краш в торговле. Файл переоткрывается на каждую запись
+        // (AppendAllText) — гарантированный flush на диск, последняя строка = виновник краша.
+        public const bool DIAG_LOG_SETTEXT_INPUT = false;
+        public static readonly string DIAG_SETTEXT_LOG_PATH =
+            System.IO.Path.Combine(
+                System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments),
+                "CavesOfQud_RU_Logs", "settext_input_trace.txt");
         // Перехват входящего текста до отрисовки в новом UI.
         public static void UITextSkin_SetText_Prefix(ref string text)
         {
+            if (DIAG_NOOP_SETTEXT_BODY) return;
             try
             {
+                System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
                 if (!TranslationEngine.Initialized || string.IsNullOrEmpty(text)) return;
                 if (TranslationEngine.ContainsCyrillicInternal(text)) return;
+                if (DIAG_SKIP_TRANSLATE_CALL) return;
+                if (TranslationEngine.MainThreadId != -1 &&
+                    System.Threading.Thread.CurrentThread.ManagedThreadId != TranslationEngine.MainThreadId)
+                {
+                    if (!_loggedOffMainThread)
+                    {
+                        _loggedOffMainThread = true;
+                        UnityEngine.Debug.LogWarning("[RussianLocalization] UITextSkin.SetText вызван НЕ из главного потока (thread " +
+                            System.Threading.Thread.CurrentThread.ManagedThreadId + ", главный = " + TranslationEngine.MainThreadId +
+                            ") — пропускаем Translate() в этом вызове.");
+                    }
+                    return;
+                }
+                // 2026-07-06 (v18): проверяем гипотезу "дело в ДЛИТЕЛЬНОСТИ вызова, а не в его
+                // логике" — вместо настоящего Translate() делаем паузу той же длительности и
+                // возвращаемся без перевода. Если краш всё равно случится — виноват тайминг (гонка
+                // с чем-то ещё), а не код Translate() как таковой.
+                if (DIAG_FAKE_DELAY_MS > 0)
+                {
+                    System.Threading.Thread.Sleep(DIAG_FAKE_DELAY_MS);
+                    return;
+                }
+                // 2026-07-06 (v21): ХВАТИТ ГАДАТЬ. Логируем КАЖДУЮ входную строку в файл с
+                // немедленным flush ПЕРЕД вызовом Translate(). Краш синхронный внутри Translate(),
+                // поэтому последняя строка в diag-файле = ровно тот текст, что убил игру.
+                // IN: до вызова, OUT: после. Виновник краша = строка с IN без соответствующего OUT.
+                string escForLog = null;
+                if (DIAG_LOG_SETTEXT_INPUT)
+                {
+                    try
+                    {
+                        escForLog = text.Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t");
+                        System.IO.File.AppendAllText(DIAG_SETTEXT_LOG_PATH,
+                            System.DateTime.Now.ToString("HH:mm:ss.fff") + "\tIN \t[len=" + text.Length + "]\t" + escForLog + System.Environment.NewLine);
+                    }
+                    catch { }
+                }
                 // Полный пайплайн (faction + паттерны по целой строке + радужные слова + кэш),
                 // как у остальных хуков. TranslateMarkup дробил по цвету и терял паттерны → франкенштейны.
                 string tr = TranslationEngine.Translate(text);
                 if (!string.IsNullOrEmpty(tr) && tr != text) text = tr;
+                if (DIAG_LOG_SETTEXT_INPUT)
+                {
+                    try
+                    {
+                        System.IO.File.AppendAllText(DIAG_SETTEXT_LOG_PATH,
+                            System.DateTime.Now.ToString("HH:mm:ss.fff") + "\tOUT\t[len=" + text.Length + "]\t" + escForLog + System.Environment.NewLine);
+                    }
+                    catch { }
+                }
             }
-            catch { /* никогда не ломаем UI */ }
+            catch { /* никогда не ломаем UI, включая InsufficientExecutionStackException */ }
         }
+
+        public const int DIAG_FAKE_DELAY_MS = 0;
 
         // Фолбэк: если текст записали прямо в поле .text, минуя SetText — переводим перед применением.
         public static void UITextSkin_SetTheText_Prefix(object __instance)
         {
+            if (DIAG_NOOP_SETTHETEXT_BODY) return;
             try
             {
+                System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
                 if (!TranslationEngine.Initialized || _utsTextField == null || __instance == null) return;
                 string cur = _utsTextField.GetValue(__instance) as string;
                 if (string.IsNullOrEmpty(cur) || TranslationEngine.ContainsCyrillicInternal(cur)) return;
                 string tr = TranslationEngine.Translate(cur);
                 if (!string.IsNullOrEmpty(tr) && tr != cur) _utsTextField.SetValue(__instance, tr);
             }
-            catch { /* никогда не ломаем UI */ }
+            catch { /* никогда не ломаем UI, включая InsufficientExecutionStackException */ }
         }
 
         // --- ОПТИМИЗИРОВАННЫЙ RuntimeTranslator ДЛЯ MODERN UI ---
@@ -5152,6 +5627,54 @@ namespace RussianLocalization
             });
         }
 
+        // 2026-07-06 (v26): аналог ExpandRainbowWords для СТАРОГО формата цветокодов "&X" классического
+        // UI. Радужное слово там — это 3+ подряд идущих "&<цвет><буква>" (напр. "&Yl&ya&Kc&yq&Yu&ye&Kr&ye&Yd"
+        // = "lacquered", "&Ye&yn&cg&Cr&Ya&yv&ce&Cd" = "engraved"). Такие слова НЕ переводились: v25-фикс
+        // в TryWordReplacement трогает только цветокоды на КРАЯХ слова, а тут код перед КАЖДОЙ буквой.
+        // Собираем слово, переводим, распределяем исходные цвета по буквам перевода.
+        // Требует ровно "&<буква><буква>" на звено, поэтому обычные одноцветные слова ("&Ysteel&y" —
+        // 1 звено) не трогает: их обрабатывает TryWordReplacement.
+        private static readonly System.Text.RegularExpressions.Regex AmpRainbowRunRegex =
+            new System.Text.RegularExpressions.Regex(@"(?:&[A-Za-z][A-Za-z]){3,}", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex AmpRainbowLetterRegex =
+            new System.Text.RegularExpressions.Regex(@"&([A-Za-z])([A-Za-z])", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        private static string ExpandAmpRainbowWords(string text)
+        {
+            if (string.IsNullOrEmpty(text) || text.IndexOf('&') < 0) return text;
+            if (text.Length > 1000) return text;
+
+            return AmpRainbowRunRegex.Replace(text, m =>
+            {
+                var letters = AmpRainbowLetterRegex.Matches(m.Value);
+                if (letters.Count < 3) return m.Value;
+
+                var colors = new List<string>(letters.Count);
+                var wordSb = new StringBuilder(letters.Count);
+                foreach (System.Text.RegularExpressions.Match lm in letters)
+                {
+                    colors.Add(lm.Groups[1].Value);   // буква цвета, напр. "Y"
+                    wordSb.Append(lm.Groups[2].Value); // сама буква слова
+                }
+                string word = wordSb.ToString();
+
+                string translated = TranslateText(word, true);
+                if (string.IsNullOrEmpty(translated) || translated == word || !ContainsCyrillic(translated))
+                    return m.Value;
+
+                int n = colors.Count;
+                int mlen = translated.Length;
+                var outSb = new StringBuilder(mlen * 3);
+                for (int i = 0; i < mlen; i++)
+                {
+                    int ci = (int)((long)i * n / mlen);
+                    if (ci >= n) ci = n - 1;
+                    outSb.Append('&').Append(colors[ci]).Append(translated[i]);
+                }
+                return outSb.ToString();
+            });
+        }
+
         /// <summary>
         /// Схлопывает последовательности вида <color=C1>L</color><color=C2>e</color>... в единый цветовой блок.
         /// Игнорирует меняющиеся цвета: используется цвет первой буквы, так как перевод
@@ -5464,7 +5987,7 @@ namespace RussianLocalization
             {
             if (string.IsNullOrEmpty(text)) return text;
 
-            if (InternalGameKeys.Contains(text.Trim())) return text;
+            if (InternalGameKeys.Contains(text.Trim()) || IsKeyInBrackets(text)) return text;
 
             bool success;
             string modernUITranslated = TryTranslateModernUI(text, out success);
@@ -5496,6 +6019,13 @@ namespace RussianLocalization
                                         .Replace('\u200B', ' ')
                                         .Replace('\u202F', ' ');
             string trimmedCore = normalizedCore.Trim();
+            // Case-sensitive check for uppercase confirmation keys only.
+            if (trimmedCore == "QUIT" || trimmedCore == "ABANDON" || trimmedCore == "RETIRE" || trimmedCore == "ABANDONED" || trimmedCore == "DELETE" ||
+                trimmedCore == "Q U I T" || trimmedCore == "A B A N D O N" || trimmedCore == "R E T I R E" || trimmedCore == "A B A N D O N E D" || trimmedCore == "D E L E T E")
+            {
+                translationCache[text] = text;
+                return text;
+            }
             string translatedCore = "";
 
             string exactMatch;
@@ -5861,7 +6391,103 @@ namespace RussianLocalization
 
     // --- HARMONY PATCHES ---
 
+    // 2026-07-05 (v3): в двух подряд крашах (см. ru-qud-crash-fix-20260705-trade) Player.log
+    // обрывался БЕЗ единого исключения ровно на строке "Forced cyrillic font for text '<буква>'" —
+    // а этот лог пишет ТОЛЬКО FontUtils.ForceCyrillicFont, вызываемая из Postfix-ов патчей на
+    // TMP_Text.text/SetText/font ниже. FontUtils.ForceCyrillicFont сама присваивает
+    // textComponent.font, а сеттер font тоже пропатчен (TMPText_Font_Patch) и снова вызывает
+    // ForceCyrillicFont — цикл самозавершается проверкой "font != cyrillicFallback", но TMPro
+    // внутри себя может дополнительно дёргать SetText/text при смене шрифта (перегенерация меша),
+    // а те патчи снова вызывают Translate()+ForceCyrillicFont. При интенсивном построении
+    // Modern UI (много хоткей-плашек/строк сразу, например экран торговли) это даёт заметную
+    // вложенность НАШИХ вызовов поверх и без того глубокого стека Unity Awake/OnEnable —
+    // access violation 0xc0000005 в ntdll.dll. Общий guard на все патчи этой группы: если
+    // впервые упираемся в предел глубины — один раз пишем в reentrancy_diag.txt реальный стек
+    // вызовов (чтобы при повторном краше видеть, что именно рекурсит), и просто пропускаем
+    // дальнейшую обработку (текст останется как есть на этом уровне), не добавляя стека.
+    internal static class UITextReentrancyGuard
+    {
+        // 2026-07-05 (v4 — БИСЕКЦИЯ): depth-guard (v3) не помог и ни разу не сработал
+        // (reentrancy_diag.txt не появился), значит эти 11 патчей НЕ рекурсят друг в друга —
+        // depth-guard тут ни при чём. Прежде чем гадать про четвёртый механизм, проверяем
+        // гипотезу целиком: полностью выключаем ВСЮ эту группу патчей (TMP_Text.text/SetText/
+        // font, TextMeshPro/UGUI.Awake) одним флагом — если краш на экране торговли ПРОПАДЁТ
+        // (ценой английского текста в этих элементах, включая хоткей-плашки), то причина
+        // ТОЧНО в этой группе, и дальше сужаем виновника внутри неё по одному патчу.
+        // Если краш ОСТАНЕТСЯ даже с ПОЛНОСТЬЮ выключенной группой — дело не в ней вообще,
+        // и следующий подозреваемый — XRL.UI.Popup (42 патченных метода) или что-то в самой
+        // игре, что переводчик лишь провоцирует. Именно так был найден RuntimeTranslator
+        // 2026-07-02 (см. ru-qud-crash-fix-20260702) — бисекцией, а не гаданием.
+        // 2026-07-05 (v6): бисекция подтвердила, что эта группа НЕ виновата — краш пережил
+        // полное отключение (см. ru-qud-crash-fix-20260705-trade v5). Возвращено обратно.
+        // 2026-07-05 (v10): ВАЖНО — v5/v6 тестировали эту группу только против краша В ТОРГОВЛЕ.
+        // Против НОВОГО стартового краша (хоткей-плашки сразу после загрузки, лог обрывается
+        // ровно на "Forced cyrillic font for text '<буква>'") эта группа никогда не проверялась
+        // отдельно. PatchUIElements уже отключён (DIAG_DISABLE_UIELEMENTS_HOOK=true), Description
+        // тоже (DIAG_DISABLE_DESCRIPTION_HOOKS=true), но краш на хоткей-плашках остался — точное
+        // совпадение с сигнатурой этой группы. Проверяем её отдельно для СТАРТОВОГО краша.
+        // 2026-07-05 (v11 — НАСТОЯЩАЯ ПРИЧИНА НАЙДЕНА, это НЕ мы): анализ дампа краша через WinDbg
+        // (!analyze -v на C:\Users\Lecoo\Documents\CavesOfQud_RU_Logs\CrashDumps\analyze.log) дал
+        // FAILURE_BUCKET_ID: INVALID_POINTER_READ_c0000005_gameoverlayrenderer64.dll!Unknown —
+        // падение происходит внутри gameoverlayrenderer64.dll (оверлей Steam), а НЕ в моде. Тот же
+        // offset 0x539c2 в ntdll.dll на КАЖДОМ краше сегодня (независимо от того, что отключено в
+        // моде) — это гонка в хуке Steam-оверлея на DirectX (OverlayHookD3D3 → GetModuleHandleW),
+        // а не рекурсия/переполнение стека в наших Harmony-патчах. Отключение хуков мода иногда
+        // "помогало" лишь потому, что снижало нагрузку/рендер-churn и меняло тайминг гонки, а не
+        // потому что чинило причину. Все диагностические флаги возвращены в штатное положение —
+        // реальный фикс: отключить Steam Overlay для игры (Steam → Свойства игры → Общие → снять
+        // "Enable Steam Overlay"), см. память ru-qud-crash-fix-20260705-trade (v11).
+        // 2026-07-05/06 (v12): пользователь подтвердил — краш пережил и полный рестарт Steam с
+        // оверлеем выключенным (дамп это подтвердил), но настаивает что дело в моде. Возможный
+        // механизм: наш код портит память, а падает потом посторонний код (тот же offset каждый
+        // раз это скорее подтверждает, чем опровергает — детерминированная порча). Возвращаем в
+        // выключенное состояние для чистой точечной проверки PatchPopup (см. флаги выше по файлу).
+        public const bool DIAG_DISABLE_TMP_HOOKS = false;
 
+        private const int MaxDepth = 12;
+
+        [ThreadStatic]
+        private static int _depth;
+
+        private static volatile bool _loggedOverflow = false;
+
+        public static bool TryEnter()
+        {
+            if (DIAG_DISABLE_TMP_HOOKS) return false;
+            return TryEnterReal();
+        }
+
+        private static bool TryEnterReal()
+        {
+            if (_depth >= MaxDepth)
+            {
+                if (!_loggedOverflow)
+                {
+                    _loggedOverflow = true;
+                    try
+                    {
+                        string trace = new System.Diagnostics.StackTrace(1, false).ToString();
+                        string msg = "[RussianLocalization] UI text reentrancy depth cap (" + MaxDepth + ") reached — skipping further nested Translate/ForceCyrillicFont calls to avoid native stack overflow. Call chain:\n" + trace;
+                        UnityEngine.Debug.LogWarning(msg);
+                        if (!string.IsNullOrEmpty(TranslationEngine.CachedModPath))
+                        {
+                            string p = System.IO.Path.Combine(TranslationEngine.CachedModPath, "reentrancy_diag.txt");
+                            System.IO.File.AppendAllText(p, DateTime.Now + "\r\n" + msg + "\r\n\r\n", System.Text.Encoding.UTF8);
+                        }
+                    }
+                    catch { /* диагностика не должна ронять игру */ }
+                }
+                return false;
+            }
+            _depth++;
+            return true;
+        }
+
+        public static void Exit()
+        {
+            _depth--;
+        }
+    }
 
     [HarmonyPatch(typeof(UnityEngine.UI.Text), "text", MethodType.Setter)]
 
@@ -5877,7 +6503,15 @@ namespace RussianLocalization
 
             {
 
-                value = TranslationEngine.Translate(value);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    value = TranslationEngine.Translate(value);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -5902,7 +6536,15 @@ namespace RussianLocalization
 
             {
 
-                value = TranslationEngine.Translate(value);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    value = TranslationEngine.Translate(value);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -5916,7 +6558,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -5941,7 +6591,15 @@ namespace RussianLocalization
 
             {
 
-                sourceText = TranslationEngine.Translate(sourceText);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    sourceText = TranslationEngine.Translate(sourceText);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -5955,7 +6613,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -5980,7 +6646,15 @@ namespace RussianLocalization
 
             {
 
-                sourceText = TranslationEngine.Translate(sourceText);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    sourceText = TranslationEngine.Translate(sourceText);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -5994,7 +6668,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6019,7 +6701,15 @@ namespace RussianLocalization
 
             {
 
-                sourceText = TranslationEngine.Translate(sourceText);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    sourceText = TranslationEngine.Translate(sourceText);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6033,7 +6723,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6058,7 +6756,15 @@ namespace RussianLocalization
 
             {
 
-                sourceText = TranslationEngine.Translate(sourceText);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    sourceText = TranslationEngine.Translate(sourceText);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6072,7 +6778,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6097,7 +6811,15 @@ namespace RussianLocalization
 
             {
 
-                sourceText = TranslationEngine.Translate(sourceText);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    sourceText = TranslationEngine.Translate(sourceText);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6111,7 +6833,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6136,13 +6866,18 @@ namespace RussianLocalization
 
             {
 
-                string text = sourceText.ToString();
-
-                string translated = TranslationEngine.Translate(text);
-
-                sourceText.Clear();
-
-                sourceText.Append(translated);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    string text = sourceText.ToString();
+                    string translated = TranslationEngine.Translate(text);
+                    sourceText.Clear();
+                    sourceText.Append(translated);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6156,7 +6891,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6180,7 +6923,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6204,7 +6955,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6228,7 +6987,15 @@ namespace RussianLocalization
 
             {
 
-                FontUtils.ForceCyrillicFont(__instance);
+                if (!UITextReentrancyGuard.TryEnter()) return;
+                try
+                {
+                    FontUtils.ForceCyrillicFont(__instance);
+                }
+                finally
+                {
+                    UITextReentrancyGuard.Exit();
+                }
 
             }
 
@@ -6308,43 +7075,23 @@ namespace RussianLocalization
 
 
 
+        // 2026-07-05: TranslateVisualTree(root) отключён насовсем. Это рекурсивный обход
+        // ВСЕГО дерева VisualElement через рефлексию (GetProperty("children")) БЕЗ лимита
+        // глубины, запускаемый синхронно в момент UIDocument.OnEnable — то есть в тот же
+        // кадр, когда Unity ещё достраивает/пересобирает виртуализированные строки списка.
+        // При открытии торговли с большим инвентарём это стабильно давало access violation
+        // 0xc0000005 в ntdll.dll (WER-логи: идентичный краш 02.07/04.07/05.07, всегда на
+        // одном и том же смещении) — тот же класс бага, что уже диагностирован и вылечен
+        // выше для RuntimeTranslator.WalkVisualTree (см. комментарии у DIAG_DISABLE_RUNTIME_
+        // TRANSLATOR): обход дерева мидконструкции нативных UI-объектов через рефлексию.
+        // try/catch тут не спасает — access violation нативный, managed-исключение не летит.
+        // Функция избыточна: UIElements.TextElement.text уже патчен (TextElement_Prefix) и
+        // переводит любой текст в момент его установки, включая новые строки списка лавки.
         public static void UIDocument_OnEnable_Postfix(object __instance)
 
         {
 
-            if (__instance == null || !TranslationEngine.Initialized) return;
-
-            try
-
-            {
-
-                var rootProp = __instance.GetType().GetProperty("rootVisualElement", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
-                if (rootProp != null)
-
-                {
-
-                    object root = rootProp.GetValue(__instance, null);
-
-                    if (root != null)
-
-                    {
-
-                        TranslateVisualTree(root);
-
-                    }
-
-                }
-
-            }
-
-            catch (Exception ex)
-
-            {
-
-                UnityEngine.Debug.LogError("[RussianLocalization] UIDocument_OnEnable_Postfix error: " + ex.ToString());
-
-            }
+            return;
 
         }
 
@@ -6593,6 +7340,20 @@ namespace RussianLocalization
             catch { /* никогда не ломаем игровой цикл из-за лога */ }
         }
 
+        // 2026-07-05 (v2): те же Write/WriteAt-префиксы падали с идентичным access violation
+        // 0xc0000005 в ntdll.dll, что и Description.get_Short/get_Long (см. Description_Patches
+        // выше) — ScreenBuffer.Write у классического ASCII-интерфейса (используется, в частности,
+        // экраном торговли) может вызывать сам себя реентрантно при отрисовке составных тайлов
+        // (фон + иконка + рамка), и КАЖДЫЙ такой вложенный вызов заново прогонял тяжёлый
+        // TranslationEngine.Translate() (десятки regex) поверх уже глубокого игрового стека
+        // рендеринга. В большом магазине это стабильно роняло игру прямо на экране торговли.
+        // Тот же приём, что и в Description_Patches: ThreadStatic-счётчик глубины, глубже которого
+        // просто возвращаем оригинальный (непереведённый) текст, не добавляя стека.
+        private const int MaxWriteRecursionDepth = 8;
+
+        [ThreadStatic]
+        private static int _writeDepth;
+
         [HarmonyPrefix]
         [HarmonyPriority(100)]
 
@@ -6608,9 +7369,17 @@ namespace RussianLocalization
 
                 LogAsciiInputAlreadyCyrillic("Write(tile)", RenderString);
 
-                string trans = TranslationEngine.Translate(RenderString);
-
-                RenderString = TranslationEngine.Transliterate(trans);
+                if (_writeDepth >= MaxWriteRecursionDepth) return;
+                _writeDepth++;
+                try
+                {
+                    string trans = TranslationEngine.Translate(RenderString);
+                    RenderString = TranslationEngine.Transliterate(trans);
+                }
+                finally
+                {
+                    _writeDepth--;
+                }
 
             }
 
@@ -6633,9 +7402,17 @@ namespace RussianLocalization
 
                 LogAsciiInputAlreadyCyrillic("Write", s);
 
-                string trans = TranslationEngine.Translate(s);
-
-                s = TranslationEngine.Transliterate(trans);
+                if (_writeDepth >= MaxWriteRecursionDepth) return;
+                _writeDepth++;
+                try
+                {
+                    string trans = TranslationEngine.Translate(s);
+                    s = TranslationEngine.Transliterate(trans);
+                }
+                finally
+                {
+                    _writeDepth--;
+                }
 
             }
 
@@ -6658,9 +7435,17 @@ namespace RussianLocalization
 
                 LogAsciiInputAlreadyCyrillic("WriteAt", s);
 
-                string trans = TranslationEngine.Translate(s);
-
-                s = TranslationEngine.Transliterate(trans);
+                if (_writeDepth >= MaxWriteRecursionDepth) return;
+                _writeDepth++;
+                try
+                {
+                    string trans = TranslationEngine.Translate(s);
+                    s = TranslationEngine.Transliterate(trans);
+                }
+                finally
+                {
+                    _writeDepth--;
+                }
 
             }
 
@@ -6683,9 +7468,17 @@ namespace RussianLocalization
 
                 LogAsciiInputAlreadyCyrillic("WriteAt(Cell)", s);
 
-                string trans = TranslationEngine.Translate(s);
-
-                s = TranslationEngine.Transliterate(trans);
+                if (_writeDepth >= MaxWriteRecursionDepth) return;
+                _writeDepth++;
+                try
+                {
+                    string trans = TranslationEngine.Translate(s);
+                    s = TranslationEngine.Transliterate(trans);
+                }
+                finally
+                {
+                    _writeDepth--;
+                }
 
             }
 
@@ -6708,9 +7501,17 @@ namespace RussianLocalization
 
                 LogAsciiInputAlreadyCyrillic("WriteAt(GO)", s);
 
-                string trans = TranslationEngine.Translate(s);
-
-                s = TranslationEngine.Transliterate(trans);
+                if (_writeDepth >= MaxWriteRecursionDepth) return;
+                _writeDepth++;
+                try
+                {
+                    string trans = TranslationEngine.Translate(s);
+                    s = TranslationEngine.Transliterate(trans);
+                }
+                finally
+                {
+                    _writeDepth--;
+                }
 
             }
 
@@ -6728,6 +7529,40 @@ namespace RussianLocalization
 
     {
 
+        // 2026-07-05: get_Short/get_Long патчатся Harmony-постфиксом БЕЗУСЛОВНО (это
+        // атрибутный [HarmonyPatch]-класс — активен всегда, независимо от диагностических
+        // флагов RussianLocalization.Initialize). Игра может строить описание предмета
+        // РЕКУРСИВНО (например, контейнер описывает вложенные предметы через тот же
+        // get_Long/get_Short) — Harmony перехватывает КАЖДЫЙ такой вложенный вызов, и наш
+        // Translate() (regex, словарные подстановки, StringBuilder) добавляет заметный расход
+        // стека на КАЖДЫЙ уровень этой рекурсии. В большом магазине со сложными/вложенными
+        // предметами это стабильно давало access violation 0xc0000005 в ntdll.dll при открытии
+        // описания (краш воспроизводился даже с ПОЛНОСТЬЮ отключёнными 5 динамическими хуками
+        // мода — то есть дело было именно здесь). Защита по глубине реентрантности: глубже
+        // MaxDescriptionRecursionDepth уровней вложенности перевод пропускаем (возвращаем
+        // оригинал как есть), чтобы не добавлять стек поверх и без того глубокой игровой рекурсии.
+        //
+        // 2026-07-05 (v7 — БИСЕКЦИЯ): cap=24 НЕ спас — краш воспроизвёлся сегодня ночью ЕЩЁ РАЗ
+        // именно на открытии описания предмета в торговле, уже ПОСЛЕ полного отключения всех
+        // 5 динамических хуков (DIAG_DISABLE_20260701_HOOKS=true) — то есть это единственный
+        // оставшийся активный переводчик текста описания (игровой загрузчик модов сам патчит все
+        // [HarmonyPatch]-классы через PatchAll при компиляции, независимо от кода Initialize —
+        // отсюда и работал этот патч, хотя явного PatchAll() в файле нет). Чтобы окончательно
+        // подтвердить виновника одним чистым тестом — полный выключатель: при true оба постфикса
+        // становятся no-op (описание остаётся английским, но переполнить стек не может).
+        // 2026-07-05 (v11): краш в торговле пережил ПОЛНОЕ отключение этого патча + PatchUIElements
+        // + всей TMP-группы одновременно — этот патч тоже не виноват. Реальная причина: WinDbg-анализ
+        // дампа (см. ru-qud-crash-fix-20260705-trade v11) дал FAILURE_BUCKET_ID указывающий на
+        // gameoverlayrenderer64.dll (оверлей Steam), не на код мода. Флаг возвращён в false.
+        // 2026-07-05/06 (v12): краш пережил и полный рестарт Steam с оверлеем выключенным —
+        // выключаем этот патч снова для чистой точечной проверки ТОЛЬКО PatchPopup.
+        public const bool DIAG_DISABLE_DESCRIPTION_HOOKS = false;
+
+        private const int MaxDescriptionRecursionDepth = 24;
+
+        [ThreadStatic]
+        private static int _descriptionDepth;
+
         [HarmonyPostfix]
 
         [HarmonyPatch("get_Short")]
@@ -6736,12 +7571,18 @@ namespace RussianLocalization
 
         {
 
-            if (TranslationEngine.Initialized && !string.IsNullOrEmpty(__result))
+            if (DIAG_DISABLE_DESCRIPTION_HOOKS) return;
+            if (!TranslationEngine.Initialized || string.IsNullOrEmpty(__result)) return;
+            if (_descriptionDepth >= MaxDescriptionRecursionDepth) return;
 
+            _descriptionDepth++;
+            try
             {
-
                 __result = TranslationEngine.Translate(__result);
-
+            }
+            finally
+            {
+                _descriptionDepth--;
             }
 
         }
@@ -6756,11 +7597,18 @@ namespace RussianLocalization
 
         {
 
-            if (TranslationEngine.Initialized && !string.IsNullOrEmpty(__result))
+            if (DIAG_DISABLE_DESCRIPTION_HOOKS) return;
+            if (!TranslationEngine.Initialized || string.IsNullOrEmpty(__result)) return;
+            if (_descriptionDepth >= MaxDescriptionRecursionDepth) return;
 
+            _descriptionDepth++;
+            try
             {
-
                 __result = TranslationEngine.Translate(__result);
+            }
+            finally
+            {
+                _descriptionDepth--;
             }
         }
     }
