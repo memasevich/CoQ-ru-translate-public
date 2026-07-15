@@ -624,14 +624,14 @@ namespace RussianLocalization
 
                                 if (kvp.Key == null) continue;
 
-                                // Фильтр безопасности: защита от 1-2 буквенных английских слов, которые ломают составные слова.
-                                // 2-буквенные слова (in, to, at, is, by, as, on, be, it) при попадании в word_dictionary
-                                // ломают длинные строки (например 'together' -> 'toвзятьher').
+                                // Фильтр безопасности: блокируем 1-буквенные английские слова (не сокращения).
+                                // 2-буквенные слова (in, to, at, of, is, by, as, on, be, it) разрешены,
+                                // так как TryWordReplacement ходит только по целым словам (split по пробелам),
+                                // а не по подстрокам — 'together' не станет 'toвзятьher'.
                                 string rawKey = kvp.Key;
                                 string trimmedKey = rawKey.Trim();
 
-                                // Безопасный 1-2 буквенный фильтр: только буквы + не игровое сокращение
-                                if (trimmedKey.Length > 0 && trimmedKey.Length <= 2 &&
+                                if (trimmedKey.Length == 1 &&
                                     System.Text.RegularExpressions.Regex.IsMatch(trimmedKey, @"^[A-Za-z]+$") &&
                                     !IsGameAbbreviation(trimmedKey))
                                 {
@@ -866,6 +866,9 @@ namespace RussianLocalization
                     // Патч XRL.UI.Popup — popup-сообщения, меню выбора, запросы строки/числа.
                     // ~277 вызовов в коде (ShowYesNo=108, PickOption=84, AskString=23, AskNumber=13...).
                     if (!DIAG_DISABLE_POPUP_HOOK) { try { PatchPopup(); } catch (Exception exP) { LogError("[RussianLocalization] PatchPopup dispatch error: " + exP.ToString()); } }
+
+                    // Динамический патч ScreenBuffer для поддержки пропущенных методов рендеринга ретро-консоли
+                    try { PatchScreenBufferDynamic(); } catch (Exception exSB) { LogError("[RussianLocalization] PatchScreenBufferDynamic dispatch error: " + exSB.ToString()); }
 
                     // Патч XRL.GameText.VariableReplace — подстановка плейсхолдеров (=subject.X=, =verb:X=).
                     // 11 перегрузок, 78 вызовов в коде.
@@ -1961,10 +1964,10 @@ namespace RussianLocalization
             else if (text.StartsWith("· ")) logPrefix = "· ";
             string matchText = logPrefix.Length > 0 ? text.Substring(logPrefix.Length) : text;
 
-            if (text.Contains("Weight: 5 lbs"))
-            {
-                Console.WriteLine($"[DEBUG C# TryTranslatePattern] text='{text}', matchText='{matchText}'");
-            }
+            // if (text.Contains("Weight: 5 lbs"))
+            // {
+            //     Console.WriteLine($"[DEBUG C# TryTranslatePattern] text='{text}', matchText='{matchText}'");
+            // }
 
             // Кандидаты для матчинга: сначала исходный текст, затем — если есть переносы строк —
             // его версия с \n, схлопнутыми в пробелы. Паттерны компилируются без Singleline, поэтому
@@ -2034,6 +2037,15 @@ namespace RussianLocalization
                                 if (group.Value == candidateForClosure || group.Value == text)
                                 {
                                     return group.Value;
+                                }
+                                if (name == "features" || name == "mutations")
+                                {
+                                    string[] parts = group.Value.Split(',');
+                                    for (int pIdx = 0; pIdx < parts.Length; pIdx++)
+                                    {
+                                        parts[pIdx] = TranslateText(parts[pIdx].Trim(), false);
+                                    }
+                                    return string.Join(", ", parts);
                                 }
                                 if (!string.IsNullOrEmpty(caseName))
                                 {
@@ -3427,7 +3439,11 @@ namespace RussianLocalization
                     }
                     else
                     {
-                        translatedCore = normalizedCore;
+                        translatedCore = TryWordReplacement(normalizedCore);
+                        if (translatedCore != normalizedCore)
+                        {
+                            LogWordReplacement(normalizedCore, translatedCore);
+                        }
                     }
                 }
 
@@ -4725,8 +4741,10 @@ namespace RussianLocalization
                 if (!TranslationEngine.Initialized) return;
                 if (__result == null) return;
 
-                // Если родной транслятор уже вернул что-то осмысленное на русском — оставляем.
-                if (HasCyrillic(__result)) return;
+                // Если родной транслятор уже вернул что-то осмысленное на русском без английского — оставляем.
+                bool hasCyr, hasEng;
+                ScanAlpha(__result, out hasCyr, out hasEng);
+                if (hasCyr && !hasEng) return;
 
                 // Быстрый пропуск: слишком короткие строки (1-2 символа) не тратим время на словарь.
                 if (string.IsNullOrEmpty(text) || text.Length <= 2) return;
@@ -4924,6 +4942,267 @@ namespace RussianLocalization
             }
         }
 
+        public static void PatchScreenBufferDynamic()
+        {
+            try
+            {
+                System.Type t = typeof(ConsoleLib.Console.ScreenBuffer);
+                var harmony = new Harmony("com.russianlocalization.screenbuffer.dynamic");
+                int patched = 0;
+
+                var prefixMethod = typeof(TranslationEngine).GetMethod("ScreenBuffer_Generic_Prefix",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+
+                var methods = t.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance);
+                
+                // Сбор отладочной информации о всех методах ScreenBuffer
+                try
+                {
+                    string logPath = Path.Combine(GetModPath(), "screenbuffer_methods.txt");
+                    List<string> methodLogs = new List<string>();
+                    foreach (var m in methods)
+                    {
+                        if (m == null) continue;
+                        var pars = m.GetParameters();
+                        List<string> parNames = new List<string>();
+                        foreach (var p in pars) parNames.Add(p.ParameterType.ToString() + " " + p.Name);
+                        methodLogs.Add(m.ReturnType.ToString() + " " + m.Name + "(" + string.Join(", ", parNames) + ")");
+                    }
+                    File.WriteAllLines(logPath, methodLogs.ToArray(), Encoding.UTF8);
+                }
+                catch { }
+
+                // Диагностика классов UI для поиска экрана осмотра
+                try
+                {
+                    string logPath = Path.Combine(GetModPath(), "show_method_check.txt");
+                    List<string> lines = new List<string>();
+                    foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        string asmName = asm.FullName;
+                        if (!asmName.Contains("Assembly-CSharp") && !asmName.Contains("XRL") && !asmName.Contains("Qud") && !asmName.Contains("ConsoleLib")) continue;
+                        foreach (var type in asm.GetTypes())
+                        {
+                            try
+                            {
+                                foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
+                                {
+                                    if (method.Name == "Show")
+                                    {
+                                        var pars = method.GetParameters();
+                                        if (pars.Length >= 4 && pars[0].ParameterType == typeof(string))
+                                        {
+                                            List<string> pTypes = new List<string>();
+                                            foreach (var p in pars) pTypes.Add(p.ParameterType.FullName);
+                                            lines.Add("Type: " + type.FullName + " -> Show(" + string.Join(", ", pTypes.ToArray()) + ")");
+                                        }
+                                    }
+                                }
+                            }
+                            catch {}
+                        }
+                    }
+                    File.WriteAllLines(logPath, lines.ToArray(), Encoding.UTF8);
+                }
+                catch (Exception ex)
+                {
+                    File.WriteAllText(Path.Combine(GetModPath(), "show_method_check.txt"), "Error: " + ex.ToString(), Encoding.UTF8);
+                }
+
+                foreach (var m in methods)
+                {
+                    if (m == null) continue;
+                    if (m.IsGenericMethodDefinition) continue;
+                    if (!m.Name.StartsWith("Write")) continue;
+
+                    var parameters = m.GetParameters();
+                    bool hasStringParam = false;
+                    foreach (var p in parameters)
+                    {
+                        if (p.ParameterType == typeof(string) || 
+                            p.ParameterType == typeof(string).MakeByRefType() ||
+                            p.ParameterType == typeof(string[]) ||
+                            p.ParameterType == typeof(System.Text.StringBuilder))
+                        {
+                            hasStringParam = true; break;
+                        }
+                    }
+                    if (!hasStringParam) continue;
+
+                    var existing = Harmony.GetPatchInfo(m);
+                    if (existing != null && existing.Prefixes != null && existing.Prefixes.Count > 0) continue;
+
+                    try
+                    {
+                        harmony.Patch(m, prefix: new HarmonyMethod(prefixMethod));
+                        patched++;
+                    }
+                    catch (Exception exPatch)
+                    {
+                        UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch ScreenBuffer." + m.Name + ": " + exPatch.Message);
+                    }
+                }
+                UnityEngine.Debug.Log("[RussianLocalization] Patched ScreenBuffer dynamically, methods patched = " + patched + ".");
+
+                // Диагностика классов UI для поиска экрана осмотра
+                try
+                {
+                    string logPath = Path.Combine(GetModPath(), "lambda_calls.txt");
+                    var tPopup = System.Type.GetType("XRL.UI.Popup, Assembly-CSharp") ??
+                                 System.Type.GetType("XRL.UI.Popup");
+                    if (tPopup != null)
+                    {
+                        var tDisplay = tPopup.GetNestedType("<>c__DisplayClass36_0", BindingFlags.Public | BindingFlags.NonPublic);
+                        if (tDisplay != null)
+                        {
+                            var method = tDisplay.GetMethod("<NewPopupMessageAsync>b__0", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                            if (method != null)
+                            {
+                                List<string> lines = new List<string>();
+                                lines.Add("Instructions for <>c__DisplayClass36_0.<NewPopupMessageAsync>b__0:");
+                                var instructions = HarmonyLib.PatchProcessor.GetOriginalInstructions(method);
+                                foreach (var inst in instructions)
+                                {
+                                    if (inst.opcode == System.Reflection.Emit.OpCodes.Call || inst.opcode == System.Reflection.Emit.OpCodes.Callvirt)
+                                    {
+                                        lines.Add("  Call: " + inst.operand?.ToString());
+                                    }
+                                }
+                                File.WriteAllLines(logPath, lines.ToArray(), Encoding.UTF8);
+                            }
+                            else
+                            {
+                                File.WriteAllText(logPath, "Method <NewPopupMessageAsync>b__0 NOT FOUND", Encoding.UTF8);
+                            }
+                        }
+                        else
+                        {
+                            File.WriteAllText(logPath, "Nested display class NOT FOUND", Encoding.UTF8);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    File.WriteAllText(Path.Combine(GetModPath(), "lambda_calls.txt"), "Error: " + ex.ToString(), Encoding.UTF8);
+                }
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("[RussianLocalization] PatchScreenBufferDynamic error: " + ex.ToString());
+            }
+        }
+
+        public static void ScreenBuffer_Generic_Prefix(System.Reflection.MethodBase __originalMethod, object[] __args)
+        {
+            try
+            {
+                if (!Initialized || !IsEnabled) return;
+                if (__args == null || __args.Length == 0) return;
+                if (__originalMethod == null) return;
+
+                var parameters = __originalMethod.GetParameters();
+                for (int i = 0; i < parameters.Length && i < __args.Length; i++)
+                {
+                    if (parameters[i].ParameterType == typeof(string) || parameters[i].ParameterType == typeof(string).MakeByRefType())
+                    {
+                        string s = __args[i] as string;
+                        if (string.IsNullOrEmpty(s)) continue;
+
+                        if (s.Contains("Perfect") || s.Contains("flaming") || s.Contains("features") || s.Contains("bite"))
+                        {
+                            try
+                            {
+                                File.AppendAllText(Path.Combine(CachedModPath, "screenbuffer_text_debug.txt"),
+                                    "Method: " + __originalMethod.Name + " (string) | Arg: '" + s + "'\n", Encoding.UTF8);
+                            }
+                            catch {}
+                        }
+
+                        if (ContainsCyrillic(s))
+                        {
+                            __args[i] = Transliterate(s);
+                            continue;
+                        }
+
+                        string trans = Translate(s);
+                        if (!string.IsNullOrEmpty(trans) && trans != s)
+                        {
+                            string transliterated = Transliterate(trans);
+                            __args[i] = transliterated;
+                        }
+                    }
+                    else if (parameters[i].ParameterType == typeof(string[]))
+                    {
+                        string[] arr = __args[i] as string[];
+                        if (arr == null || arr.Length == 0) continue;
+
+                        for (int j = 0; j < arr.Length; j++)
+                        {
+                            string s = arr[j];
+                            if (string.IsNullOrEmpty(s)) continue;
+
+                            if (s.Contains("Perfect") || s.Contains("flaming") || s.Contains("features") || s.Contains("bite"))
+                            {
+                                try
+                                {
+                                    File.AppendAllText(Path.Combine(CachedModPath, "screenbuffer_text_debug.txt"),
+                                        "Method: " + __originalMethod.Name + " (string[]) | Arg[" + j + "]: '" + s + "'\n", Encoding.UTF8);
+                                }
+                                catch {}
+                            }
+
+                            if (ContainsCyrillic(s))
+                            {
+                                arr[j] = Transliterate(s);
+                                continue;
+                            }
+
+                            string tr = Translate(s);
+                            if (!string.IsNullOrEmpty(tr) && tr != s)
+                            {
+                                arr[j] = Transliterate(tr);
+                            }
+                        }
+                    }
+                    else if (parameters[i].ParameterType == typeof(System.Text.StringBuilder))
+                    {
+                        System.Text.StringBuilder sbArg = __args[i] as System.Text.StringBuilder;
+                        if (sbArg == null || sbArg.Length == 0) continue;
+
+                        string s = sbArg.ToString();
+                        if (string.IsNullOrEmpty(s)) continue;
+
+                        if (s.Contains("Perfect") || s.Contains("flaming") || s.Contains("features") || s.Contains("bite"))
+                        {
+                            try
+                            {
+                                File.AppendAllText(Path.Combine(CachedModPath, "screenbuffer_text_debug.txt"),
+                                    "Method: " + __originalMethod.Name + " (StringBuilder) | Arg: '" + s + "'\n", Encoding.UTF8);
+                            }
+                            catch {}
+                        }
+
+                        if (ContainsCyrillic(s))
+                        {
+                            string transliterated = Transliterate(s);
+                            sbArg.Clear();
+                            sbArg.Append(transliterated);
+                            continue;
+                        }
+
+                        string tr = Translate(s);
+                        if (!string.IsNullOrEmpty(tr) && tr != s)
+                        {
+                            string transliterated = Transliterate(tr);
+                            sbArg.Clear();
+                            sbArg.Append(transliterated);
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
         // Универсальный prefix: переводит все string-параметры Popup-методов.
         // __originalMethod — MethodInfo текущего метода (магическое имя Harmony 2.x).
         // __args — массив всех аргументов; модификация __args[i] меняет то, что получит оригинал.
@@ -4942,6 +5221,14 @@ namespace RussianLocalization
                     {
                         string s = __args[i] as string;
                         if (string.IsNullOrEmpty(s)) continue;
+
+                        try
+                        {
+                            File.AppendAllText(Path.Combine(CachedModPath, "popup_args_debug.txt"),
+                                "Method: " + __originalMethod.Name + " | Arg: '" + s + "'\n", Encoding.UTF8);
+                        }
+                        catch {}
+
                         if (ContainsCyrillic(s)) continue;
                         string tr = Translate(s);
                         if (!string.IsNullOrEmpty(tr) && tr != s)
@@ -5208,7 +5495,11 @@ namespace RussianLocalization
             {
                 System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
                 if (!TranslationEngine.Initialized || string.IsNullOrEmpty(text)) return;
-                if (TranslationEngine.ContainsCyrillicInternal(text)) return;
+                
+                bool hasCyr, hasEng;
+                ScanAlpha(text, out hasCyr, out hasEng);
+                if (hasCyr && !hasEng) return;
+
                 if (DIAG_SKIP_TRANSLATE_CALL) return;
                 if (TranslationEngine.MainThreadId != -1 &&
                     System.Threading.Thread.CurrentThread.ManagedThreadId != TranslationEngine.MainThreadId)
@@ -5274,7 +5565,12 @@ namespace RussianLocalization
                 System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
                 if (!TranslationEngine.Initialized || _utsTextField == null || __instance == null) return;
                 string cur = _utsTextField.GetValue(__instance) as string;
-                if (string.IsNullOrEmpty(cur) || TranslationEngine.ContainsCyrillicInternal(cur)) return;
+                if (string.IsNullOrEmpty(cur)) return;
+
+                bool hasCyr, hasEng;
+                ScanAlpha(cur, out hasCyr, out hasEng);
+                if (hasCyr && !hasEng) return;
+
                 string tr = TranslationEngine.Translate(cur);
                 if (!string.IsNullOrEmpty(tr) && tr != cur) _utsTextField.SetValue(__instance, tr);
             }
@@ -8035,4 +8331,26 @@ namespace RussianLocalization
             _wasPressed = isPressed;
         }
     }
+
+    [HarmonyPatch(typeof(XRL.UI.Look))]
+    public static class Look_Patch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("GenerateTooltipContent", new Type[] { typeof(XRL.World.GameObject) })]
+        public static void GenerateTooltipContent_Postfix(ref string __result)
+        {
+            if (TranslationEngine.Initialized && TranslationEngine.IsEnabled && !string.IsNullOrEmpty(__result))
+            {
+                try
+                {
+                    string path = Path.Combine(TranslationEngine.CachedModPath, "generate_tooltip_output.txt");
+                    File.AppendAllText(path, "--- TOOLTIP START ---\n" + __result + "\n--- TOOLTIP END ---\n", Encoding.UTF8);
+                }
+                catch {}
+
+                __result = TranslationEngine.Translate(__result);
+            }
+        }
+    }
+
 }
