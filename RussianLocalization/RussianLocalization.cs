@@ -127,6 +127,7 @@ namespace RussianLocalization
             if (System.Threading.Interlocked.CompareExchange(ref lastCacheResetMs, (long)nowMs, (long)lastMs) == (long)lastMs)
             {
                 translationCache.Clear();
+                producedOutputs.Clear(); // Guard B: сбрасываем вместе с кэшем, чтобы не росло бесконечно.
             }
         }
 
@@ -165,6 +166,15 @@ namespace RussianLocalization
         // Потокобезопасный сборщик вообще всего игрового текста (и русского, и английского)
         // Оптимизация: используем ConcurrentDictionary вместо HashSet+lock, чтобы убрать contention на каждый вызов Translate.
         private static ConcurrentDictionary<string, byte> loggedAllTexts = new ConcurrentDictionary<string, byte>();
+
+        // 2026-07-22 (Guard B — защита от двойного прогона): множество УЖЕ ВЫДАННЫХ нами
+        // СМЕШАННЫХ переводов (кириллица + латиница). Игра иногда подаёт готовый перевод обратно
+        // в Translate(); точного совпадения по ключу-ОРИГИНАЛУ нет (это результат, а не вход),
+        // и пословный проход портит бренды/ключи внутри ("Steam Input"->"Пар Ввод",
+        // "+Tab"->"+Вкладка"). Если строка на входе — наш прошлый результат, возвращаем её как есть.
+        // Регистрируем ТОЛЬКО смешанные строки: чистый русский уже отсекается проверкой выше,
+        // а составные имена предметов выходят чисто по-русски и сюда не попадают.
+        private static ConcurrentDictionary<string, byte> producedOutputs = new ConcurrentDictionary<string, byte>();
 
 
 
@@ -577,6 +587,24 @@ namespace RussianLocalization
                                     {
                                         // Слишком короткое английское слово (не сокращение) — опасно.
                                         continue;
+                                    }
+
+                                    // 2026-07-23 (Guard C — «схлопнутые» записи словаря): если длинному ключу
+                                    // (>= 150 символов без тегов — описание/проза) соответствует значение,
+                                    // короче него в 4+ раза, запись отравлена при сборке словаря (кейс
+                                    // 23.07: описание hyena tribeskin, 397 симв. -> "{{W|[t]}} {{y|цель}}}" —
+                                    // целиковое совпадение детерминированно заменяло ВЕСЬ длинный текст
+                                    // мусором из чужой строки меню). Такие записи пропускаем и пишем в
+                                    // dict_suspicious.txt (Documents\CavesOfQud_RU_Logs) на вычистку словаря.
+                                    if (normKey.Length >= 150 && kvp.Value != null)
+                                    {
+                                        string guardStrippedKey = TagRegex.Replace(normKey, "");
+                                        string guardStrippedVal = TagRegex.Replace(kvp.Value.Trim(), "");
+                                        if (guardStrippedKey.Length >= 150 && guardStrippedVal.Length * 4 < guardStrippedKey.Length)
+                                        {
+                                            LogSuspiciousDictionaryEntry(normKey, kvp.Value, "collapsed");
+                                            continue;
+                                        }
                                     }
 
                                     staticDictionary[normKey] = kvp.Value;
@@ -1164,11 +1192,24 @@ namespace RussianLocalization
             string cached;
             if (translationCache.TryGetValue(text, out cached)) return cached;
 
+            // 2026-07-22 (Guard B): если это наш собственный прошлый результат, поданный обратно
+            // (обратная подача уже переведённой строки), — не трогаем, иначе пословный проход
+            // испортит бренды/ключи внутри неё. См. комментарий у producedOutputs.
+            if (producedOutputs.ContainsKey(text)) return text;
+
             string originalText = text;
             // Хоткей-обёртки нового UI убираем (буква возвращается в слово) ДО любой обработки.
             if (text.IndexOf("{{hotkey|", System.StringComparison.Ordinal) >= 0)
             {
                 text = HotkeyWrapperRegex.Replace(text, "${k}");
+            }
+            // 2026-07-22: если после снятия обёртки ВСЯ строка — имя клавиши (PgDown, Num 7, Tab,
+            // arrows...), это физическая клавиша — возвращаем как есть, не переводим. Проверка
+            // строго по всей строке, поэтому слова-омонимы внутри предложений не затрагиваются.
+            if (IsHotkeyLiteralKey(text.Trim()))
+            {
+                translationCache[originalText] = text;
+                return text;
             }
             // Commented out to allow translating resource loading logs (e.g., "Loading Bodies.xml" -> "Загрузка Bodies.xml")
             // if (text.StartsWith("Loading ") && (text.EndsWith(".xml") || text.EndsWith(".txt") || text.EndsWith(".json")))
@@ -1317,6 +1358,10 @@ namespace RussianLocalization
             // (см. PreserveLeadingHotkey). result здесь уже собран любым из путей —
             // словарь, паттерн, ModernUI или пословный перевод.
             result = PreserveLeadingHotkey(text, result);
+            // 2026-07-23 (Guard D): финальная сверка хоткей-токенов по ВСЕЙ строке
+            // ([x] в середине, {{W|[x]}}, {{hotkey|X}}) — ловит испорченные значения
+            // словаря, возвращаемые целиковым совпадением в обход гардов выше.
+            result = PreserveHotkeyTokens(originalText, result);
 
             if (result != null && result != text && result.Length > 1)
             {
@@ -1554,6 +1599,15 @@ namespace RussianLocalization
             if (result != null)
             {
                 translationCache[originalText] = result;
+                // Guard B: регистрируем только СМЕШАННЫЕ (рус+лат) результаты, отличные от входа —
+                // именно они рискуют испортиться при обратной подаче. Чистый русский и чистый
+                // английский сюда не попадают, поэтому множество маленькое и безопасное.
+                if (result != originalText && result.Length > 1)
+                {
+                    bool rHasCyr, rHasEng;
+                    ScanAlpha(result, out rHasCyr, out rHasEng);
+                    if (rHasCyr && rHasEng) producedOutputs.TryAdd(result, 0);
+                }
                 MaybeResetTranslationCache();
             }
 
@@ -2176,6 +2230,28 @@ namespace RussianLocalization
             "home", "end", "pgup", "pgdn", "pageup", "pagedown"
         };
 
+        // 2026-07-22: содержимое {{hotkey|X}} — это ФИЗИЧЕСКАЯ клавиша; переводить её нельзя
+        // ("PgDown"->"СтрВниз", "Num 7"->"Номер 7", "arrows"->"стрелы"). Гард срабатывает ТОЛЬКО
+        // когда ВСЯ строка целиком — имя клавиши (после снятия обёртки hotkey). Поэтому "arrows"
+        // как снаряды внутри предложения не затрагиваются (там не вся строка). end/delete исключены:
+        // пересекаются с действиями меню ([End] диалога, кнопка delete -> KeyNameCommandOverrides).
+        private static bool IsHotkeyLiteralKey(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return false;
+            string lower = s.ToLowerInvariant();
+            if (lower == "end" || lower == "delete") return false;
+            if (KeyNameSet.Contains(lower)) return true;
+            if (lower == "pgup" || lower == "pgdown" || lower == "pageup" || lower == "pagedown") return true;
+            if (lower == "arrows" || lower == "arrow keys" || lower == "numpad") return true;
+            if (lower.Length > 4 && lower.StartsWith("num ")) return true;
+            if (lower.Length >= 2 && lower[0] == 'f' && char.IsDigit(lower[1]))
+            {
+                int fVal;
+                if (int.TryParse(lower.Substring(1), out fVal) && fVal >= 1 && fVal <= 12) return true;
+            }
+            return false;
+        }
+
         private static bool IsKeyName(string text)
         {
             if (string.IsNullOrEmpty(text)) return false;
@@ -2288,6 +2364,183 @@ namespace RussianLocalization
                 return "[" + srcKey + "]" + translated.Substring(mDstAny.Length);
             return translated;
         }
+
+        // === 2026-07-23 (Guard D — хоткеи не переводятся НИГДЕ в строке) ===
+        // Кейсы из логов 20-23.07: "Ctesiphus [N]" -> "Ктесиф [Н]" (транслитерация
+        // одиночной буквы в середине строки), "{{W|[space]}}" -> "{{W|[пробел]}}",
+        // "{{hotkey|Space}}" -> "{{hotkey|Пробел}}" (испорченные значения лежат в
+        // dictionary.json и возвращаются целиковым совпадением в обход всех гардов).
+        // PreserveLeadingHotkey закрывал только [x] В НАЧАЛЕ строки; этот валидатор —
+        // финальная сверка хоткей-токенов источника с результатом для всей строки.
+        // Принцип: физическая клавиша при переводе не меняется. Мутировавший токен
+        // восстанавливаем ТОЛЬКО когда это однозначно безопасно (см. правила ниже).
+        private static readonly System.Text.RegularExpressions.Regex HotkeyTokenRegex =
+            new System.Text.RegularExpressions.Regex(@"\{\{hotkey\|(?<k>[^{}]*)\}\}", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex WBracketTokenRegex =
+            new System.Text.RegularExpressions.Regex(@"\{\{[Ww]\|\[(?<k>[^\]]+)\]\}\}", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex LatinSingleBracketRegex =
+            new System.Text.RegularExpressions.Regex(@"\[(?<k>[A-Za-z])\]", System.Text.RegularExpressions.RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex CyrillicSingleBracketRegex =
+            new System.Text.RegularExpressions.Regex(@"\[(?<k>[А-Яа-яЁё])\]", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        // Содержимое скобок — физическая клавиша (одиночная буква или имя клавиши).
+        // "[Unlearned]" и прочие текстовые метки сюда НЕ попадают — их перевод разрешён.
+        private static bool IsProtectedBracketKey(string key)
+        {
+            if (string.IsNullOrEmpty(key)) return false;
+            string t = key.Trim();
+            if (t.Length == 1 && char.IsLetter(t[0])) return true;
+            if (KeyNameSet.Contains(t)) return true;
+            if (IsHotkeyLiteralKey(t)) return true; // pgup/pgdown/arrows/f1-f12/num N
+            return false;
+        }
+
+        // Обратная транслитерация одиночных букв (зеркало таблицы Transliterate(),
+        // только однобуквенные соответствия). Нужна, чтобы отличить порчу хоткея
+        // ([N]->[Н] транслитерацией) от осознанного перевода направления ([N]->[С]).
+        private static char MapCyrillicTranslitBack(char c)
+        {
+            switch (c)
+            {
+                case 'а': return 'a'; case 'А': return 'A';
+                case 'б': return 'b'; case 'Б': return 'B';
+                case 'в': return 'v'; case 'В': return 'V';
+                case 'г': return 'g'; case 'Г': return 'G';
+                case 'д': return 'd'; case 'Д': return 'D';
+                case 'е': return 'e'; case 'Е': return 'E';
+                case 'з': return 'z'; case 'З': return 'Z';
+                case 'и': return 'i'; case 'И': return 'I';
+                case 'к': return 'k'; case 'К': return 'K';
+                case 'л': return 'l'; case 'Л': return 'L';
+                case 'м': return 'm'; case 'М': return 'M';
+                case 'н': return 'n'; case 'Н': return 'N';
+                case 'о': return 'o'; case 'О': return 'O';
+                case 'п': return 'p'; case 'П': return 'P';
+                case 'р': return 'r'; case 'Р': return 'R';
+                case 'с': return 's'; case 'С': return 'S';
+                case 'т': return 't'; case 'Т': return 'T';
+                case 'у': return 'u'; case 'У': return 'U';
+                case 'ф': return 'f'; case 'Ф': return 'F';
+                case 'ы': return 'y'; case 'Ы': return 'Y';
+                default: return '\0';
+            }
+        }
+
+        // Токен считается уцелевшим, если он (или его регистровый вариант для
+        // одиночной буквы: [w] -> [W] — та же клавиша) есть в результате.
+        private static bool HotkeyTokenSurvives(string result, string token, string key)
+        {
+            if (result.Contains(token)) return true;
+            if (!string.IsNullOrEmpty(key) && key.Length == 1 && char.IsLetter(key[0]))
+            {
+                char swapped = char.IsUpper(key[0]) ? char.ToLowerInvariant(key[0]) : char.ToUpperInvariant(key[0]);
+                if (result.Contains(token.Replace("[" + key + "]", "[" + swapped + "]"))) return true;
+                if (result.Contains(token.Replace("|" + key + "}}", "|" + swapped + "}}"))) return true;
+            }
+            return false;
+        }
+
+        // Попарное восстановление токенов одного типа ({{hotkey|X}} или {{W|[X]}}).
+        // Восстанавливаем только когда число мутировавших спанов в результате РАВНО
+        // числу потерянных токенов источника — иначе не угадываем и ничего не трогаем.
+        private static string RestoreMissingHotkeyTokens(string source, string result,
+            System.Text.RegularExpressions.Regex tokenRegex,
+            System.Predicate<System.Text.RegularExpressions.Match> protect)
+        {
+            var srcTokens = new List<System.Tuple<string, string>>(); // (полный токен, ключ)
+            foreach (System.Text.RegularExpressions.Match m in tokenRegex.Matches(source))
+            {
+                if (protect != null && !protect(m)) continue;
+                srcTokens.Add(System.Tuple.Create(m.Value, m.Groups["k"].Value));
+            }
+            if (srcTokens.Count == 0) return result;
+            var srcSet = new HashSet<string>(System.StringComparer.Ordinal);
+            foreach (var t in srcTokens) srcSet.Add(t.Item1);
+            var missing = new List<System.Tuple<string, string>>();
+            foreach (var t in srcTokens)
+            {
+                if (HotkeyTokenSurvives(result, t.Item1, t.Item2)) continue;
+                bool already = false;
+                foreach (var x in missing) if (x.Item1 == t.Item1) { already = true; break; }
+                if (!already) missing.Add(t);
+            }
+            if (missing.Count == 0) return result;
+            var mutated = new List<System.Text.RegularExpressions.Match>();
+            foreach (System.Text.RegularExpressions.Match m in tokenRegex.Matches(result))
+            {
+                if (!srcSet.Contains(m.Value)) mutated.Add(m);
+            }
+            if (mutated.Count != missing.Count) return result; // счётчики не сошлись — безопасный выход
+            // Заменяем с КОНЦА строки, чтобы индексы ранних совпадений оставались валидны.
+            for (int i = missing.Count - 1; i >= 0; i--)
+            {
+                var mm = mutated[i];
+                result = result.Substring(0, mm.Index) + missing[i].Item1 + result.Substring(mm.Index + mm.Length);
+            }
+            return result;
+        }
+
+        private static string PreserveHotkeyTokens(string source, string translated)
+        {
+            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(translated)) return translated;
+            if (source == translated) return translated;
+            string result = translated;
+
+            // A. {{hotkey|X}} — кроме «хоткей-в-слове» (одиночная буква, слитная со
+            // словом: "{{hotkey|t}}arget" — движок штатно сливает букву со словом).
+            result = RestoreMissingHotkeyTokens(source, result, HotkeyTokenRegex, m =>
+            {
+                string k = m.Groups["k"].Value;
+                if (k.Length == 0) return false;
+                if (k.Length == 1)
+                {
+                    int next = m.Index + m.Length;
+                    if (next < source.Length && char.IsLetter(source[next])) return false;
+                }
+                return true;
+            });
+
+            // B. {{W|[X]}} / {{w|[X]}} с клавишным содержимым. Пропускаем тип целиком,
+            // если в результате есть =commandKey: — это осознанная подстановка клавиши
+            // команды ("{{W|[y]}} {{y|Yes}}" -> "{{W|[=commandKey:Accept=]}} {{y|Да}}").
+            if (result.IndexOf("=commandKey:", System.StringComparison.Ordinal) < 0)
+            {
+                result = RestoreMissingHotkeyTokens(source, result, WBracketTokenRegex,
+                    m => IsProtectedBracketKey(m.Groups["k"].Value));
+            }
+
+            // C. Одиночная [x] в любом месте строки: восстанавливаем точечно, только
+            // если в результате нашлась кириллическая [буква], которая является
+            // транслитерацией или раскладкой именно этой буквы ([N]->[Н], [f]->[ф],
+            // [r]->[к]). Осознанный перевод направлений ([N]->[С], [W]->[З]) НЕ трогаем.
+            var srcLatin = new List<System.Tuple<string, char>>();
+            foreach (System.Text.RegularExpressions.Match m in LatinSingleBracketRegex.Matches(source))
+            {
+                // буквы внутри {{W|[x]}} / {{w|[x]}} — это тип B выше, здесь пропускаем
+                int st = m.Index - 4;
+                if (st >= 0 && (source.Substring(st, 4) == "{{W|" || source.Substring(st, 4) == "{{w|")) continue;
+                srcLatin.Add(System.Tuple.Create(m.Value, m.Groups["k"].Value[0]));
+            }
+            foreach (var t in srcLatin)
+            {
+                if (HotkeyTokenSurvives(result, t.Item1, t.Item2.ToString())) continue;
+                foreach (System.Text.RegularExpressions.Match mc in CyrillicSingleBracketRegex.Matches(result))
+                {
+                    char cyr = mc.Groups["k"].Value[0];
+                    char back = MapCyrillicTranslitBack(cyr);
+                    bool isMutation =
+                        (back != '\0' && char.ToLowerInvariant(back) == char.ToLowerInvariant(t.Item2)) ||
+                        char.ToLowerInvariant(MapCyrillicCharToEnglish(cyr)) == char.ToLowerInvariant(t.Item2);
+                    if (isMutation)
+                    {
+                        result = result.Substring(0, mc.Index) + t.Item1 + result.Substring(mc.Index + mc.Length);
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+
 
         // 2026-07-06 (v20 — ВОЗМОЖНАЯ НАСТОЯЩАЯ ПРИЧИНА): TranslateInternal() вызывает сам себя
         // (через TranslateInternalClean) БЕЗ КАКОГО-ЛИБО лимита глубины сразу в 4 местах: разбор
@@ -3667,7 +3920,32 @@ namespace RussianLocalization
                     // Развёрнутая проза, которой нет в словаре целиком. Пословный перевод здесь
                     // не достигает НИ ОДНОЙ цели, поэтому оставляем английский как есть — см.
                     // комментарий к IsEnglishProse.
-                    translatedCore = normalizedCore;
+                    //
+                    // 2026-07-22: ИСКЛЮЧЕНИЕ — многоабзацные попапы обучения. Игра шлёт их одной
+                    // строкой вида "Абзац1\n\nPress X": целого композита в словаре нет, а маркер
+                    // прозы (can/have/will/be) заставлял вернуть ВЕСЬ текст английским, хотя каждый
+                    // абзац по отдельности в словаре ЕСТЬ ("Ascend." -> "Подняться." и т.п.).
+                    // Поэтому для МНОГОСТРОЧНОЙ прозы сначала пробуем построчный перевод точным
+                    // совпадением (тот же приём и с той же семантикой, что и в не-прозовой ветке
+                    // ниже). Если НИ ОДНА строка не изменилась — оставляем английский ровно как
+                    // раньше, поэтому для «настоящей» однострочной прозы регрессий нет.
+                    if (normalizedCore.IndexOf('\n') >= 0)
+                    {
+                        string[] proseNlParts = normalizedCore.Split('\n');
+                        List<string> translatedProseNl = new List<string>(proseNlParts.Length);
+                        bool anyProseNlChanged = false;
+                        foreach (var pnp in proseNlParts)
+                        {
+                            string tpnp = TranslateText(pnp);
+                            translatedProseNl.Add(tpnp);
+                            if (tpnp != pnp) anyProseNlChanged = true;
+                        }
+                        translatedCore = anyProseNlChanged ? string.Join("\n", translatedProseNl) : normalizedCore;
+                    }
+                    else
+                    {
+                        translatedCore = normalizedCore;
+                    }
                 }
                 else
                 {
@@ -3882,32 +4160,19 @@ namespace RussianLocalization
             }
         }
 
-        // 1 фунт = 0.45359237 кг (международный фунт, точное значение).
-        private const double KgPerPound = 0.45359237;
-
         // Формы фунтов, встречающиеся в словарях: "фнт."×303, "фунтов"×231, "фунт"×63,
-        // "фунта"×36, "фн."×4. Число может быть одиночным (5 фнт.) или парой несомое/предел
-        // (65/349 фнт.). \b на конце нет намеренно: после "фнт" идёт точка.
-        private static readonly System.Text.RegularExpressions.Regex PoundsRegex =
+        // "фунта"×36, "фн."×4, плюс голое "фнт" без точки (из "lb" -> "фнт" в словарях).
+        // Порядок альтернатив важен: длинные формы первыми, чтобы "фунтов" не съедалось
+        // как "фунт". Точку после "фнт"/"фн" забираем вместе с сокращением.
+        private static readonly System.Text.RegularExpressions.Regex PoundUnitsRegex =
             new System.Text.RegularExpressions.Regex(
-                @"(?<a>\d+(?:[.,]\d+)?)(?:\s*/\s*(?<b>\d+(?:[.,]\d+)?))?\s*(?<unit>фнт\.|фн\.|фунтов|фунта|фунт)",
+                @"фнт\.?|фн\.|фунтов|фунта|фунт",
                 System.Text.RegularExpressions.RegexOptions.Compiled);
 
-        private static string FormatKg(double kg)
-        {
-            // Округляем до десятых. Целые показываем без ",0" — "0 кг", а не "0,0 кг".
-            double r = Math.Round(kg, 1, MidpointRounding.AwayFromZero);
-            return r == Math.Floor(r)
-                ? ((long)r).ToString(System.Globalization.CultureInfo.InvariantCulture)
-                : r.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture).Replace('.', ',');
-        }
-
-        // Переводит вес из фунтов в килограммы прямо в готовой строке.
-        // ВАЖНО: именно пересчёт, а не переименование подписи. "65/349 фнт." — это реально
-        // 29,5/158,3 кг; если просто заменить слово, игрок увидит «предел 349 кг» и это будет
-        // враньём в 2.2 раза.
-        // НЕ трогаем форму "Weight: N#" (8 строк, статус-бар): там нет подписи единиц, и у меня
-        // нет подтверждения, что '#' — это именно фунты. Врать наугад хуже, чем не трогать.
+        // Заменяет подпись единиц веса "фнт."/"фунтов"/"фунт"/"фунта"/"фн." на "кг"
+        // прямо в готовой строке. Числа НЕ пересчитываются (решение пользователя от
+        // 2026-07-21): значения остаются игровыми, меняется только текст единицы —
+        // поэтому дробных чисел вида "29,5 кг" больше не появляется.
         private static string ConvertPoundsToKilograms(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
@@ -3916,22 +4181,7 @@ namespace RussianLocalization
                 text.IndexOf("фунт", StringComparison.Ordinal) < 0 &&
                 text.IndexOf("фн.", StringComparison.Ordinal) < 0) return text;
 
-            return PoundsRegex.Replace(text, m =>
-            {
-                double a, b;
-                string sa = m.Groups["a"].Value.Replace(',', '.');
-                if (!double.TryParse(sa, System.Globalization.NumberStyles.Float,
-                        System.Globalization.CultureInfo.InvariantCulture, out a)) return m.Value;
-
-                if (m.Groups["b"].Success)
-                {
-                    string sb = m.Groups["b"].Value.Replace(',', '.');
-                    if (!double.TryParse(sb, System.Globalization.NumberStyles.Float,
-                            System.Globalization.CultureInfo.InvariantCulture, out b)) return m.Value;
-                    return FormatKg(a * KgPerPound) + "/" + FormatKg(b * KgPerPound) + " кг";
-                }
-                return FormatKg(a * KgPerPound) + " кг";
-            });
+            return PoundUnitsRegex.Replace(text, "кг");
         }
 
         // Английские связки и вспомогательные глаголы — надёжный признак развёрнутой прозы.
@@ -3999,6 +4249,25 @@ namespace RussianLocalization
                     sb.Append(words[wordIdx]);
                     wordIdx++;
                     continue;
+                }
+                // 2026-07-22: Защита плейсхолдеров подстановки движка. Символы $ * = срезаются как
+                // краевая пунктуация, поэтому "$focus" даёт ядро "focus"->"фокус"->сборка "$фокус",
+                // а "*CultSymbol*"->"*КультСимвол*", "=name="->"=имя=" — рантайм-подстановка ломается.
+                // Такие токены (начинается с '$'; касается '*' на краю; обёрнут в '=...=') НИКОГДА
+                // не переводим — оставляем как есть. Живой текст такими маркерами не начинается.
+                {
+                    string wtok = words[wordIdx];
+                    int wlen = wtok.Length;
+                    if (wlen > 0 &&
+                        (wtok[0] == '$' ||
+                         wtok[0] == '*' || wtok[wlen - 1] == '*' ||
+                         (wlen > 1 && (wtok[0] == '=' || wtok[wlen - 1] == '='))))
+                    {
+                        if (sb.Length > 0) sb.Append(' ');
+                        sb.Append(wtok);
+                        wordIdx++;
+                        continue;
+                    }
                 }
                 string bestMatch = null;
                 int bestLen = 0;
@@ -4235,6 +4504,26 @@ namespace RussianLocalization
         }
 
 
+
+        // 2026-07-23 (Guard C): журнал подозрительных записей словаря. Пишем ТОЛЬКО в
+        // Documents\CavesOfQud_RU_Logs — в папке мода лишних файлов быть не должно.
+        private static void LogSuspiciousDictionaryEntry(string key, string value, string reason)
+        {
+            try
+            {
+                string docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                if (string.IsNullOrEmpty(docsPath)) return;
+                string targetFolder = Path.Combine(docsPath, "CavesOfQud_RU_Logs");
+                if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
+                string oneLineKey = (key ?? "").Replace("\r", " ").Replace("\n", "\\n");
+                string oneLineVal = (value ?? "").Replace("\r", " ").Replace("\n", "\\n");
+                File.AppendAllText(Path.Combine(targetFolder, "dict_suspicious.txt"),
+                    "[" + reason + "] KEY(" + oneLineKey.Length + "): " + oneLineKey + Environment.NewLine +
+                    "    VAL(" + oneLineVal.Length + "): " + oneLineVal + Environment.NewLine,
+                    Encoding.UTF8);
+            }
+            catch {}
+        }
 
         private static void AppendToLogFile(string filename, string content)
 
