@@ -1073,3 +1073,278 @@ degree of *DimensionSymbol*
 Maruuq
 Maruuq прибыли в солончак на глубину 1 слоя и начали свою невероятную одиссею через Куд.
 At first light under a strange and тёмно-бордовый sky, the people of salt marsh, 1 stratum deep saw an image on the horizon that looked like a железная рукавица bathed in тёмно-бордовый. It was Maruuq, and after they came and left, the people of salt marsh, 1 stratum deep built a monument to Maruuq and thenceforth called them Железная Рукавица-in-Тёмно-Бордовый.
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+300&y quills
++&C80-120&y quills
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+300&y quills
++&C80-120&y quills
+campfire [E]
+stairs down [N]
+CmdMoveToPointOfInterestMenu
+wooden arrow x57 {{c|}}4 {{r|}}1d2 (4/1d4)
+short bow x2 {{c|}}4 {{y|[{{K|empty}}]}}
+water-stained
+iron mace x3
+of a полный луна, Yimula manifested a скрытый способности внутри их и связанные the божественный ранги of те с жала с наконечником с сбивающий с толком яд.
+While wandering around the deep underground, Yimula stumbled upon a clan of those with stingers tipped with confusing venom. Because of Yimula's otherworldly visage, they accepted them into their fold and taught them their secrets.
+You strike the giant amoeba with your stinger!
+Perfect&y
+You strike the giant centipede with your stinger!
+{{Y|steel}} hand axe {{c|}}5 {{r|}}1d3+1
+iron mace x2 {{c|}}5 {{r|}}2
+staff {{c|}}5 {{r|}}1d2
+You strike the
+iron long sword {{c|}}5 {{r|}}1d4
+small boulder x2 {{c|}}4 {{r|}}1d3
+club {{c|}}5 {{r|}}1d2
+sfx_artifact_examination_success_total
+iron battle axe {{c|}}5 {{r|}}1d2+1
+slender club {{c|}}5 {{r|}}1d2
+{{r|{{r|bloody}} small stone}} {{c|}}4 {{r|}}1d2
+{{r|{{r|blood}}-stained small stone}} {{c|}}4 {{r|}}1d2
+small stone &c&y4 &r&y1d2
+small stone x2 {{c|}}4 {{r|}}1d2
+{{W|Space}}-select | unlock (F1) | Fire Missile Weapon
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+wooden arrow x55 {{c|}}4 {{r|}}1d2 (4/1d4)
+furs x2 {{b|}}2 {{K|	}}-1
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+wooden arrow x55 {{c|}}4 {{r|}}1d2 (4/1d4)
+furs x2 {{b|}}2 {{K|	}}-1
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}5 {{r|}}1d6
+{{w|bronze}} two-handed sword {{c|}}6 {{r|}}1d6
+{{Y|steel}} hand axe {{c|}}5 {{r|}}1d3+1
+club {{c|}}5 {{r|}}1d2
+iron battle axe {{c|}}5 {{r|}}1d2+1
+iron long sword {{c|}}5 {{r|}}1d4
+iron mace x2 {{c|}}5 {{r|}}2
+staff {{c|}}5 {{r|}}1d2
+short bow x2 {{c|}}4 {{y|[{{K|empty}}]}}
+Stinger damage: 1d6
+Venom confuses opponents for 2d3+2 round.
+20% chance on melee attack to sting your opponent ({{c|}}{{rules|8}} {{r|}}{{rules|1d6}})
+It will cost {{C|1}} mutation point to increase Stinger (Confusing Venom)'s rank by 1.
+20% chance on melee attack to sting your opponent (&c&C7&y &r&C1d6&y)
+Venom confuses opponents for &C2d3+2&y rounds
+20% chance on melee attack to sting your opponent (&c&C8&y &r&C1d6&y)
++ This mutation's rank is increased by 3 due to your high Ego.&y
+300&y quills
++&C80-120&y quills
++&C3&y Strength
++&C4&y Strength
++ This mutation's rank is increased by 3 due to being rapidly advanced 1 time.&y
+You toggle &cHarvest Plants&y off.
+You toggle &cHarvest Plants&y on.
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+wooden arrow x55 {{c|}}4 {{r|}}1d2 (4/1d4)
+furs x2 {{b|}}2 {{K|	}}-1
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}5 {{r|}}1d6
+{{w|bronze}} two-handed sword {{c|}}6 {{r|}}1d6
+{{Y|steel}} hand axe {{c|}}5 {{r|}}1d3+1
+club {{c|}}5 {{r|}}1d2
+iron battle axe {{c|}}5 {{r|}}1d2+1
+iron long sword {{c|}}5 {{r|}}1d4
+iron mace x2 {{c|}}5 {{r|}}2
+staff {{c|}}5 {{r|}}1d2
+short bow x2 {{c|}}4 {{y|[{{K|empty}}]}}
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+wooden arrow x55 {{c|}}4 {{r|}}1d2 (4/1d4)
+furs x2 {{b|}}2 {{K|	}}-1
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}5 {{r|}}1d6
+{{w|bronze}} two-handed sword {{c|}}6 {{r|}}1d6
+{{Y|steel}} hand axe {{c|}}5 {{r|}}1d3+1
+club {{c|}}5 {{r|}}1d2
+iron battle axe {{c|}}5 {{r|}}1d2+1
+iron long sword {{c|}}5 {{r|}}1d4
+iron mace x2 {{c|}}5 {{r|}}2
+staff {{c|}}5 {{r|}}1d2
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+short bow x2 {{c|}}4 {{y|[{{K|empty}}]}}
