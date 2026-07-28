@@ -1,0 +1,5 @@
+# SteamCMD доустанавливается скриптом публикации — в репозитории ему не место
+_tools/steamcmd/
+
+# Генерируется при каждом запуске Publish-Workshop.ps1
+_tools/publish/workshop_item.vdf
