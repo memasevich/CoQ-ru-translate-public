@@ -6113,5 +6113,6 @@
   "^(?:<color=[^>]+>|\\{\\{[^}]+\\}\\}|\\s)*\\[?(?<k>[A-Za-z0-9])\\]?\\s+(?:ABILITIES|Abilities|abilities)(?:</color>|\\}\\})*$": "[{k}] СПОСОБНОСТИ",
   "^(?:<color=[^>]+>|\\{\\{[^}]+\\}\\}|\\s)*(?:ABILITIES|Abilities|abilities)\\s+\\[?(?<k>[A-Za-z0-9])\\]?(?:</color>|\\}\\})*$": "СПОСОБНОСТИ [{k}]",
   "^(?:<color=[^>]+>)*\\[(?<k>[A-Za-z0-9])\\](?:</color>)*(?:<color=[^>]+>)*\\s*(?:ABILITIES|Abilities|abilities)(?:</color>)*$": "[{k}] СПОСОБНОСТИ",
-  "^(?:<color=[^>]+>)*(?:\\[(?<k>[A-Za-z0-9])\\])?\\s*(?:ABILITIES|Abilities|abilities)(?:</color>)*(?:<color=[^>]+>)*(?:\\s*\\[(?<k2>[A-Za-z0-9])\\])?(?:</color>)*$": "[{k}] СПОСОБНОСТИ"
+  "^(?:<color=[^>]+>)*(?:\\[(?<k>[A-Za-z0-9])\\])?\\s*(?:ABILITIES|Abilities|abilities)(?:</color>)*(?:<color=[^>]+>)*(?:\\s*\\[(?<k2>[A-Za-z0-9])\\])?(?:</color>)*$": "[{k}] СПОСОБНОСТИ",
+  "^(?:<color=[^>]+>)*\\s*(?<k>[A-Za-z0-9])\\s*(?:</color>)*(?:<color=[^>]+>)*\\s*(?:ABILITIES|Abilities|abilities)(?:</color>)*$": "{k} СПОСОБНОСТИ"
 }
