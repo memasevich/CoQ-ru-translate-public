@@ -2550,6 +2550,9 @@ namespace RussianLocalization
         // никогда не была защищена. Список предметов в торговле с несколькими цветовыми тегами
         // (качество, цена и т.д.) — ровно то, что могло дать существенную глубину именно тут.
         private const int MaxTranslateInternalDepth = 24;
+
+        // Порог "огромного текста" в TranslateInternalClean (см. там же).
+        private const int OversizeThreshold = 3000;
         [ThreadStatic]
         private static int _translateInternalDepth;
         private static string TranslateInternal(string text)
@@ -2750,7 +2753,7 @@ namespace RussianLocalization
             // БЫСТРЫЙ ВЫХОД ДЛЯ ОГРОМНЫХ ТЕКСТОВ:
             // Если строка > 3000 символов (справка, титры) и её нет в словаре/кэше,
             // мы не пускаем её в тяжёлую пословную обработку, чтобы не вешать игру.
-            if (text.Length > 3000)
+            if (text.Length > OversizeThreshold)
             {
                 string earlyCached;
                 if (translationCache.TryGetValue(text, out earlyCached)) return earlyCached;
@@ -2765,6 +2768,13 @@ namespace RussianLocalization
                 {
                     if (staticDictionary.TryGetValue(origKey, out earlyExact)) return earlyExact;
                 }
+
+                // 2026-07-28: ПОПЫТКА пускать длинные многострочные тексты на разбиение по
+                // абзацам/строкам ОТКАЧЕНА — она вешала игру при открытии справки. Разбиение
+                // само по себе дешёвое, но каждая из ~200 строк Credits уходила в полную
+                // пословную обработку (в т.ч. прогон по всему patternDictionary), и всё это
+                // синхронно на одном кадре. Длинные страницы справки переводим только
+                // целостраничным точным ключом — он проверяется выше и стоит один поиск в хеше.
 
                 // Не нашли - возвращаем оригинал, кэшируем "неудачу"
                 translationCache[text] = text;
@@ -5561,16 +5571,43 @@ namespace RussianLocalization
                     if (pre != null) { harmony.Patch(setText, prefix: new HarmonyMethod(pre)); patched++; }
                 }
 
+                // 2026-07-28: ФОЛБЭК ДЛЯ ПРЯМОЙ ЗАПИСИ В ПОЛЕ .text.
+                //
+                // Часть Modern UI пишет текст НЕ через SetText(string), а прямо в public-поле
+                // UITextSkin.text и затем зовёт Apply(). Самый заметный пример — экран справки:
+                //   Qud.UI.HelpRow.setData():
+                //       categoryDescription.text = "{{C|" + row.Description.ToUpper() + "}}";
+                //       categoryDescription.Apply();
+                //       description.text = row.HelpText;   // + подстановка ~CmdLook → {{hotkey|…}}
+                //       description.Apply();
+                // Из-за этого ни SetText-патч, ни TMP_Text-патчи не видят текст (финальная запись
+                // в TMP идёт через tmp.SetCharArray(char[], int, int), а не через сеттер .text).
+                //
+                // Раньше фолбэк вешался на SetTheText() с ПУСТЫМ списком параметров, но в текущей
+                // версии игры сигнатура — private void SetTheText(ReadOnlySpan<char> Text), поэтому
+                // GetMethod(..., Type.EmptyTypes, ...) молча возвращал null и патч не ставился
+                // (в логе было "methods patched = 1" вместо 2).
+                //
+                // Правильная точка — public void Apply(): это единственная воронка (SetTheText
+                // вызывается только из неё), сигнатура стабильна, и на момент вызова HelpRow уже
+                // закончил подстановку ~Cmd-токенов — то есть в префикс приходит ровно такой же
+                // размеченный текст, какой получает SetText-патч. Патчить сам
+                // SetTheText(ReadOnlySpan<char>) не стоит: Span — ref struct, byref-параметр в
+                // Harmony-префиксе на нём хрупкий.
                 if (_utsTextField != null)
                 {
-                    var setTheText = t.GetMethod("SetTheText",
+                    var apply = t.GetMethod("Apply",
                         System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
                         null, System.Type.EmptyTypes, null);
-                    if (setTheText != null)
+                    if (apply != null)
                     {
                         var pre2 = typeof(TranslationEngine).GetMethod("UITextSkin_SetTheText_Prefix",
                             System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                        if (pre2 != null) { harmony.Patch(setTheText, prefix: new HarmonyMethod(pre2)); patched++; }
+                        if (pre2 != null) { harmony.Patch(apply, prefix: new HarmonyMethod(pre2)); patched++; }
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogWarning("[RussianLocalization] UITextSkin.Apply() not found — прямая запись в .text останется без перевода.");
                     }
                 }
 
@@ -6399,7 +6436,48 @@ namespace RussianLocalization
 
         public const int DIAG_FAKE_DELAY_MS = 0;
 
+        // Мемо «мы сами это уже перевели»: instance -> последняя строка, которую мы записали в .text.
+        // Apply() зовётся не только из setData, но и из Start() и из Updated() (GetPreferredValues),
+        // а переведённая справка всё равно содержит латиницу (имена команд, "Alt"), то есть дешёвый
+        // guard hasCyr && !hasEng её не отсечёт. Сравнение по ССЫЛКЕ (ReferenceEquals) стоит копейки
+        // и снимает повторный Translate() многокилобайтной страницы на каждом Apply.
+        // ConditionalWeakTable не держит UITextSkin от сборки мусора.
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<object, string> _utsLastApplied =
+            new System.Runtime.CompilerServices.ConditionalWeakTable<object, string>();
+
+        // Длина, начиная с которой блок из UITextSkin.Apply() переводится ТОЛЬКО точным
+        // совпадением по словарю, без пословной обработки (см. UITextSkin_SetTheText_Prefix).
+        // 300 — ниже самой короткой страницы справки (Action Costs, 352 символа) и заметно выше
+        // обычных подписей UI.
+        private const int UITextSkinExactOnlyThreshold = 300;
+
+        /// <summary>
+        /// Только точное совпадение по словарю, без пословного прохода: один поиск в хеше.
+        /// Ведущие/замыкающие пробелы оригинала сохраняются (ключи в словаре — .Trim()'нутые).
+        /// Используется для больших статичных блоков (страницы справки), где полный Translate()
+        /// неприемлемо дорог — см. UITextSkin_SetTheText_Prefix и XRLManualPage_GetData_Patch.
+        /// </summary>
+        public static bool TryTranslateExactPreservingPadding(string text, out string result)
+        {
+            result = null;
+            if (string.IsNullOrEmpty(text)) return false;
+
+            string trimmed = text.Trim();
+            string exact;
+            if (trimmed.Length == 0 || !staticDictionary.TryGetValue(trimmed, out exact)) return false;
+
+            int lead = 0;
+            while (lead < text.Length && char.IsWhiteSpace(text[lead])) lead++;
+            int trail = 0;
+            while (trail < text.Length - lead && char.IsWhiteSpace(text[text.Length - 1 - trail])) trail++;
+
+            result = text.Substring(0, lead) + exact + text.Substring(text.Length - trail);
+            return true;
+        }
+
         // Фолбэк: если текст записали прямо в поле .text, минуя SetText — переводим перед применением.
+        // Висит на UITextSkin.Apply() (см. PatchUITextSkin): именно так рисуется экран справки
+        // (Qud.UI.HelpRow) и другие места, пишущие в поле напрямую.
         public static void UITextSkin_SetTheText_Prefix(object __instance)
         {
             if (DIAG_NOOP_SETTHETEXT_BODY) return;
@@ -6410,12 +6488,43 @@ namespace RussianLocalization
                 string cur = _utsTextField.GetValue(__instance) as string;
                 if (string.IsNullOrEmpty(cur)) return;
 
+                string lastApplied;
+                if (_utsLastApplied.TryGetValue(__instance, out lastApplied) && ReferenceEquals(lastApplied, cur)) return;
+
                 bool hasCyr, hasEng;
                 ScanAlpha(cur, out hasCyr, out hasEng);
                 if (hasCyr && !hasEng) return;
 
+                // 2026-07-28: ПРЕДОХРАНИТЕЛЬ ПРОТИВ ЗАВИСАНИЯ НА БОЛЬШИХ БЛОКАХ.
+                //
+                // Этот хук — не редкий фолбэк, а массовый путь: при открытии справки
+                // Qud.UI.HelpScreen создаёт строки сразу для ВСЕХ топиков Manual.xml (~24 КБ),
+                // и все они прилетают сюда синхронно на одном кадре. Полный Translate() режет
+                // такой текст на строки и гоняет каждую по patternDictionary (~6100 регулярок) —
+                // это сотни тысяч сопоставлений за кадр, игра просто виснет.
+                //
+                // Поэтому большие блоки переводим ТОЛЬКО точным совпадением по словарю: один
+                // поиск в хеше, никакого пословного прохода. Для справки это и есть рабочая
+                // схема — целостраничные ключи из Manual.xml. Короткие подписи (кнопки,
+                // заголовки, ярлыки) идут полным путём как раньше.
+                if (cur.Length >= UITextSkinExactOnlyThreshold)
+                {
+                    string bigResult;
+                    if (!TryTranslateExactPreservingPadding(cur, out bigResult)) return;
+
+                    _utsTextField.SetValue(__instance, bigResult);
+                    _utsLastApplied.Remove(__instance);
+                    _utsLastApplied.Add(__instance, bigResult);
+                    return;
+                }
+
                 string tr = TranslationEngine.Translate(cur);
-                if (!string.IsNullOrEmpty(tr) && tr != cur) _utsTextField.SetValue(__instance, tr);
+                if (!string.IsNullOrEmpty(tr) && tr != cur)
+                {
+                    _utsTextField.SetValue(__instance, tr);
+                    _utsLastApplied.Remove(__instance);
+                    _utsLastApplied.Add(__instance, tr);
+                }
             }
             catch { /* никогда не ломаем UI, включая InsufficientExecutionStackException */ }
         }
@@ -8850,6 +8959,42 @@ namespace RussianLocalization
     }
 
     // --- ПАТЧИ ДЛЯ TRANSLATION OF MEMORY DATABASES ---
+
+    // ============================================================
+    // СПРАВКА (Base/Manual.xml) — перевод страницы ДО подстановки клавиш.
+    //
+    // Цепочка отрисовки: XRLManualPage.GetData() -> HelpScreen.HelpMenu() кладёт результат в
+    // HelpDataRow.HelpText -> HelpRow.setData() заменяет ~CmdLook и т.п. на {{hotkey|...}} по
+    // текущей раскладке игрока -> UITextSkin.text + Apply().
+    //
+    // Перехватывать в конце (на Apply) для страниц с ~Cmd-токенами бесполезно: к тому моменту
+    // текст уже зависит от раскладки, и точное совпадение по словарю не сойдётся. Поэтому
+    // переводим на входе — здесь страница ещё ровно такая, как в Manual.xml, и ключ стабилен.
+    // Перевод обязан сохранять ~Cmd-токены: подстановку клавиш игра сделает сама, уже по русскому
+    // тексту.
+    //
+    // Только точное совпадение: страницы большие (до ~8.5 КБ), полный Translate() с прогоном по
+    // patternDictionary вешает игру при открытии справки.
+    [HarmonyPatch(typeof(XRL.Help.XRLManualPage))]
+    public static class XRLManualPage_GetData_Patch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("GetData", new Type[] { typeof(bool) })]
+        public static void GetData_Postfix(ref string __result)
+        {
+            try
+            {
+                if (!TranslationEngine.Initialized || string.IsNullOrEmpty(__result)) return;
+
+                string translated;
+                if (TranslationEngine.TryTranslateExactPreservingPadding(__result, out translated))
+                {
+                    __result = translated;
+                }
+            }
+            catch { /* справка не должна ронять UI */ }
+        }
+    }
 
     [HarmonyPatch(typeof(XRL.World.QuestLoader))]
     public static class QuestLoader_Patch
