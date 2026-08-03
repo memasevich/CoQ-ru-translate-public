@@ -2825,8 +2825,44 @@ namespace RussianLocalization
                     }
                 }
             }
+
+            // D. 2026-08-03: форма "[{{W|X}}]" — скобка СНАРУЖИ разметки. Тип B ловит обратный
+            // порядок "{{W|[X]}}", тип C такие буквы пропускает как «внутри разметки», и в щель
+            // между ними уезжали клавиши меню: лог 03.08 дал "Ежедневно [Д]" вместо [D],
+            // "Учебное пособие [Е]" вместо [E], "Классический [А]" вместо [A]. Игрок видит
+            // букву, которой нет на клавише. Сопоставление позиционное: i-я такая скобка
+            // источника соответствует i-й в результате.
+            if (source.IndexOf("[{{", System.StringComparison.Ordinal) >= 0)
+            {
+                var srcKeys = new List<string>();
+                foreach (System.Text.RegularExpressions.Match m in MarkedBracketKeyRegex.Matches(source))
+                {
+                    string k = m.Groups["k"].Value;
+                    if (k.Length == 1 && ((k[0] >= 'a' && k[0] <= 'z') || (k[0] >= 'A' && k[0] <= 'Z'))) srcKeys.Add(k);
+                    else srcKeys.Add(null);
+                }
+                if (srcKeys.Count > 0)
+                {
+                    int idx = 0;
+                    result = MarkedBracketKeyRegex.Replace(result, m =>
+                    {
+                        string lat = idx < srcKeys.Count ? srcKeys[idx] : null;
+                        idx++;
+                        if (lat == null) return m.Value;
+                        string cur = m.Groups["k"].Value;
+                        if (cur == lat) return m.Value;
+                        if (!ContainsCyrillic(cur)) return m.Value;
+                        return m.Value.Replace("|" + cur + "}}", "|" + lat + "}}");
+                    });
+                }
+            }
             return result;
         }
+
+        // "[{{W|A}}]" — клавиша, обёрнутая разметкой цвета, скобка снаружи.
+        private static readonly System.Text.RegularExpressions.Regex MarkedBracketKeyRegex =
+            new System.Text.RegularExpressions.Regex(@"\[\{\{[A-Za-z&]+\|(?<k>[^}\]]{1,2})\}\}\]",
+                System.Text.RegularExpressions.RegexOptions.Compiled);
 
 
         // 2026-07-06 (v20 — ВОЗМОЖНАЯ НАСТОЯЩАЯ ПРИЧИНА): TranslateInternal() вызывает сам себя
