@@ -372,6 +372,16 @@ namespace RussianLocalization
             var sufMatch = TagSuffixRegex.Match(word);
             string suffix = sufMatch.Success ? sufMatch.Value : "";
 
+            // Токен целиком состоит из разметки ("&y", "</color>", "}}") — склонять нечего.
+            // Префиксная и суффиксная маски здесь ПЕРЕКРЫВАЮТСЯ (обе матчат один и тот же "&y"),
+            // и наивное Substring(0, clean.Length - suffix.Length) уходило в отрицательную длину
+            // -> ArgumentOutOfRangeException. Исключение всплывало из MatchEvaluator'а в
+            // Regex.Replace, ApplyMorphMarkers ловил его целиком и возвращал ВСЮ строку
+            // нетронутой — игрок видел сырой "{{case:&wбронзовый &y длинный меч|acc|auto|sg}}".
+            // Одиночные "&y" встречаются в цепочках жидкостей ("&rокровавленный &y &Kасфальт"),
+            // поэтому падал каждый такой текст, а не редкий угол.
+            if (prefix.Length + suffix.Length >= word.Length) return word;
+
             string clean = word;
             if (prefix.Length > 0) clean = clean.Substring(prefix.Length);
             if (suffix.Length > 0) clean = clean.Substring(0, clean.Length - suffix.Length);
@@ -1527,42 +1537,51 @@ namespace RussianLocalization
             if (string.IsNullOrEmpty(text)) return text;
             if (!text.Contains("{{case:")) return text;
 
+            // Падеж считается ПОМАТЧЕВО. Раньше try стоял вокруг всего Regex.Replace, и одно
+            // исключение на одном слове оставляло НЕТРОНУТЫМИ все маркеры строки — игрок видел
+            // сырой "{{case:...|gen|auto|sg}}". Теперь сбой на слове стоит только несклонённого
+            // слова, а маркер снимается в любом случае.
+            string replaced;
             try
             {
-                return Regex.Replace(text, @"\{\{case:([^|]+)\|([^|]+)\|([^|]+)\|([^}]+)\}\}", match =>
+                replaced = Regex.Replace(text, @"\{\{case:([^|]+)\|([^|]+)\|([^|]+)\|([^}]+)\}\}", match =>
                 {
                     string word = match.Groups[1].Value.Trim();
-                    string caseStr = match.Groups[2].Value.Trim().ToLower();
-                    string genderStr = match.Groups[3].Value.Trim().ToLower();
-                    string numberStr = match.Groups[4].Value.Trim().ToLower();
+                    try
+                    {
+                        string caseStr = match.Groups[2].Value.Trim().ToLower();
+                        string numberStr = match.Groups[4].Value.Trim().ToLower();
 
-                    MorphCase mc = ParseCase(caseStr);
-                    MorphNumber mn = numberStr == "pl" || numberStr == "plural" ? MorphNumber.Plural : MorphNumber.Singular;
-                    
-                    MorphGender mg;
-                    if (genderStr == "auto")
-                    {
-                        // Автоматическое определение рода
-                        mg = DetectGenderForWord(word);
-                    }
-                    else
-                    {
-                        mg = ParseGender(genderStr);
-                    }
+                        MorphCase mc = ParseCase(caseStr);
+                        MorphNumber mn = numberStr == "pl" || numberStr == "plural" ? MorphNumber.Plural : MorphNumber.Singular;
 
-                    // Для автоматического рода используем Decline, который сам определит род
-                    if (genderStr == "auto")
-                    {
+                        // Род здесь не нужен: Decline определяет его сам по главному слову фразы —
+                        // и для "auto", и для явного значения ветки раньше были идентичны.
                         return Decline(word, mc, mn);
                     }
-                    
-                    return Decline(word, mc, mn);
+                    catch
+                    {
+                        // Склонение не удалось — отдаём слово в именительном, но БЕЗ маркера.
+                        return word;
+                    }
                 });
             }
             catch
             {
-                return text;
+                replaced = text;
             }
+
+            // Страховка: маркер не должен доживать до экрана ни при каких обстоятельствах.
+            if (replaced.Contains("{{case:"))
+            {
+                try
+                {
+                    replaced = Regex.Replace(replaced, @"\{\{case:([^|}]+)(?:\|[^|}]*){0,3}\}\}", m => m.Groups[1].Value.Trim());
+                }
+                catch { }
+            }
+
+            return replaced;
         }
         
         // Определение рода слова для морфологических маркеров

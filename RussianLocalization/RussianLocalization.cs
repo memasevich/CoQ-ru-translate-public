@@ -186,7 +186,17 @@ namespace RussianLocalization
         // ExtractColors. На экране выходило «Бурный рост 6>» вместо «Бурный рост <6>» —
         // 87 строк лога 30.07 (все способности: Sting, Toast, Telepathy, Deploy Turret...).
         // С @"<[^<>]+>" совпадение начинается со второго '<', и одиночный '<' остаётся текстом.
-        private static readonly System.Text.RegularExpressions.Regex TagRegex = new System.Text.RegularExpressions.Regex(@"<[^<>]+>");
+        //
+        // 2026-08-04: та же болезнь в НЕразорванном виде. Когда панель присылает хоткей одним
+        // блоком — "<color=#98875FFF><6></color>" — предыдущая правка не помогает: "<6>"
+        // подходит под <[^<>]+> целиком и опознаётся как тег. Хоткей исчезал из origStrip, и
+        // на экране оставалось «Бурный рост» без «<6>» (в логе 03.08 — 20 строк: Бурный рост,
+        // Поджарить, Телепатия, Жалить, Установка турели, Луч замораживания, "<X> Photonic...",
+        // "Some Ability Name <W>").
+        // Негативный просмотр (?![A-Z0-9]>) исключает ОДИНОЧНЫЕ прописные буквы и цифры —
+        // ими не бывает ни одного настоящего тега TextMeshPro. Разметочные "<b>", "<i>",
+        // "<u>", "<s>" — строчные, под исключение не попадают и по-прежнему снимаются.
+        private static readonly System.Text.RegularExpressions.Regex TagRegex = new System.Text.RegularExpressions.Regex(@"<(?![A-Z0-9]>)[^<>]+>");
 
         private static readonly System.Text.RegularExpressions.Regex ModernUIMenuRegex = new System.Text.RegularExpressions.Regex(@"^\[([^\]]+)\]\s*(.*)$");
 
@@ -1813,6 +1823,12 @@ namespace RussianLocalization
                     LogError("[RussianLocalization] Morphology marker processing failed: " + ex.Message);
                 }
             }
+
+            // Английский «клей» (артикли и "of"), прилипший к русским словам. Стоит здесь по той
+            // же причине, что и фунты ниже: строку собирают три независимых прохода, и латать
+            // каждый из них по отдельности — гарантированный разнобой. Обязательно ПОСЛЕ
+            // ApplyMorphMarkers, иначе правила лезут внутрь "{{case:...|gen|auto|sg}}".
+            if (result != null) result = StripLeftoverEnglishGlue(result);
 
             // Фунты -> килограммы. Стоит В САМОМ КОНЦЕ конвейера намеренно: сюда приходит
             // финальная строка независимо от того, кто её собрал — словарь, паттерн или
@@ -5219,6 +5235,11 @@ namespace RussianLocalization
         // Не затрагивают текст внутри блоков, только удаляют пустые и висящие теги.
         private static readonly System.Text.RegularExpressions.Regex EmptyColorBlockRegex =
             new System.Text.RegularExpressions.Regex(@"<color=[^>]+>[ \t]*</color>", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        // Битый закрывающий тег с атрибутом: </color="green"> — присылает сама игра.
+        private static readonly System.Text.RegularExpressions.Regex MalformedCloseColorRegex =
+            new System.Text.RegularExpressions.Regex(@"</color[ \t]*=[^>]*>",
+                System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         // Подряд идущие одинаковые открывающие теги: <color=X><color=X> -> <color=X>
         // (?![ \t]*</color>) — не схлопываем, если после тега идёт закрывающий (это валидный пустой блок).
         private static readonly System.Text.RegularExpressions.Regex DoubleOpenColorRegex =
@@ -5241,6 +5262,12 @@ namespace RussianLocalization
             if (string.IsNullOrEmpty(text)) return text;
             if (text.IndexOf("<color=", StringComparison.OrdinalIgnoreCase) < 0 &&
                 text.IndexOf("</color>", StringComparison.OrdinalIgnoreCase) < 0) return text;
+            // 0. Чиним битый закрывающий тег самой игры: "</color=\"green\">". Такого тега не
+            //    существует — TextMeshPro печатает его БУКВАЛЬНО. Он встречается в экране
+            //    создания персонажа ("Skill Points: </color=\"green\">2</color>"): строка
+            //    переводилась ("Очки навыков"), а мусорный тег доезжал до игрока как есть.
+            //    Приводим к нормальному "</color>", дальше лишнюю пару снимет шаг 5.
+            text = MalformedCloseColorRegex.Replace(text, "</color>");
             // 1. Удаляем блоки только с пробелами <color=X>   </color>
             text = EmptyColorBlockRegex.Replace(text, "");
             // 2. Схлопываем 2+ подряд идущих одинаковых открывающих тегов.
@@ -5251,7 +5278,103 @@ namespace RussianLocalization
             text = DoubleCloseColorRegex.Replace(text, "</color>");
             // 4. Удаляем висящий открывающий тег в самом конце строки (без пары).
             text = TrailingOpenColorRegex.Replace(text, "");
+            // 5. Удаляем ЛИШНИЕ закрывающие теги (их больше, чем открывающих).
+            text = DropUnmatchedColorCloses(text);
             return text;
+        }
+
+        // Перевод длинных книг/журналов склеивает несколько цветовых отрезков оригинала в один
+        // абзац, а закрывающие теги от съеденных отрезков остаются. Разметка перекашивается
+        // ("[Обращение к читателю]</color>\n</color><color=...": 2 открывающих, 3 закрывающих),
+        // и TextMeshPro печатает лишний "</color>" БУКВАЛЬНО — игрок видит тег в тексте книги.
+        // Считаем глубину слева направо и выбрасываем закрывающие теги на нулевой глубине.
+        // Недостающие закрывающие НЕ дописываем: тег до конца строки безвреден, а лишний текст
+        // в переводе — нет.
+        internal static string DropUnmatchedColorCloses(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            int closes = 0;
+            for (int i = text.IndexOf("</color>", StringComparison.OrdinalIgnoreCase); i >= 0;
+                 i = text.IndexOf("</color>", i + 8, StringComparison.OrdinalIgnoreCase)) closes++;
+            if (closes == 0) return text;
+
+            var sb = new System.Text.StringBuilder(text.Length);
+            int depth = 0;
+            int pos = 0;
+            while (pos < text.Length)
+            {
+                if (pos + 7 <= text.Length && string.Compare(text, pos, "<color=", 0, 7, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    int close = text.IndexOf('>', pos);
+                    if (close < 0) { sb.Append(text, pos, text.Length - pos); break; }
+                    sb.Append(text, pos, close - pos + 1);
+                    depth++;
+                    pos = close + 1;
+                    continue;
+                }
+                if (pos + 8 <= text.Length && string.Compare(text, pos, "</color>", 0, 8, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    if (depth > 0) { sb.Append("</color>"); depth--; }
+                    // depth == 0 — пары нет, тег просто выбрасываем
+                    pos += 8;
+                    continue;
+                }
+                sb.Append(text[pos]);
+                pos++;
+            }
+            return sb.ToString();
+        }
+
+        // Английский артикль перед русским словом: "У The слабый ...", "В the месяц ...".
+        private static readonly System.Text.RegularExpressions.Regex LeftoverArticleRegex =
+            new System.Text.RegularExpressions.Regex(
+                @"(^|[\s>|(\[""'—-])(?:the|an?)[ \t]+(?=[А-Яа-яЁё])",
+                System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        // Английское "of" после русского слова: "сияющий стрела of Annulus Колесо Sharqushur".
+        // Ведущий артикль второй части снимаем той же заменой ("of The Ellipse" -> " Ellipse").
+        private static readonly System.Text.RegularExpressions.Regex LeftoverOfRegex =
+            new System.Text.RegularExpressions.Regex(
+                @"(?<=[А-Яа-яЁё][.,)\]""']?)[ \t]+of[ \t]+(?:the[ \t]+)?",
+                System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// Снимает английские артикли и "of", прилипшие к русскому тексту.
+        /// В русском нет артиклей, и ни один проход перевода их не убирает: словарь их не знает,
+        /// а пословный проход оставляет как есть. Отсюда "У The слабый ... нечего продать" и
+        /// сгенерированные названия вида "сияющий стрела of Annulus Колесо Sharqushur".
+        ///
+        /// Два разных условия применения — намеренно:
+        ///  * артикли режем ТОЛЬКО когда кириллицы больше латиницы. В ещё не переведённом
+        ///    английском предложении ("...looked like a miniature glacier bathed in ivory")
+        ///    артикль — законная часть текста, и удалять его нельзя;
+        ///  * "of" режем ещё и в коротких строках-названиях без границы предложения: там
+        ///    латиницы часто больше ("аналоговый сабо of The Ellipse Sharqushur"), но это
+        ///    заведомо имя предмета, а не английская проза.
+        /// Прогон по логу 03.08 (2512 записи): 65 изменений, все в плюс, побочек нет.
+        /// </summary>
+        internal static string StripLeftoverEnglishGlue(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            if (!ContainsCyrillic(text)) return text;
+
+            int cyr = 0, lat = 0;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if ((c >= 'А' && c <= 'я') || c == 'Ё' || c == 'ё') cyr++;
+                else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) lat++;
+            }
+            bool cyrillicDominant = cyr > lat;
+
+            // Строка-название: короткая, без границы предложения и без переносов.
+            bool nameLike = text.Length <= 100 && text.IndexOf('\n') < 0
+                && !System.Text.RegularExpressions.Regex.IsMatch(text, @"[.!?][ \t]");
+
+            string result = text;
+            if (cyrillicDominant) result = LeftoverArticleRegex.Replace(result, "$1");
+            if (cyrillicDominant || nameLike) result = LeftoverOfRegex.Replace(result, " ");
+            return result;
         }
 
         // Регулярки для нормализации текста
@@ -5290,6 +5413,15 @@ namespace RussianLocalization
             // 2. Схлопываем 2+ подряд идущих пробела/таба в один
             // ВАЖНО: пропускаем содержимое внутри <color=...>...</color>, чтобы не сломать структуру
             result = NormalizeOutsideColorBlocks(result, MultiSpaceRegex, " ");
+
+            // 2а. Двойной пробел ВНУТРИ цветового блока шаг 2 не трогает — и правильно:
+            // титры и таблицы выравниваются как раз пробелами внутри блоков, схлопывать их
+            // нельзя. Но два узких случая безопасны и видны игроку:
+            //   * после двоеточия — "АКТИВНЫЕ ЭФФЕКТЫ:  переход вброд";
+            //   * перед закрывающим тегом — "ЭФФЕКТЫ:  </color><color=...>окровавленный".
+            // Ни один из них не может быть колонкой выравнивания.
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"(?<=:)[ \t]{2,}(?=[А-Яа-яЁёA-Za-z])", " ");
+            result = System.Text.RegularExpressions.Regex.Replace(result, @"(?<=[^\s])[ \t]{2,}(?=</color>)", " ");
 
             // 3. Схлопываем 3+ подряд идущих переноса строк в 2 (\n\n)
             result = MultiNewlineRegex.Replace(result, "\n\n");
