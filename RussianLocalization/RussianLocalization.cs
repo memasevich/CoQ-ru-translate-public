@@ -178,7 +178,15 @@ namespace RussianLocalization
 
 
 
-        private static readonly System.Text.RegularExpressions.Regex TagRegex = new System.Text.RegularExpressions.Regex(@"<[^>]+>");
+        // 2026-07-30: класс символов ВНУТРИ тега исключает '<', иначе одиночный '<' съедается.
+        // Панель способностей присылает хоткей разорванным по цветовым регионам:
+        //   <color=#FFFFFFFF><</color><color=#98875FFF>6</color><color=#FFFFFFFF>></color>
+        // Со старым @"<[^>]+>" подстрока "<</color>" целиком опознавалась как тег (потому что
+        // [^>]+ поглощал "</color"), и '<' исчезал и из origStrip, и из карты цветов
+        // ExtractColors. На экране выходило «Бурный рост 6>» вместо «Бурный рост <6>» —
+        // 87 строк лога 30.07 (все способности: Sting, Toast, Telepathy, Deploy Turret...).
+        // С @"<[^<>]+>" совпадение начинается со второго '<', и одиночный '<' остаётся текстом.
+        private static readonly System.Text.RegularExpressions.Regex TagRegex = new System.Text.RegularExpressions.Regex(@"<[^<>]+>");
 
         private static readonly System.Text.RegularExpressions.Regex ModernUIMenuRegex = new System.Text.RegularExpressions.Regex(@"^\[([^\]]+)\]\s*(.*)$");
 
@@ -517,6 +525,213 @@ namespace RussianLocalization
             }
         }
 
+        // ============================================================
+        // ЗАЩИТА ОТ ДВОЙНОЙ УСТАНОВКИ (2026-08-03)
+        // ============================================================
+        // Игроки ставят мод и подпиской в Workshop, и ручной копией в
+        // CavesOfQud\Mods\RussianLocalization. Обе копии — РАЗНЫЕ СБОРКИ, поэтому
+        // статик-флаг Initialized их не связывает: у каждой свой экземпляр. В логе
+        // это выглядит так (Player.log игрока, 2026-08-02):
+        //   INFO - Enabled mods: Русификатор 1.0.4 by memasevich, Русификатор 1.0.4 by memasevich
+        //   ...десятки CS0436 (MorphCase/FormsEntry конфликтуют с 3728849656.dll)
+        //   ...вся инициализация дважды, потом у второй копии Popup=0, ScreenBuffer=0
+        // Двойной патч TextElement.text и два RuntimeTranslator прогоняют каждую строку
+        // через перевод дважды — игра не доходит до главного меню.
+        //
+        // ОПОЗНАНИЕ ПО ТИПУ, А НЕ ПО ID. В manifest.json нет поля ID, а папки у копий
+        // разные ("RussianLocalization" против "3728849656") — по ID их не сматчить.
+        // Признак «это копия того же мода» — сборка определяет наш собственный тип.
+        //
+        // ИНВАРИАНТ: обе копии не отключаются НИКОГДА. При любой ошибке разбора копия
+        // считает победителем себя. Отказ в сторону «работают обе» — это сегодняшнее
+        // поведение: плохое, но известное. Отказ в сторону «не работает ни одна» дал бы
+        // полностью английскую игру без всяких объяснений, что заметно хуже.
+        private const string TranslationEngineTypeName = "RussianLocalization.TranslationEngine";
+
+        // Слот в AppDomain — общая память процесса, видна обеим сборкам без общего типа.
+        // Страховка второго уровня: если разбор через ModManager не сработает, деградируем
+        // до «первый выиграл». ИМЯ СЛОТА МЕНЯТЬ НЕЛЬЗЯ — иначе разные версии мода перестанут
+        // видеть друг друга.
+        private const string ActiveInstanceSlot = "RussianLocalization.ActiveInstance";
+
+        /// <summary>Сообщение о дубликате для показа игроку; заполняет ТОЛЬКО копия-победитель.</summary>
+        private static string _duplicateInstallMessage;
+        private static bool _duplicateInstallMessageShown;
+
+        /// <summary>
+        /// Возвращает true, если эта копия должна отключиться: рядом работает другая,
+        /// более приоритетная. Заодно заполняет _duplicateInstallMessage у победителя.
+        /// </summary>
+        private static bool ShouldYieldToAnotherInstall()
+        {
+            System.Reflection.Assembly selfAssembly = typeof(TranslationEngine).Assembly;
+
+            try
+            {
+                // 1. Собираем все активные моды, чья сборка определяет наш тип.
+                var copies = new List<ModInfo>();
+                foreach (var mod in ModManager.ActiveMods)
+                {
+                    if (mod == null || mod.Assembly == null) continue;
+                    System.Type t = null;
+                    try { t = mod.Assembly.GetType(TranslationEngineTypeName, false); } catch { }
+                    if (t != null) copies.Add(mod);
+                }
+
+                if (copies.Count <= 1)
+                {
+                    // Единственная копия — обычный случай. Маркер всё равно ставим:
+                    // он нужен, если ВТОРАЯ копия не сможет разобрать ModManager.
+                    try { System.AppDomain.CurrentDomain.SetData(ActiveInstanceSlot, selfAssembly.FullName); } catch { }
+                    return false;
+                }
+
+                // 2. Победитель: старшая версия -> Steam-источник -> первый путь по ordinal.
+                // Правило детерминированное, поэтому каждая копия приходит к одному и тому
+                // же выводу независимо, и порядок загрузки ни на что не влияет.
+                ModInfo winner = null;
+                foreach (var mod in copies)
+                {
+                    if (winner == null) { winner = mod; continue; }
+                    if (ComparePriority(mod, winner) > 0) winner = mod;
+                }
+
+                bool iAmWinner = winner != null && ReferenceEquals(winner.Assembly, selfAssembly);
+
+                if (iAmWinner)
+                {
+                    _duplicateInstallMessage = BuildDuplicateInstallMessage(winner, copies);
+                    LogError("[RussianLocalization] Мод установлен дважды. Активна копия: " +
+                             DescribeCopy(winner) + ". Остальные отключены.");
+                    try { System.AppDomain.CurrentDomain.SetData(ActiveInstanceSlot, selfAssembly.FullName); } catch { }
+                    return false;
+                }
+
+                LogError("[RussianLocalization] Обнаружена более приоритетная копия мода (" +
+                         DescribeCopy(winner) + ") — эта копия (" +
+                         DescribeCopy(ModManager.GetMod(selfAssembly)) +
+                         ") отключается, чтобы не патчить игру дважды.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Разбор через ModManager не удался — падаем на маркер в AppDomain.
+                LogError("[RussianLocalization] Проверка двойной установки через ModManager не удалась (" +
+                         ex.Message + "), переключаюсь на маркер AppDomain.");
+                try
+                {
+                    object marker = System.AppDomain.CurrentDomain.GetData(ActiveInstanceSlot);
+                    string owner = marker as string;
+                    if (!string.IsNullOrEmpty(owner))
+                    {
+                        // Свой собственный маркер — это переинициализация нас же
+                        // (Qud умеет перезапускать мод без перезапуска игры), не отключаемся.
+                        if (string.Equals(owner, selfAssembly.FullName, StringComparison.Ordinal)) return false;
+                        LogError("[RussianLocalization] Мод уже активен в сборке " + owner +
+                                 " — эта копия отключается.");
+                        return true;
+                    }
+                    System.AppDomain.CurrentDomain.SetData(ActiveInstanceSlot, selfAssembly.FullName);
+                }
+                catch { }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Страховка третьего уровня, на самом патчинге. 0Harmony.dll грузится из Managed
+        /// один раз, поэтому его реестр патчей — общее состояние обеих копий мода: если
+        /// наш Harmony ID уже кем-то занят, патчит не первый экземпляр и вставать поверх
+        /// нельзя. Спасает, даже когда оба предыдущих уровня почему-то не сработали.
+        /// </summary>
+        private static bool AnotherInstallAlreadyPatched(string harmonyId, string what)
+        {
+            try
+            {
+                if (!Harmony.HasAnyPatches(harmonyId)) return false;
+                UnityEngine.Debug.LogWarning("[RussianLocalization] " + what + ": патчи под ID " + harmonyId +
+                    " уже установлены другой копией мода — пропускаем, чтобы не патчить дважды.");
+                return true;
+            }
+            catch { return false; }
+        }
+
+        /// <summary>Больше нуля — приоритетнее. Версия, затем Steam-источник, затем путь.</summary>
+        private static int ComparePriority(ModInfo a, ModInfo b)
+        {
+            // ModManifest.Version — это XRL.Version, и она СТРУКТУРА (проверено рефлексией
+            // по Assembly-CSharp: IsValueType = true). Отсюда два следствия:
+            //
+            // 1. Сравнивать её с null бессмысленно — значение есть всегда, по умолчанию 0.0.0.0.
+            //    «Версия неизвестна» выражается только через Manifest == null (сам манифест —
+            //    ссылочный тип).
+            // 2. Присваивать ей null НЕЛЬЗЯ ВООБЩЕ, даже просто "XRL.Version v = null;". Это
+            //    компилируется через implicit-оператор из System.Version, то есть в
+            //    op_Implicit(null) -> XRL.Version..ctor((System.Version)null), а тот кидает
+            //    NullReferenceException. Первая редакция этого метода падала так на КАЖДОМ
+            //    вызове; поймано офлайн-тестом ComparePriority на подставных ModInfo.
+            bool hasA = a != null && a.Manifest != null;
+            bool hasB = b != null && b.Manifest != null;
+            if (hasA != hasB) return hasA ? 1 : -1;
+            if (hasA)
+            {
+                int byVersion = a.Manifest.Version.CompareTo(b.Manifest.Version);
+                if (byVersion != 0) return byVersion;
+            }
+
+            // Одинаковая версия в обеих папках — самый вероятный случай (подписался,
+            // не удалив ручную установку). Workshop-копия каноничнее забытой ручной.
+            bool sa = a != null && a.Source == ModSource.Steam;
+            bool sb = b != null && b.Source == ModSource.Steam;
+            if (sa != sb) return sa ? 1 : -1;
+
+            string pa = a != null ? (a.Path ?? "") : "";
+            string pb = b != null ? (b.Path ?? "") : "";
+            return -string.Compare(pa, pb, StringComparison.Ordinal);
+        }
+
+        private static string DescribeCopy(ModInfo mod)
+        {
+            if (mod == null) return "неизвестная копия";
+            // Version — структура, сравнивать её с null нельзя (см. ComparePriority):
+            // признак «версия неизвестна» — это отсутствие самого манифеста.
+            string version = mod.Manifest != null
+                ? mod.Manifest.Version.ToString() : "версия неизвестна";
+            return (mod.Path ?? "путь неизвестен") + " (" + version + ", " + mod.Source + ")";
+        }
+
+        private static string BuildDuplicateInstallMessage(ModInfo winner, List<ModInfo> copies)
+        {
+            var sb = new StringBuilder();
+            sb.Append("{{R|Русификатор установлен дважды.}}\n\n");
+            sb.Append("{{G|Активна:}}   ").Append(DescribeCopy(winner)).Append('\n');
+            foreach (var mod in copies)
+            {
+                if (mod == null || ReferenceEquals(mod, winner)) continue;
+                sb.Append("{{K|Отключена:}} ").Append(DescribeCopy(mod)).Append('\n');
+            }
+            sb.Append("\nУдалите лишнюю папку и перезапустите игру.");
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Показывает окно о двойной установке — один раз за сессию. Зовётся из
+        /// [CallAfterGameLoaded] (см. DuplicateInstallNotice): из статического
+        /// конструктора Popup.Show звать нельзя, UI на той стадии ещё не живой —
+        /// именно там игра и висла при двойной установке.
+        /// </summary>
+        public static void ShowDuplicateInstallNoticeOnce()
+        {
+            if (_duplicateInstallMessageShown) return;
+            if (string.IsNullOrEmpty(_duplicateInstallMessage)) return;
+            _duplicateInstallMessageShown = true;
+            try { XRL.UI.Popup.Show(_duplicateInstallMessage); }
+            catch (Exception ex)
+            {
+                LogError("[RussianLocalization] Не удалось показать окно о двойной установке: " + ex.Message);
+            }
+        }
+
         public static void Initialize()
         {
             lock (FileLock)
@@ -525,11 +740,19 @@ namespace RussianLocalization
 
                 if (Initialized) return;
 
-                
+
 
                 try
 
                 {
+
+                    // Проверяем ДО загрузки словарей: у проигравшей копии это экономит
+                    // ~10 секунд и вторые 165807 фраз + 49044 формы в памяти.
+                    if (ShouldYieldToAnotherInstall())
+                    {
+                        IsEnabled = false;
+                        return;
+                    }
 
                     string modPath = GetModPath();
 
@@ -936,6 +1159,10 @@ namespace RussianLocalization
                     // Патч XRL.UI.Popup — popup-сообщения, меню выбора, запросы строки/числа.
                     // ~277 вызовов в коде (ShowYesNo=108, PickOption=84, AskString=23, AskNumber=13...).
                     if (!DIAG_DISABLE_POPUP_HOOK) { try { PatchPopup(); } catch (Exception exP) { LogError("[RussianLocalization] PatchPopup dispatch error: " + exP.ToString()); } }
+
+                    // Патч XRL.UI.BookUI.AutoformatPages — перевод текста книги ДО нарезки
+                    // на строки, иначе перенос считается по английской ширине (см. PatchBookUI).
+                    try { PatchBookUI(); } catch (Exception exB) { LogError("[RussianLocalization] PatchBookUI dispatch error: " + exB.ToString()); }
 
                     // Динамический патч ScreenBuffer для поддержки пропущенных методов рендеринга ретро-консоли
                     try { PatchScreenBufferDynamic(); } catch (Exception exSB) { LogError("[RussianLocalization] PatchScreenBufferDynamic dispatch error: " + exSB.ToString()); }
@@ -2043,6 +2270,32 @@ namespace RussianLocalization
         private const int MaxPatternDepth = 16;
         [ThreadStatic]
         private static int _patternDepth;
+
+        // 2026-08-03: лимит длины (введён вместе с фиксом краша v1.0.5) режет длинные
+        // рантайм-строки, чтобы не гонять 6 тысяч регулярок по книжным страницам.
+        // Но хроника памятника султану ("At twilight ... thenceforth called them X-in-Y")
+        // собирается движком и выходит на 360-500 символов — она упиралась в лимит и
+        // целиком уезжала в пословный перевод (лог 03.08, строка 3663: английский текст
+        // с русскими вставками). Поднимать лимит целиком нельзя — замер на образце из
+        // лога дал 211 мс на один прогон по всем паттернам. Поэтому исключение точечное:
+        // длинную строку пропускаем, только если в ней есть дешёвый литеральный маркер
+        // шаблона хроники. Проверка — IndexOf по подстроке, до регулярок дело не доходит.
+        // Результат кладётся в translationCache, так что цена платится один раз.
+        private const int PatternMaxLength = 350;
+        private static readonly string[] LongTextPatternMarkers =
+        {
+            "saw an image on the horizon",
+        };
+
+        private static bool IsLongTextWorthMatching(string text)
+        {
+            for (int i = 0; i < LongTextPatternMarkers.Length; i++)
+            {
+                if (text.IndexOf(LongTextPatternMarkers[i], StringComparison.Ordinal) >= 0) return true;
+            }
+            return false;
+        }
+
         public static string TryTranslatePattern(string text, out bool success)
 
         {
@@ -2051,7 +2304,7 @@ namespace RussianLocalization
 
             if (string.IsNullOrEmpty(text)) return text;
 
-            if (text.Length > 350) return text;
+            if (text.Length > PatternMaxLength && !IsLongTextWorthMatching(text)) return text;
 
             if (_patternDepth >= MaxPatternDepth) return text;
             _patternDepth++;
@@ -2080,23 +2333,57 @@ namespace RussianLocalization
             // его версия с \n, схлопнутыми в пробелы. Паттерны компилируются без Singleline, поэтому
             // "." не матчит \n: фразы, перенесённые по ширине окна (например, длинный текст интересов
             // фракций), иначе не находятся и уходят в пословный перевод. Нормализованный кандидат это чинит.
-            string[] candidates;
+            // 2026-07-31: добавлены КАНДИДАТЫ БЕЗ ЦВЕТОРАЗМЕТКИ. Внутриигровой лог сообщений
+            // использует классические коды "&X" ("&yYou put the &Bwater-stained leather cap&y…"),
+            // а почти все паттерны написаны либо под чистый текст, либо под XML "<color=…>".
+            // Из-за этого фразовые паттерны не матчились и строка уходила в пословный перевод —
+            // отсюда «Вы помещать the …», «бассейн солоноватый асфальт», «на запад» и т.п.
+            // Порядок кандидатов важен: сначала ИСХОДНЫЙ текст (цветоразметка сохраняется, если
+            // есть точный цветной паттерн), и только если ничего не совпало — очищенные версии.
+            // Компромисс осознанный: на очищенном кандидате теряются цвета внутри фразы, но
+            // взамен получаем верную грамматику вместо франкенштейна.
+            string bareColorPrefix = "";
+            var candidateList = new List<string>(4) { matchText };
             if (matchText.IndexOf('\n') >= 0)
             {
                 string collapsed = matchText.Replace("\r", " ").Replace("\n", " ");
                 while (collapsed.Contains("  ")) collapsed = collapsed.Replace("  ", " ");
                 collapsed = collapsed.Trim();
-                candidates = new[] { matchText, collapsed };
+                if (collapsed.Length > 0 && collapsed != matchText) candidateList.Add(collapsed);
             }
-            else
             {
-                candidates = new[] { matchText };
+                string bare = candidateList[candidateList.Count - 1];
+                if (bare.IndexOf('&') >= 0) bare = StripAmpColorCodes(bare);
+                if (bare.IndexOf('<') >= 0) bare = ColorTagRegex.Replace(bare, "");
+                if (bare.IndexOf("  ") >= 0)
+                {
+                    while (bare.Contains("  ")) bare = bare.Replace("  ", " ");
+                }
+                bare = bare.Trim();
+                if (bare.Length > 0 && !candidateList.Contains(bare))
+                {
+                    candidateList.Add(bare);
+                    // Ведущий цветокод строки задаёт её базовый цвет в логе. На «голом» кандидате
+                    // разметка теряется, поэтому ведущий токен возвращаем обратно в результат.
+                    if (matchText.Length > 1 && matchText[0] == '&' && char.IsLetter(matchText[1]))
+                        bareColorPrefix = matchText.Substring(0, 2);
+                    else
+                    {
+                        var lead = ColorTagRegex.Match(matchText);
+                        if (lead.Success && lead.Index == 0) bareColorPrefix = lead.Value;
+                    }
+                }
             }
+            string[] candidates = candidateList.ToArray();
+            // Индекс последнего кандидата — того самого «голого»; только для него нужен bareColorPrefix.
+            int bareIndex = bareColorPrefix.Length > 0 ? candidates.Length - 1 : -1;
 
             var placeholderRegex = new System.Text.RegularExpressions.Regex(@"\{(?<name>[a-zA-Z0-9_]+)(?::(?<case>[a-z]+))?\}");
 
-            foreach (string candidate in candidates)
+            for (int ci = 0; ci < candidates.Length; ci++)
             {
+                string candidate = candidates[ci];
+                string restoreColor = (ci == bareIndex) ? bareColorPrefix : "";
                 for (int i = 0; i < patternDictionary.Count; i++)
                 {
                     var rule = patternDictionary[i];
@@ -2212,7 +2499,7 @@ namespace RussianLocalization
                             m => char.IsUpper(m.Value[0]) ? "Со " : "со ");
 
                         success = true;
-                        return logPrefix + result;
+                        return logPrefix + restoreColor + result;
                     }
                 }
             }
@@ -3582,6 +3869,14 @@ namespace RussianLocalization
         private static readonly Dictionary<string, MorphCase> PrepositionCases = 
             new Dictionary<string, MorphCase>(StringComparer.OrdinalIgnoreCase)
         {
+            // 2026-07-31: "в"/"на" ОТСУТСТВОВАЛИ здесь, хотя ниже в InferCaseFromTemplate есть
+            // ветка `if (w == "в" || w == "на")`, уточняющая Acc/Prep по глаголу. Без ключа
+            // TryGetValue не срабатывал, ветка была недостижима, и падеж оставался Nom — отсюда
+            // «на запад» вместо «на западе» и «в луже асфальт» вместо «в луже асфальта» во всех
+            // паттернах сразу. Значение здесь — лишь заглушка: реальный падеж выбирает та ветка.
+            { "в", MorphCase.Prep },
+            { "на", MorphCase.Prep },
+            { "со", MorphCase.Gen },
             { "мимо", MorphCase.Gen },
             { "около", MorphCase.Gen },
             { "у", MorphCase.Gen },
@@ -3608,6 +3903,24 @@ namespace RussianLocalization
             { "о", MorphCase.Prep },
             { "об", MorphCase.Prep },
             { "обо", MorphCase.Prep }
+            // 2026-08-02, НАЙДЕННЫЙ, НО СОЗНАТЕЛЬНО НЕ ЗАКРЫТЫЙ ЗДЕСЬ БАГ.
+            // "в" и "на" в этой таблице отсутствуют — из-за этого ветка их разбора в
+            // InferCaseFromTemplate (см. проверку "кладёте"/"бросаете"/... → Acc, иначе Prep)
+            // НЕДОСТИЖИМА: TryGetValue не находит предлог, и вывод падежа сразу падает в Nom.
+            // Отсюда "Вы видите военачальника на юго-восток" вместо "на юго-востоке".
+            //
+            // Просто дописать сюда { "в", Prep } и { "на", Prep } НЕЛЬЗЯ: в шаблонах 248
+            // вхождений "на {x}"/"в {x}" без явного падежа, и заметная их часть требует
+            // винительного — "вы прибываете в {where}", "Вы отправляетесь в {place}",
+            // "Вы врезаетесь в {target}", "{target} садится на {seat}", "экипировать {item}
+            // на {slot}". Список-исключение в InferCaseFromTemplate покрывает лишь 6 форм
+            // ("садитесь" есть, а "садится" уже нет), поэтому включение предлогов заменит
+            // один класс ошибок на другой.
+            // Чтобы закрыть по-настоящему, нужно сперва расширить AccusativeVerbs до полного
+            // набора глаголов движения/помещения, встречающихся в шаблонах, и прогнать
+            // дифференциальный тест по всем 248 вхождениям.
+            // Пока направления исправлены точечно — явными аннотациями {dir:prep}/{dir:gen}
+            // в pattern_dictionary.json (68 шаблонов), явный падеж имеет приоритет над выводом.
         };
 
         // Переходные глаголы, управляющие винительным падежом прямого объекта.
@@ -3635,6 +3948,25 @@ namespace RussianLocalization
             "моим", "моими", "нашим", "нашими"
         };
 
+        // Глаголы движения/помещения: после них "в"/"на" требуют винительного падежа
+        // («отправляетесь в Джоппу», «кладёте меч в сундук»), а не предложного.
+        // Подстроки, а не целые слова: в шаблонах встречаются и «вы прибываете», и «он прибывает».
+        private static readonly string[] MotionVerbs = new[]
+        {
+            "входим", "входите", "войти", "кладёте", "кладете", "положить",
+            "бросаете", "бросает", "наступаете", "наступает", "направляется", "направляетесь",
+            "садитесь", "садится", "прибываете", "прибывает", "прибыл", "отправляетесь", "отправляется",
+            "экипиров", "надева", "надеть", "вешаете", "вешает",
+            "отправляйтесь", "врезаетесь", "врезается", "возвращаетесь", "возвращается",
+            "переходите", "переходит", "спускаетесь", "спускается", "поднимаетесь", "поднимается",
+            "уходите", "уходит", "убираете", "убирает", "помещаете", "помещает", "суёте", "суете",
+            // Глаголы движения из подсказок-инструкций («Снова двигайтесь на юг, чтобы войти»).
+            // Без них ветка "в"/"на" отдавала предложный падеж: «двигайтесь на юге».
+            "двигайтесь", "двигайся", "двигаетесь", "двигается", "идите", "иди", "идёте", "идете",
+            "шагайте", "шагаете", "бегите", "бежите", "плывите", "плывёте", "плывете",
+            "переместитесь", "перемещаетесь", "перемещается", "нажмите"
+        };
+
         private static MorphCase InferCaseFromTemplate(string template, string placeholderName)
         {
             if (string.IsNullOrEmpty(template) || string.IsNullOrEmpty(placeholderName))
@@ -3659,12 +3991,12 @@ namespace RussianLocalization
                 {
                     if (w == "в" || w == "на")
                     {
+                        // "в"/"на" двухпадежные: направление -> Acc («идёте в Джоппу»),
+                        // место -> Prep («видите крокодила на западе»). Решает глагол слева.
                         string lowerContext = leftContext.ToLowerInvariant();
-                        if (lowerContext.Contains("входим") || lowerContext.Contains("кладёте") ||
-                            lowerContext.Contains("бросаете") || lowerContext.Contains("наступаете") ||
-                            lowerContext.Contains("направляется") || lowerContext.Contains("садитесь"))
+                        foreach (string mv in MotionVerbs)
                         {
-                            return MorphCase.Acc;
+                            if (lowerContext.Contains(mv)) return MorphCase.Acc;
                         }
                         return MorphCase.Prep;
                     }
@@ -4092,6 +4424,12 @@ namespace RussianLocalization
 
         // 2026-07-06 (v25): вырезает цветокоды классического UI Qud "&X" (& + буква) из строки.
         // Escaped "&&" (литеральный амперсанд) и "& " (амперсанд-пробел) НЕ трогаем.
+        // XML-цветоразметка Qud: "<color=#RRGGBBAA>" / "</color>". Используется для построения
+        // кандидата без разметки при матчинге паттернов (см. TryTranslatePatternBody).
+        private static readonly System.Text.RegularExpressions.Regex ColorTagRegex =
+            new System.Text.RegularExpressions.Regex(@"</?color(?:=[^>]*)?>",
+                System.Text.RegularExpressions.RegexOptions.Compiled);
+
         private static string StripAmpColorCodes(string s)
         {
             if (string.IsNullOrEmpty(s) || s.IndexOf('&') < 0) return s;
@@ -5123,6 +5461,8 @@ namespace RussianLocalization
 
 
 
+                if (AnotherInstallAlreadyPatched("com.russianlocalization.uielements", "PatchUIElements")) return;
+                
                 var harmony = new Harmony("com.russianlocalization.uielements");
 
 
@@ -5558,6 +5898,8 @@ namespace RussianLocalization
                 _utsTextField = t.GetField("text",
                     System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
+                if (AnotherInstallAlreadyPatched("com.russianlocalization.uitextskin", "PatchUITextSkin")) return;
+                
                 var harmony = new Harmony("com.russianlocalization.uitextskin");
                 int patched = 0;
 
@@ -5641,6 +5983,8 @@ namespace RussianLocalization
                     return;
                 }
 
+                if (AnotherInstallAlreadyPatched("com.russianlocalization.popup", "PatchPopup")) return;
+                
                 var harmony = new Harmony("com.russianlocalization.popup");
                 int patched = 0;
 
@@ -5743,11 +6087,173 @@ namespace RussianLocalization
             }
         }
 
+        // ============================================================
+        // ПАТЧ XRL.UI.BookUI.AutoformatPages — перенос строк в книгах
+        // ============================================================
+        // 2026-08-02: игроки жалуются, что в сгенерированных книгах длинный текст
+        // «не переносится» — строки вылезают за поля страницы и рвутся посреди слова.
+        //
+        // Причина. Книги с Format="Auto" (25 штук в Books.xml) и процедурно
+        // сгенерированные книги приходят в AutoformatPages одним куском НЕнарезанного
+        // текста: абзацы разделены \n, внутри абзаца переносов нет. AutoformatPages
+        // сама режет его на строки по ширине страницы (NextLine/NextWordLength) и
+        // складывает готовые BookPage — каждая с уже жёстко проставленными переносами.
+        //
+        // Мод до сих пор видел книгу только ПОСЛЕ нарезки: в классическом UI через
+        // ScreenBuffer.Write построчно, в Modern UI через BookPage.RenderForModernUI →
+        // UITextSkin. То есть переводилась каждая готовая строка по отдельности, а
+        // русская строка длиннее английской на 15-30% — при этом перенос, посчитанный
+        // по английской ширине, оставался на прежнем месте. Отсюда и вылезающий текст.
+        //
+        // Правильная точка — ДО нарезки. Переводим Title и Text в префиксе, и игра
+        // сама переносит уже русский текст по фактической ширине страницы.
+        public static void PatchBookUI()
+        {
+            try
+            {
+                System.Type t = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { t = asm.GetType("XRL.UI.BookUI"); } catch { }
+                    if (t != null) break;
+                }
+                if (t == null)
+                {
+                    UnityEngine.Debug.Log("[RussianLocalization] XRL.UI.BookUI not found — book word-wrap hook skipped.");
+                    return;
+                }
+
+                if (AnotherInstallAlreadyPatched("com.russianlocalization.bookui", "PatchBookUI")) return;
+                
+                var harmony = new Harmony("com.russianlocalization.bookui");
+                var pre = typeof(TranslationEngine).GetMethod("BookUI_AutoformatPages_Prefix",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                int patched = 0;
+
+                if (pre != null)
+                {
+                    // Две перегрузки: (Title, Text, Format, Margins) и
+                    // (Title, Text, Format, Left, Right, Top, Bottom). Имена первых двух
+                    // параметров в обеих одинаковы — Harmony связывает префикс по имени.
+                    foreach (var m in t.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
+                                                   System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
+                    {
+                        if (m == null || m.IsGenericMethodDefinition) continue;
+                        if (m.Name != "AutoformatPages") continue;
+
+                        var ps = m.GetParameters();
+                        if (ps.Length < 2) continue;
+                        if (ps[0].ParameterType != typeof(string) || ps[1].ParameterType != typeof(string)) continue;
+                        if (ps[0].Name != "Title" || ps[1].Name != "Text") continue;
+
+                        try
+                        {
+                            harmony.Patch(m, prefix: new HarmonyMethod(pre));
+                            patched++;
+                        }
+                        catch (Exception exPatch)
+                        {
+                            UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch BookUI.AutoformatPages: " + exPatch.Message);
+                        }
+                    }
+                }
+
+                UnityEngine.Debug.Log("[RussianLocalization] Patched XRL.UI.BookUI (book word-wrap fix), methods patched = " + patched + ".");
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError("[RussianLocalization] PatchBookUI error: " + ex.ToString());
+            }
+        }
+
+        // Потолок для пофразового фолбэка в книге. Статичные книги берутся одним ключом
+        // (см. ниже) и сюда не попадают; фолбэк нужен только процедурно сгенерированным,
+        // а они заметно короче. Ограничение страхует от полного пословного прохода по
+        // очень длинному тексту прямо в кадре открытия книги.
+        private const int BookParagraphFallbackLimit = 20000;
+
+        public static void BookUI_AutoformatPages_Prefix(ref string Title, ref string Text)
+        {
+            try
+            {
+                if (!Initialized || !IsEnabled) return;
+
+                if (!string.IsNullOrEmpty(Title))
+                {
+                    string translatedTitle = Translate(Title);
+                    if (!string.IsNullOrEmpty(translatedTitle)) Title = translatedTitle;
+                }
+
+                if (string.IsNullOrEmpty(Text)) return;
+
+                bool hasCyr, hasEng;
+                ScanAlpha(Text, out hasCyr, out hasEng);
+                if (hasCyr && !hasEng) return;
+
+                // 1. Целая страница одним ключом. Статичные книги Books.xml лежат в словаре
+                //    именно так — целиком, вместе с \n между абзацами. Для текста длиннее
+                //    OversizeThreshold это ровно тот путь, который Translate() и так проверяет
+                //    первым (точное совпадение), то есть стоит один поиск в хеше.
+                string whole = Translate(Text);
+                if (!string.IsNullOrEmpty(whole) && whole != Text)
+                {
+                    Text = whole;
+                    return;
+                }
+
+                // 2. Процедурно сгенерированная книга: целого ключа нет и быть не может —
+                //    текст собирается на лету. Переводим по абзацам. Все \n здесь авторские
+                //    (нарезки по ширине ещё не было), поэтому границы абзацев сохраняем
+                //    как есть — игра расставит переносы сама.
+                if (Text.Length > BookParagraphFallbackLimit) return;
+
+                string[] parts = Text.Split('\n');
+                var sb = new StringBuilder(Text.Length + Text.Length / 3);
+                bool changed = false;
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    if (i > 0) sb.Append('\n');
+
+                    string part = parts[i];
+                    // На CRLF-тексте split('\n') оставляет '\r' в хвосте: он не должен
+                    // попасть в ключ словаря, но обязан вернуться в результат.
+                    bool hadCr = part.Length > 0 && part[part.Length - 1] == '\r';
+                    if (hadCr) part = part.Substring(0, part.Length - 1);
+
+                    if (part.Trim().Length == 0)
+                    {
+                        sb.Append(part);
+                        if (hadCr) sb.Append('\r');
+                        continue;
+                    }
+
+                    string translatedPart = Translate(part);
+                    if (!string.IsNullOrEmpty(translatedPart) && translatedPart != part)
+                    {
+                        changed = true;
+                        sb.Append(translatedPart);
+                    }
+                    else
+                    {
+                        sb.Append(part);
+                    }
+                    if (hadCr) sb.Append('\r');
+                }
+                if (changed) Text = sb.ToString();
+            }
+            catch
+            {
+                // Книга должна открыться в любом случае — даже непереведённой.
+            }
+        }
+
         public static void PatchScreenBufferDynamic()
         {
             try
             {
                 System.Type t = typeof(ConsoleLib.Console.ScreenBuffer);
+                if (AnotherInstallAlreadyPatched("com.russianlocalization.screenbuffer.dynamic", "PatchScreenBufferDynamic")) return;
+                
                 var harmony = new Harmony("com.russianlocalization.screenbuffer.dynamic");
                 int patched = 0;
 
@@ -6156,6 +6662,8 @@ namespace RussianLocalization
                     return;
                 }
 
+                if (AnotherInstallAlreadyPatched("com.russianlocalization.gametext", "PatchGameText")) return;
+                
                 var harmony = new Harmony("com.russianlocalization.gametext");
                 int patched = 0;
 
@@ -9439,6 +9947,26 @@ namespace RussianLocalization
 
                 __result = TranslationEngine.Translate(__result);
             }
+        }
+    }
+
+    // Показ окна о двойной установке. Окно показывает копия-ПОБЕДИТЕЛЬ: у проигравшей
+    // нет ни одного хука (она вышла из Initialize до патчинга), а победитель полностью
+    // инициализирован и уже знает о дубликатах — он их перечислял.
+    //
+    // Момент показа: [CallAfterGameLoaded], то есть при входе в игру, а не в главном
+    // меню. Готового хука «UI ожил на главном меню» у Qud нет, а самодельный на
+    // MonoBehaviour.Update со счётчиком кадров — ровно тот класс кода, который в этом
+    // моде уже дважды приводил к крашам на загрузке (см. историю RuntimeTranslator).
+    // После фикса игра запускается нормально, так что до загрузки персонажа игрок дойдёт.
+    [HasCallAfterGameLoaded]
+    public static class DuplicateInstallNotice
+    {
+        [CallAfterGameLoaded]
+        public static void OnGameLoaded()
+        {
+            try { TranslationEngine.ShowDuplicateInstallNoticeOnce(); }
+            catch { /* уведомление не должно ломать загрузку игры */ }
         }
     }
 
