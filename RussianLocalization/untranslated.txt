@@ -1348,3 +1348,1842 @@ iron mace x2 {{c|}}5 {{r|}}2
 staff {{c|}}5 {{r|}}1d2
 short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
 short bow x2 {{c|}}4 {{y|[{{K|empty}}]}}
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+{{W|Space}}-select | unlock (F1) | Fire Missile Weapon
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+wooden arrow x55 {{c|}}4 {{r|}}1d2 (4/1d4)
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+These are nine things you should do when you start your game.
+After that, use the rest of this Help as a reference manual.
+
+{{W|1. Walk around}}
+
+{{?KB|Move by pressing directional keys (Num 8, Num 6, etc) or by clicking on the map.}}{{?Gamepad|Indicate direction with Navigate [Unbound] and press Take a step after indicating direction [Unbound] to move or hold Take a step after indicating direction [Unbound] to move continuously.}}{{?Gamepad|
+You can also auto-explore the map with Num 0.}}
+
+{{W|2. Interact with things}}
+
+Walk next to an NPC or other object and press Space.
+
+{{W|3. Look at things}}
+
+{{?KB|Press }}Д to enter Look mode and then move the cursor around the map.{{?KB|
+Or right-click to quick look.}}
+
+{{W|4. Use your abilities}}
+
+{{?KB|Click on a button on the ability bar at the bottom of your screen
+or press its hotkey.}}{{?Gamepad|Navigate the hotbar at the bottom of your screen with  and 
+and then press Use selected ability [Unbound] to use an ability.}}
+
+{{W|5. View your character sheet}}
+
+{{?KB|Press Tab to view your core character info.
+Press У to view your equipment.
+Press Ш to view your inventory.
+Press О to view your journal.
+Press Й to view your quests.
+Press Л to view your skills.
+Press +А to view your faction relationships.
+
+You can scroll through these pages with Num 7 and Num 9.}}{{?Gamepad|Press Tab to view your core character info.
+Navigate to other pages in your character sheet with Num 7 and Num 9.}}
+
+{{W|6. Bring up a list of points of interest}}
+
+Press Backspace.
+
+{{W|7. Bring up additional information about objects on the map}}
+
+Press {{W|Alt}} for an overlay with extra info like creature hostility 
+(red = hostile, yellow = neutral, green = friendly) and a clear view of 
+interesting items.
+
+{{W|8. Walk to another map}}
+
+Simply walk offscreen, or go to the world map with -.
+
+{{W|9. Attack an enemy}}
+
+To perform a basic attack, just walk into a hostile creature.
+Or you can use an attack ability.
+may access your new activated ability from the Manage Abilities menu ('Ф').
+(for example, {{C|}}4, {{R|}}1d4). The penetration value of melee weapons is related
+something else, such as a non-hostile opponent or a wall, use '\'
+and select the direction in which you wish to attack.
+Each weapon has a penetration value ({{C|}}4, for example). This value
+weapon's damage value ({{R|}}1d4, for example). A filled circle icon over your
+as bows, pistols, and rifles. To make a missile attack, press 'А' to aim
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+wooden arrow x55 {{c|}}4 {{r|}}1d2 (4/1d4)
+furs x2 {{b|}}2 {{K|	}}-1
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}5 {{r|}}1d6
+{{w|bronze}} two-handed sword {{c|}}6 {{r|}}1d6
+{{Y|steel}} hand axe {{c|}}5 {{r|}}1d3+1
+club {{c|}}5 {{r|}}1d2
+iron battle axe {{c|}}5 {{r|}}1d2+1
+iron long sword {{c|}}5 {{r|}}1d4
+iron mace x2 {{c|}}5 {{r|}}2
+staff {{c|}}5 {{r|}}1d2
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+short bow x2 {{c|}}4 {{y|[{{K|empty}}]}}
+Stinger damage: 1d6
+Venom confuses opponents for 2d3+2 round.
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+pass:temple,n=3,width=78,height=23
+page 1 of 1
+wooden arrow x58 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}6 {{r|}}1d6
+iron battle axe {{c|}}6 {{r|}}1d2+1
+iron long sword {{c|}}6 {{r|}}1d4
+iron mace x2 {{c|}}6 {{r|}}2
+two-handed iron long sword x2 {{c|}}7 {{r|}}1d8
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+{{m-M sequence|beaded}} bracelet x2 {{b|}}0 {{K|	}}0
+Boar leather vamps are scuffed with little fissures sparking in wind-rasped quartz.
+
+{{cyan|Engraved: This item is engraved with a scene from the life of the ancient sultan {{magenta|Badukht I}}:
+
+In 6912 BR, a corrupt administrator was appointed minister of the circuitboard-worshipping Province of Qanna. He outlawed the practice of taking measurements, and Badukht was forced to flee.}}
+
+{{rules|+50 reputation with the Badukhtian Kith}}
+
+{{K|Weight: 1 lbs.}}
+In 6912 BR, a corrupt administrator was appointed minister
+of the circuitboard-worshipping Province of Qanna. He
+outlawed the practice of taking measurements, and Badukht
+was forced to flee.
+Stinger damage: 1d6
+Venom confuses opponents for 2d3+2 round.
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+{{W|[F]}} fire
+{{W|[R]}} reload
+page 1 of 1
+wooden arrow x58 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}6 {{r|}}1d6
+iron battle axe {{c|}}6 {{r|}}1d2+1
+iron long sword {{c|}}6 {{r|}}1d4
+iron mace x2 {{c|}}6 {{r|}}2
+two-handed iron long sword x2 {{c|}}7 {{r|}}1d8
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+{{m-M sequence|beaded}} bracelet x2 {{b|}}0 {{K|	}}0
+20% chance on melee attack to sting your opponent ({{c|}}{{rules|8}} {{r|}}{{rules|1d6}})
+{{B|quest:}} Visit the Qanna Circuitboardquad
+While journeying across the wavegraph hills, Yimula discovered the rust wells. There they befriended water barons and sipped from the red iron spring.
+small stone x3 {{c|}}4 {{r|}}1d2
+{{r|{{r|blood}}-stained small stone}} {{c|}}4 {{r|}}1d2
+Perfect&y
+You strike the cannibal with your stinger!
+club {{c|}}5 {{r|}}1d2
+{{b|carbide}} arrow x2 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+{{c|stun}} rod {{c|}}6 {{r|}}1d2 {{y|[odd trinket]}} [{{r|rusted}}]
+iron long sword x2 {{c|}}6 {{r|}}1d4
+{{fiery|flaming}} club {{c|}}5 {{r|}}1d2
+You beat at the flames on the &Rflaming&y club with your hands!
+You strike the cave spider with your stinger!
+sfx_artifact_examination_success_total
+You strike the
+deep pool of {{rules|15836}} drams of {{r|bloody}} {{w|brackish}} {{B|water}}
+deep pool of {{rules|7827}} drams of {{Y|salty}} {{B|water}}
+staff {{c|}}5 {{r|}}1d2
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+wooden arrow x62 {{c|}}4 {{r|}}1d2 (4/1d4)
+iron mace x3 {{c|}}6 {{r|}}2
+You resist the
+leech's
+wooden arrow x63 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{B|{{B|wet}} {{starry|light-obfuscating}} lens}} {{b|}}0 {{K|	}}1
+deep pool of {{rules|7938}} drams of {{Y|salty}} {{B|water}}
+pestle {{c|}}5 {{r|}}1d2-1
+You receive a Joppa recoiler!
+:: You receive a Joppa recoiler!
+Argyve ignores you.
+wooden arrow x66 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{starry|light-obfuscating}} lens {{b|}}0 {{K|	}}1
+{{r|{{r|blood}}-stained club}} {{c|}}5 {{r|}}1d2
+{{r|{{r|blood}}-stained iron mace}} x3 {{c|}}6 {{r|}}2
+{{b|carbide}} arrow x6 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x38 {{c|}}4 {{r|}}1d2
+shotgun shell x29 {{c|}}4 {{r|}}1d2
+{{Y|steel}} arrow x13 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+wooden arrow x77 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{w|bronze}} dagger x4 {{c|}}5 {{r|}}1d2
+{{w|bronze}} long sword x2 {{c|}}5 {{r|}}1d3
+{{w|bronze}} two-handed sword x2 {{c|}}6 {{r|}}1d6
+{{b|carbide}} hammer {{c|}}6 {{r|}}2d3
+{{B|folded carbide}} long sword {{c|}}6 {{r|}}1d10
+hand axe x2 {{c|}}5 {{r|}}1d2
+{{w|leather}} whip x2 {{c|}}6 {{r|}}1d4
+staff x2 {{c|}}5 {{r|}}1d2
+{{Y|steel}} hand axe {{c|}}6 {{r|}}1d3+1
+short bow x2 {{c|}}4 {{y|[{{K|empty}}]}}
+two-handed iron long sword {{c|}}7 {{r|}}1d8
+{{w|leather}} whip {{c|}}6 {{r|}}1d4
+club x2 {{c|}}5 {{r|}}1d2
+hand axe x3 {{c|}}5 {{r|}}1d2
+iron battle axe x2 {{c|}}6 {{r|}}1d2+1
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+W|A}}]
+W|B}}]
+W|C}}]
+W|D}}]
+W|E}}]
+W|F}}]
+W|G}}]
+W|H}}]
+W|I}}]
+W|J}}]
+W|K}}]
+W|L}}]
+ù&y Charge-based melee fighter
+ù&y Ability to freeze enemies
+ù&y Highly maneuverable
+ù&y {{W|Most survivable}} starting build
+ù&y Melee fighter
+ù&y Highly-armored
+ù&y Emits sleep gas to disable enemies
+ù&y {{W|Highly survivable}} starting build
+ù&y Primarily ranged fighter
+ù&y Quick and maneuverable
+ù&y Flies
+ù&y Mental-based ranged fighter
+ù&y Effective crowd control and map vision
+ù&y {{W|Medium survivable}} starting build
+ù&y Hybrid melee fighter and mental caster
+ù&y Ability to set enemies on fire
+ù&y Causes harvestable plants to grow nearby
+ù&y {{W|Challenging}} starting build
+^g°
+^y±
+She kneads остатки джема и пасты о her халат. Срезанные стебли мерзопшеницы невольно украшают her седые локоны. She smells как еда из детства.
+gaw
+its брюшным баллоном, раздутым до невзрачных размеров из-за съеденного мусора it has.
+worldly длинная рука of Namrod Crescent
+of Apad Square
+clear дубинка of Urakish
+wandering стрела of Purple Circle Apad
+voltaic винтовка of Alaruk
+of Apad Polyform
+logical винтовка of Kinemur
+stained сторожить of Blue Salinon Namrod
+of Namrod Digon
+jeweled эгида of Duazoppir
+prismatic крышка of White Akh
+of The Black Mirqakesh
+of Blue Deltoid Habamrod
+clear полоса of White Habamrod
+stained щит of Cyan Icosagon Namrod
+gleaming щит of Apad Square
+of Ivory Apad
+glacial эгида of Ekabymish
+glazed эгида of Amber Sherqutara
+radiant пистолет of Kigawan
+prismatic клеймо of White Henagon Habamrod
+white-hot дубинка of Ebony Apeirogon Apad
+potent глефа of Green Napad
+of Red Cardioid Habamrod
+mighty топорик of Silver Habamrod
+Ey squats в мягком ореоле прохладного света, который исходит прямо от пластин панцирной брони eir и меха между ними. Каждое движение сопровождается шипящей музыкой, когда эти пластины скользят друг по другу, шепча бессловесную молитву.
+she has еще молод, он собрал сообразительность, превосходящую детеныша, а теперь еще и gathers оружие для лучшей охоты. Разломав кусок коралла по линиям сдвига и пережевав его, she shapes превратил обломки в хрупкую, но смертельную кромку.
+prismatic сабо of Ebony Polyform Namrod
+glacial эгида of Purple Habamrod
+mighty грудь of Habamrod Square
+of Purple Spiral Habamrod
+of Sabatum
+commanding очко. of Ikesh
+stained сторожить of Habamrod Salinon
+wintry посох of The Amber Shapad
+dominant дубинка of Silver Harvalep
+prismatic топорик of Qakesh
+colossal заточка of Urqur
+foreign хе-хе of Cyan Apad
+of Black Rhomboid Apad
+arbitrary связь of Habamrod Rhomboid
+of Black Namrod
+wired хе-хе of Black Mirakesh
+of Turuk Quadrilateral
+radiant пистолет of Cyan Habamrod
+of Namrod Quadragon
+voltaic связь of Tevuh
+mighty очко. of Arqumrod
+colossal почта of Ekamrimrod
+stained дубинка of Amber Star Habamrod
+voltaic ружьё of White Ellipse Habamrod
+wired оборка of Cyan Oval Namrod
+coiled связь of Amber Star Habamrod
+baking: $markovTitle
+sweetened-meat broth
+rescued vittle
+hummus with bananas
+fermented-sponge hummus
+shining глефа of The Red Apad
+freezing колпачок of Namrod Rhomb
+whimsical *cult*
+*cult*, the Here and There
+Lost *cult*
+cult of *CultSymbol*
+nihility of *DimensionSymbol*
+vast quadragon
+spotless heart
+realm of *DimensionSymbol*
+Mehd
+Mehd прибыли в солончак на глубину 1 слоя и начали свою невероятную одиссею через Куд.
+At noon under a weird and коралл sky, the people of salt marsh, 1 stratum deep saw an image on the horizon that looked like a топор bathed in коралл. It was Mehd, and after they came and left, the people of salt marsh, 1 stratum deep built a monument to Mehd and thenceforth called them Топор-in-Коралл.
+ABA
+ABAN
+ABAND
+ABANDO
+{{W|[F]}} fire
+{{W|[R]}} reload
+wooden arrow x66 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{starry|light-obfuscating}} lens {{b|}}0 {{K|	}}1
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}6 {{r|}}1d6
+two-handed iron long sword x2 {{c|}}7 {{r|}}1d8
+{{m-M sequence|beaded}} bracelet x2 {{b|}}0 {{K|	}}0
+torch (half-burnt)
+d2 раунда..
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Arnold Schwarzenegger's Skills
+(build xxx.xxx.xxx.xxx)
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+wooden arrow x66 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{starry|light-obfuscating}} lens {{b|}}0 {{K|	}}1
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}6 {{r|}}1d6
+two-handed iron long sword x2 {{c|}}7 {{r|}}1d8
+{{m-M sequence|beaded}} bracelet x2 {{b|}}0 {{K|	}}0
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+(build xxx.xxx.xxx.xxx)
+Look [{{C|1}}/{{C|3}}] | {{W|Esc}} | {{hotkey|(F1)}} {{W|l}}ock | {{hotkey|+/-}} change selection | {{hotkey|Space}} interact | {{hotkey|Ц}} walk
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+(build xxx.xxx.xxx.xxx)
+20% chance on melee attack to sting your opponent ({{c|}}{{rules|8}} {{r|}}{{rules|1d6}})
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+wooden arrow x66 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{starry|light-obfuscating}} lens {{b|}}0 {{K|	}}1
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}6 {{r|}}1d6
+two-handed iron long sword x2 {{c|}}7 {{r|}}1d8
+{{m-M sequence|beaded}} bracelet x2 {{b|}}0 {{K|	}}0
+blood-stained p
+sfx_artifact_examination_success_total
+two-handed iron long sword {{c|}}7 {{r|}}1d8
+You put the frowning
+:: You put the goggles in the chest to the west.
+:: You put the leather cap in the chest to the west.
+You put the
+You put the slender
+:: You put the vinewood sap mask in the chest to the west.
+:: You put the ashes in the chest to the west.
+:: You put the two-handed iron long sword x2 in the chest to the west.
+You toggle &cHarvest Plants&y off.
+You toggle &cHarvest Plants&y on.
+You put the frowning &bл&Bу&Cн&cа&y mask in the chest to the west.
+You put the goggles in the chest to the west.
+You put the leather cap in the chest to the west.
+You put the &Kл&Yи&Kгh&Yt&K-o&Yb&Kfu&Ys&Kca&Yt&Kin&Yg&y lens in the chest to the west.
+You put the slender &YIssach&ra&Yri&y &rс&rо&Rл&Rн&Wц&Wе&y veil in the chest to the west.
+You put the &Wс&Wо&Rл&Rн&Wц&Wе&y and &bл&Bу&Cн&cа&y mask in the chest to the west.
+You put the vinewood sap mask in the chest to the west.
+You put the &Yг&Yр&yа&yв&cи&Cр&Cо&Yв&Yа&yн&cн&cы&Cй&y leather moccasins in the chest to the west.
+You put the &Wwitchwood&y wreath in the chest to the west.
+You put the ashes in the chest to the west.
+You put the two-handed iron long sword x2 in the chest to the west.
+You put the &Welectrified&y club in the chest to the west.
+You put the &Cfreezing&y hand axe in the chest to the west.
+Conversation:{{W|{{M|Gruohowof-Uho, Snapjaw Scavenger Pariah}}}}
+You share your {{B|water}} with Gruohowof-Uho, Snapjaw Scavenger Pariah and begin the water ritual.
+In sacred ritual =name= shared their holy water with noted luminary {{M|Gruohowof-Uho, Snapjaw Scavenger Pariah}}.
+Yimula поделился святой водой с выдающимся светилом. {{M|Gruohowof-Uho, Щелкун-падальщик Пария}}.
+Choose a random name from {{M|Gruohowof-Uho, Snapjaw Scavenger Pariah's}} culture.
+Rufbawlafo-Ufaf (no coloring)
+^kRufbawlafo-Ufaf^k&y (black)
+^kRufbawlafo-Ufaf^k&y (dark blue)
+^kRufbawlafo-Ufaf^k&y (blue)
+^kRufbawlafo-Ufaf^k&y (cyan)
+^kRufbawlafo-Ufaf^k&y (dark cyan)
+^kRufbawlafo-Ufaf^k&y (dark green)
+^kRufbawlafo-Ufaf^k&y (green)
+^kRufbawlafo-Ufaf^k&y (dark red)
+^kRufbawlafo-Ufaf^k&y (red)
+^kRufbawlafo-Ufaf^k&y (dark magenta)
+^kRufbawlafo-Ufaf^k&y (magenta)
+^kRufbawlafo-Ufaf^k&y (gold)
+^kRufbawlafo-Ufaf^k&y (brown)
+^kRufbawlafo-Ufaf^k&y (white)
+^kRufbawlafo-Ufaf^k&y (gray)
+{{agolgot|Rufbawlafo-Ufaf}} (agolgot)
+{{amorous|Rufbawlafo-Ufaf}} (amorous)
+{{arctic camouflage|Rufbawlafo-Ufaf}} (arctic camouflage)
+{{astral|Rufbawlafo-Ufaf}} (astral)
+{{auroral|Rufbawlafo-Ufaf}} (auroral)
+{{bee|Rufbawlafo-Ufaf}} (bee)
+{{bethsaida|Rufbawlafo-Ufaf}} (bethsaida)
+{{bio|Rufbawlafo-Ufaf}} (bio)
+{{blaze|Rufbawlafo-Ufaf}} (blaze)
+{{brainbrine|Rufbawlafo-Ufaf}} (brain brine)
+{{camouflage|Rufbawlafo-Ufaf}} (camouflage)
+{{chaotic|Rufbawlafo-Ufaf}} (chaotic)
+{{cloning|Rufbawlafo-Ufaf}} (cloning)
+{{cloudy|Rufbawlafo-Ufaf}} (cloudy)
+{{crochide|Rufbawlafo-Ufaf}} (crochide)
+{{cryogenic|Rufbawlafo-Ufaf}} (cryogenic)
+{{crystalline|Rufbawlafo-Ufaf}} (crystalline)
+{{crysteel|Rufbawlafo-Ufaf}} (crysteel)
+{{dark fiery|Rufbawlafo-Ufaf}} (dark fiery)
+{{defoliant|Rufbawlafo-Ufaf}} (defoliant)
+{{desert camouflage|Rufbawlafo-Ufaf}} (desert camouflage)
+{{displacer|Rufbawlafo-Ufaf}} (displacer)
+{{dreamsmoke|Rufbawlafo-Ufaf}} (dreamsmoke)
+{{eater|Rufbawlafo-Ufaf}} (Eater)
+{{electrical|Rufbawlafo-Ufaf}} (electrical)
+{{engraved|Rufbawlafo-Ufaf}} (engraved)
+{{entropic|Rufbawlafo-Ufaf}} (entropic)
+{{feathered|Rufbawlafo-Ufaf}} (feathered)
+{{fiery|Rufbawlafo-Ufaf}} (fiery)
+{{filthy|Rufbawlafo-Ufaf}} (filthy)
+{{forest|Rufbawlafo-Ufaf}} (forest)
+{{freezing|Rufbawlafo-Ufaf}} (freezing)
+{{fungicide|Rufbawlafo-Ufaf}} (fungicide)
+{{gaslight|Rufbawlafo-Ufaf}} (gaslight)
+{{ghostly|Rufbawlafo-Ufaf}} (ghostly)
+{{glittering|Rufbawlafo-Ufaf}} (glittering)
+{{glotrot|Rufbawlafo-Ufaf}} (glotrot)
+{{graffitied|Rufbawlafo-Ufaf}} (graffitied)
+{{hologram|Rufbawlafo-Ufaf}} (hologram)
+{{horned|Rufbawlafo-Ufaf}} (horned)
+{{hypertractor|Rufbawlafo-Ufaf}} (hypertractor)
+{{hypervelocity|Rufbawlafo-Ufaf}} (hypervelocity)
+{{icy|Rufbawlafo-Ufaf}} (icy)
+{{illuminated|Rufbawlafo-Ufaf}} (illuminated)
+{{implanted|Rufbawlafo-Ufaf}} (implanted)
+{{ironshank|Rufbawlafo-Ufaf}} (ironshank)
+{{issachari|Rufbawlafo-Ufaf}} (Issachari)
+{{jungle|Rufbawlafo-Ufaf}} (jungle)
+{{kaleidoslug|Rufbawlafo-Ufaf}} (kaleidoslug)
+{{lacquered|Rufbawlafo-Ufaf}} (lacquered)
+{{lah|Rufbawlafo-Ufaf}} (lah)
+{{lanterned|Rufbawlafo-Ufaf}} (lanterned)
+{{leafy|Rufbawlafo-Ufaf}} (leafy)
+{{leopard|Rufbawlafo-Ufaf}} (leopard)
+{{love|Rufbawlafo-Ufaf}} (love)
+{{lovesickness|Rufbawlafo-Ufaf}} (lovesickness)
+{{mercurial|Rufbawlafo-Ufaf}} (mercurial)
+{{metamorphic|Rufbawlafo-Ufaf}} (metamorphic)
+{{mirrorshades|Rufbawlafo-Ufaf}} (mirrorshades)
+{{moon|Rufbawlafo-Ufaf}} (moon)
+{{nanoneuro|Rufbawlafo-Ufaf}} (Nano-Neuro)
+{{nanotech|Rufbawlafo-Ufaf}} (nanotech)
+{{nectar|Rufbawlafo-Ufaf}} (nectar)
+{{nervous|Rufbawlafo-Ufaf}} (nervous)
+{{neutronic|Rufbawlafo-Ufaf}} (neutronic)
+{{ninefold|Rufbawlafo-Ufaf}} (ninefold)
+{{normal|Rufbawlafo-Ufaf}} (normal)
+{{normalish|Rufbawlafo-Ufaf}} (normalish)
+{{opalescent|Rufbawlafo-Ufaf}} (opalescent)
+{{overloaded|Rufbawlafo-Ufaf}} (overloaded)
+{{painted|Rufbawlafo-Ufaf}} (painted)
+{{paisley|Rufbawlafo-Ufaf}} (paisley)
+{{palladium mesh|Rufbawlafo-Ufaf}} (palladium mesh)
+{{patchwork|Rufbawlafo-Ufaf}} (patchwork)
+{{pearly|Rufbawlafo-Ufaf}} (pearly)
+{{peridot|Rufbawlafo-Ufaf}} (peridot)
+{{phase-harmonic|Rufbawlafo-Ufaf}} (phase-harmonic)
+{{plaid|Rufbawlafo-Ufaf}} (plaid)
+{{plasma|Rufbawlafo-Ufaf}} (plasma)
+{{plastifer|Rufbawlafo-Ufaf}} (plastifer)
+{{polarized|Rufbawlafo-Ufaf}} (polarized)
+{{prismatic|Rufbawlafo-Ufaf}} (prismatic)
+{{psionic|Rufbawlafo-Ufaf}} (psionic)
+{{psychalflesh|Rufbawlafo-Ufaf}} (psychalflesh)
+{{qas|Rufbawlafo-Ufaf}} (qas)
+{{qon|Rufbawlafo-Ufaf}} (qon)
+{{radiant|Rufbawlafo-Ufaf}} (radiant)
+{{rainbow|Rufbawlafo-Ufaf}} (rainbow)
+{{random|Rufbawlafo-Ufaf}} (random)
+{{refractive|Rufbawlafo-Ufaf}} (refractive)
+{{rermadon|Rufbawlafo-Ufaf}} (rermadon)
+{{resonance|Rufbawlafo-Ufaf}} (resonance)
+{{rocket|Rufbawlafo-Ufaf}} (rocket)
+{{rubbergum|Rufbawlafo-Ufaf}} (rubbergum)
+{{rusty|Rufbawlafo-Ufaf}} (rusty)
+{{scaled|Rufbawlafo-Ufaf}} (scaled)
+{{shade|Rufbawlafo-Ufaf}} (shade)
+{{shimmering|Rufbawlafo-Ufaf}} (shimmering)
+{{shugruith|Rufbawlafo-Ufaf}} (shugruith)
+{{sickly|Rufbawlafo-Ufaf}} (sickly)
+{{silvery|Rufbawlafo-Ufaf}} (silvery)
+{{skulk|Rufbawlafo-Ufaf}} (skulk)
+{{snail-encrusted|Rufbawlafo-Ufaf}} (snail-encrusted)
+{{snakeskin|Rufbawlafo-Ufaf}} (snakeskin)
+{{soul|Rufbawlafo-Ufaf}} (soul)
+{{sparkling|Rufbawlafo-Ufaf}} (sparkling)
+{{spaser|Rufbawlafo-Ufaf}} (spaser)
+{{sphynx|Rufbawlafo-Ufaf}} (sphynx)
+{{spiked|Rufbawlafo-Ufaf}} (spiked)
+{{spring-turret|Rufbawlafo-Ufaf}} (spring-turret)
+{{starry|Rufbawlafo-Ufaf}} (starry)
+{{structural|Rufbawlafo-Ufaf}} (structural)
+{{sun|Rufbawlafo-Ufaf}} (sun)
+{{sunset|Rufbawlafo-Ufaf}} (sunset)
+{{sunslag|Rufbawlafo-Ufaf}} (sunslag)
+{{syphon|Rufbawlafo-Ufaf}} (syphon)
+{{tarnished|Rufbawlafo-Ufaf}} (tarnished)
+{{tartan|Rufbawlafo-Ufaf}} (tartan)
+{{telemetric|Rufbawlafo-Ufaf}} (telemetric)
+{{thermo|Rufbawlafo-Ufaf}} (thermo)
+{{transkinetic|Rufbawlafo-Ufaf}} (transkinetic)
+{{turbow|Rufbawlafo-Ufaf}} (turbow)
+{{ubernostrum|Rufbawlafo-Ufaf}} (ubernostrum)
+{{urban camouflage|Rufbawlafo-Ufaf}} (urban camouflage)
+{{visage|Rufbawlafo-Ufaf}} (VISAGE)
+{{watery|Rufbawlafo-Ufaf}} (watery)
+{{zetachrome|Rufbawlafo-Ufaf}} (zetachrome)
+You name your wide-brimmed hat '{{crystalline|Rufbawlafo-Ufaf}}'.
+You name your wide-brimmed hat '&mRuf&bb&Ba&Yw&Bl&ba&mfo-Ufa&bf&y'.
+Blessed by divine beings, =name= discovered the legendary wide-brimmed hat known as '{{crystalline|Rufbawlafo-Ufaf}}'.
+Yimula обнаружен the легендарный широкополая шляпа известный как '{{crystalline|Rufbawlafo-Ufaf}}'.
+At a remote  near the Kamritum Meteoritefold, Yimula met with a group of  and commissed a wide-brimmed hat named {{crystalline|Rufbawlafo-Ufaf}}.
+water_-brother..
+water-brother..
+This item is a named wide-brimmed hat.
+lead slug x106 {{c|}}4 {{r|}}1d2
+shotgun shell x17 {{c|}}4 {{r|}}1d2
+chrome revolver {{c|}}7 {{r|}}1d6 {{y|[{{K|empty}}]}}
+Issachar rifle x2 {{c|}}9 {{r|}}1d8 {{y|[{{K|empty}}]}}
+musket x3 {{c|}}8 {{r|}}1d8 {{y|[{{K|empty}}]}}
+barrel steel from a hundred salt storms. The stock is spoon carved from fibrous brinestalk in the style of the Issachari dune.
+storms. The stock is spoon carved from fibrous brinestalk
+The hind bone of a salthopper was scorched clean and bent to a recurve bow. Sinew is strung on the nocks.
+{{rules|
+Weapon Class: Bows && Rifles
+Accuracy: Low}}
+{{cyan|Engraved: This item is engraved with a scene from the life of the ancient sultan {{magenta|Artapater}}:
+
+In 1902 BR, Artapater, the Famed Oscilloscope, died of natural causes. He was 105 years old.}}
+
+{{rules|+40 reputation with the Cult of Artapater}}
+
+{{K|Weight: 5 lbs.}}
+torch (half-burnt)
+:: You reload your Issachar rifle with lead slug x6.
+{{W|Space}}-select | unlock (F1) | Fire Missile Weapon
+slender club {{c|}}5 {{r|}}1d2
+small boulder x2 {{c|}}4 {{r|}}1d3
+lead slug x83 {{c|}}4 {{r|}}1d2
+Boiled goat leather was cut to a cuirass and fit with straps and iron buckles. It smells of beeswax.
+
+{{cyan|Engraved: This item is engraved with a scene from the life of the ancient sultan {{magenta|Dalemasp}}:
+
+In 3477 BR, Dalemasp, the Eminent Snowflake, the Woe of Sherash, Wife of Alus, died of natural causes. She was 130 years old.}}
+
+{{rules|+40 reputation with the Wife of Alus Society}}
+
+{{K|Weight: 15 lbs.}}
+{{Y|steel}} mace {{c|}}6 {{r|}}2d2
+wooden arrow x67 {{c|}}4 {{r|}}1d2 (4/1d4)
+You cannot light the {{B|{{B|wet}} campfire remains}} while they're in the pool of {{w|brackish}} {{B|water}}.
+You cannot light the &Bwet campfire remains&y while they're in the pool of &wbrackish&y &Bwater&y.
+{{K|{{K|tarred}} snapjaw hunter}} {{y|[{{B|wading}}]}} [{{B|stuck in a {{fiery|flaming}} pool of {{K|asphalt}}}}]
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+wooden arrow x4 {{c|}}4 {{r|}}1d2 (4/1d4)
+club {{c|}}5 {{r|}}1d2
+lead slug x77 {{c|}}4 {{r|}}1d2
+wooden arrow x72 {{c|}}4 {{r|}}1d2 (4/1d4)
+leather cap x2 {{b|}}1 {{K|	}}0
+{{w|bronze}} two-handed sword {{c|}}6 {{r|}}1d6
+small boulder x3 {{c|}}4 {{r|}}1d3
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+(build xxx.xxx.xxx.xxx)
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x77 {{c|}}4 {{r|}}1d2
+wooden arrow x72 {{c|}}4 {{r|}}1d2 (4/1d4)
+leather cap x2 {{b|}}1 {{K|	}}0
+{{B|{{B|water}}-stained {{Y|steel}} long sword}} {{c|}}6 {{r|}}1d6
+{{Y|steel}} mace {{c|}}6 {{r|}}2d2
+club {{c|}}5 {{r|}}1d2
+:: You reload your Issachar rifle with lead slug x6.
+You can sense nothing from the dreadroot.
+You can sense nothing from the {{W|{{W|sappy}} dreadroot}}.
+You can sense nothing from the &Wsappy dreadroot&y.
+lead slug x71 {{c|}}4 {{r|}}1d2
+{{B|{{K|tarry}} {{B|wet}} leather cap}} x2 {{b|}}1 {{K|	}}0
+{{B|{{K|tarry}} {{B|wet}} {{Y|steel}} mace}} {{c|}}6 {{r|}}2d2
+This item is a named wide-brimmed hat.
+wreath x2
+Ruf
+fo-Ufa
+small boulder x2 {{c|}}4 {{r|}}1d3
+slender club {{c|}}5 {{r|}}1d2
+There  is already a campfire to the northwest. Do you want to go to it?
+You receive an {{ubernostrum|ubernostrum}} injector, a weird artifact, a {{Y|salve}} injector, a {{Y|salve}} injector, and a {{Y|salve}} injector!
+You receive an &cу&gб&Gе&Wр&wн&cо&Cс&Gт&gр&wу&Wм&y injector, a weird artifact, a &Ysalve&y injector, a &Ysalve&y injector, and a &Ysalve&y injector!
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{B|{{B|water}}-stained leather cap}} x2 {{b|}}1 {{K|	}}0
+{{r|{{r|blood}}-stained {{Y|steel}} mace}} {{c|}}6 {{r|}}2d2
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+(build xxx.xxx.xxx.xxx)
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+(build xxx.xxx.xxx.xxx)
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x71 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{B|{{B|water}}-stained leather cap}} x2 {{b|}}1 {{K|	}}0
+{{r|{{r|blood}}-stained {{Y|steel}} mace}} {{c|}}6 {{r|}}2d2
+club {{c|}}5 {{r|}}1d2
+two-handed iron long sword x2 {{c|}}7 {{r|}}1d8
+Add how many {{R|boomrose}} arrow {{c|}}4 {{r|}}1d2 (4/1d2) to trade.
+Add how many &Rboomrose&y arrow &c&y4 &r&y1d2 (4/1d2) to trade.
+Boiled goat leather was cut to a cuirass and fit with straps and iron buckles. It smells of beeswax.
+
+{{cyan|Engraved: This item is engraved with a scene from the life of the ancient sultan {{magenta|Dalemasp}}:
+
+In 3477 BR, Dalemasp, the Eminent Snowflake, the Woe of Sherash, Wife of Alus, died of natural causes. She was 130 years old.}}
+
+{{rules|+40 reputation with the Wife of Alus Society}}
+
+{{K|Weight: 15 lbs.}}
+In 3477 BR, Dalemasp, the Eminent Snowflake, the Woe of
+Sherash, Wife of Alus, died of natural causes. She was 130
+You put the
+x2 in the chest to the northwest.
+:: You put the sooty smock in the chest to the northwest.
+wreath x2 in the chest to the northwest.
+:: You put the club in the chest to the northwest.
+:: You put the desert kris in the chest to the northwest.
+:: You put the iron dagger in the chest to the northwest.
+x9 in the chest to the northwest.
+sfx_artifact_examination_success_total
+Fix-It
+You reload your Issachar rifle with lead slug x6.
+You receive an &cу&gб&Gе&Wр&wн&cо&Cс&Gт&gр&wу&Wм&y injector, a weird artifact, a &Ysalve&y injector, a &Ysalve&y injector, and a &Ysalve&y injector!
+You put the &Yг&Yр&yа&yв&cи&Cр&Cо&Yв&Yа&yн&cн&cы&Cй&y leather armor in the chest to the northwest.
+You put the &Bwater-stained leather cap&y x2 in the chest to the northwest.
+You put the &Cп&Bе&bр&gн&Gа&gт&bы&Bй&y leather moccasins in the chest to the northwest.
+You put the sooty smock in the chest to the northwest.
+You put the &Wwitchwood&y wreath x2 in the chest to the northwest.
+You put the &rblood-stained iron mace&y in the chest to the northwest.
+You put the &rblood-stained &Ysteel&r mace&y in the chest to the northwest.
+You put the &wbronze&y long sword in the chest to the northwest.
+You put the club in the chest to the northwest.
+You put the desert kris in the chest to the northwest.
+You put the iron dagger in the chest to the northwest.
+You put the &rр&rа&Rс&Rк&Wр&Wа&wш&gе&gн&Gн&Gа&Bя&y iron mace in the chest to the northwest.
+You put the &Ysteel&y long sword in the chest to the northwest.
+You put the &wcopper nugget&y x9 in the chest to the northwest.
+Stinger damage: 1d6
+Venom confuses opponents for 2d3+2 round.
+You receive a {{Y|droid scrambler}} and a {{Y|stamped data disk}}!
+You receive a &Ydroid scrambler&y and a &Ystamped data disk&y!
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+(build xxx.xxx.xxx.xxx)
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x71 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+You reload your Issachar rifle with lead slug x6.
+You receive a &Ydroid scrambler&y and a &Ystamped data disk&y!
+You toggle &cHarvest Plants&y on.
+You toggle &cHarvest Plants&y off.
+You receive an &cу&gб&Gе&Wр&wн&cо&Cс&Gт&gр&wу&Wм&y injector, a weird artifact, a &Ysalve&y injector, a &Ysalve&y injector, and a &Ysalve&y injector!
+data disk: {{C|{{G|acid}} gas grenade mk III}} <{{C|DD}}{{r|1}}>
+data disk: {{C|{{C|freeze}} grenade mk I}} <{{C|DD}}>
+sfx_characterMod_tinkerSchematic_learn
+Notes:&y
+Bold =name= discovered -1, once thought lost to the sands of time.
+Acting against the enfranchisement of the Girsh, Yimula led an army to the historic site of the Kamritum Meteoritefold. Yimula freed its citizens, and in their honor they climbed the burning belfries.
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{W|[F]}} fire
+{{W|[R]}} reload
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x71 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+You reload your Issachar rifle with lead slug x6.
+You toggle &cHarvest Plants&y on.
+You toggle &cHarvest Plants&y off.
+{{W|Space}}-select | unlock (F1) | Fire Missile Weapon
+with lead slug x6.
+Rust-flaked trash from a cross-section of eons functions as his habit, contoured to his body by a lifetime of wear.
+{{Y|steel}} battle axe {{c|}}6 {{r|}}1d3+1
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+{{Y|steel}} arrow x5 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+wooden arrow x3 {{c|}}4 {{r|}}1d2 (4/1d4)
+You flinch away as a
+arrow whistles past from the southwest!
+{{Y|steel}} vinereaper {{c|}}6 {{r|}}1d3+1
+short bow {{c|}}4 {{r|}}1d3+1 {{y|[{{Y|steel}} arrow]}}
+Ovoid spots, crimson and coral and citrine, scatter like an island chain across her back and neck.
+Supply the short bow turret with how many {{R|boomrose}} arrow {{c|}}4 {{r|}}1d2s (4/1d2)? (max=6)
+Supply the short bow turret with how many &Rboomrose&y arrow &c&y4
+&y1d2s (4/1d2)? (max=6)
+You transfer six &Rboomrose&y arrows to the short bow turret.
+Supply the short bow turret with how many wooden arrow {{c|}}4 {{r|}}1d2s (4/1d4)? (max=76)
+Supply the short bow turret with how many wooden arrow &c&y4
+&y1d2s (4/1d4)? (max=76)
+You transfer seventy-six wooden arrows to the short bow turret.
+:: You transfer seventy-six wooden arrows to the short bow turret.
+Supply the short bow turret with how many {{b|carbide}} arrow {{c|}}4 {{r|}}1d2s (4/1d4+1)? (max=8)
+Supply the short bow turret with how many &bcarbide&y arrow &c&y4
+&y1d2s (4/1d4+1)? (max=8)
+You transfer eight &bcarbide&y arrows to the short bow turret.
+Supply the short bow turret with how many {{Y|steel}} arrow {{c|}}4 {{r|}}1d2s (4/1d3+1)? (max=5)
+Supply the short bow turret with how many &Ysteel&y arrow &c&y4
+&y1d2s (4/1d3+1)? (max=5)
+You transfer five &Ysteel&y arrows to the short bow turret.
+You died in the explosion of a {{R|boomrose}} arrow caused by a short bow turret.
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x71 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+You reload your Issachar rifle with lead slug x6.
+You toggle &cHarvest Plants&y on.
+You toggle &cHarvest Plants&y off.
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+You reload your Issachar rifle with lead slug x6.
+You toggle &cHarvest Plants&y off.
+You toggle &cHarvest Plants&y on.
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x71 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+Fix-It
+{{w|leather}} whip {{c|}}6 {{r|}}1d4
+{{r|{{r|bloody}} {{w|leather}} whip}} {{c|}}6 {{r|}}1d4
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{W|[F]}} fire
+{{W|[R]}} reload
+{{r|{{r|bloody}} {{w|leather}} whip}} {{c|}}6 {{r|}}1d4
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+W|A}}]
+W|B}}]
+ù&y Charge-based melee fighter
+ù&y Ability to freeze enemies
+ù&y Highly maneuverable
+ù&y {{W|Most survivable}} starting build
+ù&y Melee fighter
+ù&y Highly-armored
+ù&y Emits sleep gas to disable enemies
+ù&y {{W|Highly survivable}} starting build
+ù&y Primarily ranged fighter
+ù&y Quick and maneuverable
+ù&y Flies
+ù&y Mental-based ranged fighter
+ù&y Effective crowd control and map vision
+ù&y {{W|Medium survivable}} starting build
+ù&y Hybrid melee fighter and mental caster
+ù&y Ability to set enemies on fire
+ù&y Causes harvestable plants to grow nearby
+ù&y {{W|Challenging}} starting build
+^g°
+^y±
+charm
+atomic clock
+stained преимущество of Surchetara
+of Annulus Wheel Sharqushur
+glazed шлем of The Sharqushur Star
+glazed очко. of Sharqushur Star
+analog сабо of The Ellipse Sharqushur
+coiled личное оружие of The Bippir Cross
+potent топорик of The Salinon Hashan
+glacial упал of Nappir
+radiant стрела of Annulus Wheel Sharqushur
+luminous пробирается of Icosagon Sharqushur
+glazed шиповки of The Heptagon Sharqushur
+of The Darsippir Spade
+wandering полоса of The Ellipse Bippir
+of The Sharqushur Quincunx
+of Sheranna
+mighty стержень of The Ellipse Tursish
+potent Заточка of Rectangle Triad Sharqushur
+of Apeirogon Heart Kashur
+stained перчатки of Nanip
+mighty хе-хе of Damas
+potent кортик of Ellipse Ring Kashur
+of Salinon Diamond Bippir
+dominant очко. of Trapezus Trefoil Bippir
+wired стрела of Salinon Tree Sharqushur
+logical цепь of The Ovoid Sharqushur
+glazed шиповки of Henagon Pentacle Kashur
+digital полоса of Shuilikish
+of Monogon Ankh Bippir
+frosty Крис of The Bippir Knot
+commanding клеймо of The Annulus Immu
+stained игрушка of The Salinon Sharqushur
+wired длинная рука of Heptagon Rose Sharqushur
+of The Bippir Eye
+coiled Крис of Nanip
+of The Bippir Cross
+colossal очко. of The Ellipse Tursish
+commanding пушка of Annulus Pentagram Sharqushur
+commanding булава of Dulil
+gleaming пистолет of The Salinon Bippir
+colossal заточка of The Ellipse Tursish
+glazed Крис of The Ellipse Bippir
+clear преимущество of Tile Diamond Kashur
+potent топорик of a {{w|honey}} weep
+commanding очко. of The Icosagon Sharqushur
+analog капюшон of Recoming nook at Gyl
+commanding грудь of Triquetra Pentacle Kashur
+analog ружьё of Polygon Sharqushur
+$focus: $markovTitle
+silk-salt borscht
+erotic toasted fruit borscht
+salt-stuffed soup in lah-cured compote, chip slaw, and yogurt
+astral vittle with $focus
+open flame and flaky cider inside of crunchy casserole
+prismatic шиповки of The Polygon Kashur
+commanding посох of Saazobal
+coiled пистолет of The Pentagon Kashur
+weighted грудь of Arbelos Pentagram Kashur
+clear дубинка of Heptagon Pentacle Havuh
+Hidden *cult*
+church of *CultSymbol*
+*cult*, the Divided
+people of *CultSymbol*
+*cult* and Love
+sect of *CultSymbol*
+D18A69A5479D
+EDD12F698284
+Kiroomeq
+Kiroomeq прибыли в солончак на глубину 1 слоя и начали свою невероятную одиссею через Куд.
+At twilight under a rare and слоновая кость sky, the people of salt marsh, 1 stratum deep saw an image on the horizon that looked like a миниатюрный ледник bathed in слоновая кость. It was Kiroomeq, and after they came and left, the people of salt marsh, 1 stratum deep built a monument to Kiroomeq and thenceforth called them Миниатюрный Ледник-in-Слоновая Кость.
+^YÛ
+^Yß
+^CÜ
+sfx_artifact_examination_success_total
+iron battle axe {{c|}}6 {{r|}}1d2+1
+At a remote library near some forgotten ruins, Kiroomeq met with a group of blind scribes and together they penned the beloved codex And Burrows.
+In the month of Simmun Ut of 1001, =name= penned the influential book, {{W|Aphorisms about Birds}}.
+Kiroomeq написал влиятельную книгу, {{W|Афоризмы о птицах}}.
+At a remote library near Ring Pentagram Bippir, Kiroomeq met with a group of blind scribes and together they penned the beloved codex {{W|Aphorisms about Birds}}.
+{{W|[F]}} fire
+{{W|[R]}} reload
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x2 {{b|}}0 {{K|	}}1
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{w|leather}} whip {{c|}}6 {{r|}}1d4
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x2 {{b|}}0 {{K|	}}1
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{w|leather}} whip {{c|}}6 {{r|}}1d4
+You reload your Issachar rifle with lead slug x6.
+You beat at the flames on the &Rflaming&y cloth robe with your hands!
+You toggle &cHarvest Plants&y on.
+You toggle &cHarvest Plants&y off.
+1d3 [odd trinket]
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{W|[F]}} fire
+{{W|[R]}} reload
+You reload your Issachar rifle with lead slug x6.
+You beat at the flames on the &Rflaming&y cloth robe with your hands!
+You toggle &cHarvest Plants&y on.
+You toggle &cHarvest Plants&y off.
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+Fix-It
+worn burnoose x2 {{b|}}0 {{K|	}}1
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{w|leather}} whip {{c|}}6 {{r|}}1d4
+desert kris {{c|}}6 {{r|}}1d3
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x73 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x2 {{b|}}0 {{K|	}}1
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{w|leather}} whip {{c|}}6 {{r|}}1d4
+desert kris {{c|}}6 {{r|}}1d3
+Jewel-Encrusted: This item is much
+1d3 [odd trinket]
+Lucent skin blooms beneath matted feathers. His tiny beak is hooked.
+club {{c|}}5 {{r|}}1d2
+20% chance on melee attack to sting your opponent ({{c|}}{{rules|8}} {{r|}}{{rules|1d6}})
+It will cost {{C|1}} mutation point to increase Stinger (Confusing Venom)'s rank by 1.
+20% chance on melee attack to sting your opponent (&c&C7&y &r&C1d6&y)
+Venom confuses opponents for &C2d3+2&y rounds
+20% chance on melee attack to sting your opponent (&c&C8&y &r&C1d6&y)
+It will cost {{C|1}} mutation point to increase Pyrokinesis's rank by 1.
++ This mutation's rank is increased by 3 due to your high Ego.&y
+It will cost {{C|1}} mutation point to increase Burgeoning's rank by 1.
++&C80-120&y quills
++ This mutation's rank is increased by 3 due to being rapidly advanced 1 time.&y
+You shake off the stun.
+iron long sword {{c|}}6 {{r|}}1d4
+{{W|Space}}-select | unlock (F1) | Fire Missile Weapon
+iron battle axe {{c|}}6 {{r|}}1d2+1
+staff {{c|}}5 {{r|}}1d2
+worn burnoose x3 {{b|}}0 {{K|	}}1
+{{Y|steel}} hand axe {{c|}}6 {{r|}}1d3+1
+{{w|bronze}} two-handed sword {{c|}}6 {{r|}}1d6
+Bold =name= discovered -1, once thought lost to the sands of time.
+Acting against the enfranchisement of the Girsh, Yimula led an army to the historic site of the Kamritum Meteoritefold. Yimula freed its citizens, and in their honor they climbed the burning belfries.
+chrome revolver {{c|}}7 {{r|}}1d6 {{y|[{{K|empty}}]}}
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+{{Y|steel}} arrow x5 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+wooden arrow x5 {{c|}}4 {{r|}}1d2 (4/1d4)
+Rust-flaked trash from a cross-section of eons functions as his habit, contoured to his body by a lifetime of wear.
+{{Y|steel}} war hammer {{c|}}6 {{r|}}2d2
+short bow {{c|}}4 {{r|}}1d2 {{y|[{{R|boomrose}} arrow]}}
+{{R|boomrose}} arrow x10 {{c|}}4 {{r|}}1d2 (4/1d2)
+{{Y|steel}} arrow x10 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+wooden arrow x10 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{R|boomrose}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d2)
+wooden arrow x83 {{c|}}4 {{r|}}1d2 (4/1d4)
+This item is a named wide-brimmed hat.
+Ruf
+fo-Ufa
+1d8 [lead slug x3]
+Ovoid spots, crimson and coral and citrine, scatter like an island chain across her back and neck.
+{{c|stun}} rod {{c|}}6 {{r|}}1d2 {{y|[odd trinket]}} [{{r|rusted}}]
+A Gleaming Silver Rondure Adorns His
+Kendren! I Am Shaken, 5th Edition
+Yimula написал(а) влиятельную книгу «Блестящий Серебряная сфера Adorns Его».
+Yimula написал(а) влиятельную книгу «Kendren! I Am Shaken, 5th Edition».
+You learn the item modification {{W|polarized}}.
+You learn the item modification &Wpolarized&y.
+sfx_artifact_examination_success_total
+Drink Lovely Friend! If You'd Care
+Yimula написал(а) влиятельную книгу «Пить Lovely Друг! Если You'd Забота».
+You Dig; Mopango Wanderers
+That Pinches Light
+Yimula написал(а) влиятельную книгу «То Pinches Свет».
+Yimula написал(а) влиятельную книгу «Вы Копать; Мопанго Wanderers».
+At Being Named, Vol. VII
+Yimula написал(а) влиятельную книгу «At Being Named, Vol. VII».
+Child Who Are You? I Managed
+A Missile Is Likely
+Yimula написал(а) влиятельную книгу «A Missile Is Likely».
+Yimula написал(а) влиятельную книгу «Child Who Are You? I Managed».
+{{B|{{B|wet}} iron long sword}} {{c|}}6 {{r|}}1d4
+shrine to Dalemasp, Wife of Alus
+While traveling near Dabyvah in the omen-worshipping Province of Sherash, Dalemasp was captured by bandits. She languished in captivity for seven years, eventually escaping to Shepad Spire.
+{{B|{{B|wet}} {{w|leather}} whip}} {{c|}}6 {{r|}}1d4
+{{lacquered|lacquered}} {{w|bronze}} two-handed sword {{c|}}6 {{r|}}1d6
+pestle {{c|}}5 {{r|}}1d2-1
+{{B|{{B|wet}} iron battle axe}} {{c|}}6 {{r|}}1d2+1
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+{{R|boomrose}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d2)
+{{Y|steel}} arrow x10 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x83 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x3 {{b|}}0 {{K|	}}1
+A Gleaming Silver Rondure Adorns His
+Kendren! I Am Shaken, 5th Edition
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{c|stun}} rod {{c|}}6 {{r|}}1d2 {{y|[odd trinket]}} [{{r|rusted}}]
+{{w|leather}} whip {{c|}}7 {{r|}}1d4
+{{Y|steel}} war hammer {{c|}}7 {{r|}}2d2
+club {{c|}}5 {{r|}}1d2
+desert kris {{c|}}6 {{r|}}1d3
+iron battle axe {{c|}}6 {{r|}}1d2+1
+short bow {{c|}}4 {{r|}}1d2 {{y|[{{R|boomrose}} arrow]}}
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+{{B|{{B|wet}} Yimula}} {{y|[{{B|wading}}]'s}} Skills
+You already have that skill.
+:: You already have that skill.
+Look [{{C|1}}/{{C|2}}] | {{W|}} | {{hotkey|()}} {{W|l}}ock | {{hotkey|/}} change selection | {{hotkey|}} interact | {{hotkey|}} walk
+beade
+d bracelet
+Look | {{W|}} | {{hotkey|()}} {{W|l}}ock | {{hotkey|}} interact | {{hotkey|}} walk
+Look | {{W|}} | {{hotkey|()}} {{W|l}}ock | {{hotkey|}} walk
+You can't find a way to reach the snapjaw scavenger.
+Current location (S)
+Center, the Kamritum Meteoritefold (C)
+{{B|{{B|wet}} Yimula's}} Skills
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{C|ú}} You discovered the location of Agganip.
+{{C|ú}} In sacred ritual you shared your {{B|water}} with {{&Y|Warden Ishikat-No-Longer}}.
+{{C|ú}} You read Unable to Learn.
+{{C|ú}} You read They Owe Us a Dying Animal.
+{{C|ú}} You read The Underearth Tools One Needs.
+{{C|ú}} You convinced a {{R|salamander}} to join your cause.
+{{C|ú}} You read She Always Had a Good.
+^k>^k &y&yYou read one of the few legible excerpts from &YShe Always Had a Good&y:
+^k>^k &y&YКаннибал и Обращённый механимист скользит на гель!
+^k>^k &y&yYou wade through a pool of &Ygel&y.
+^k>^k &y&YПастуший пёс скользит на гель!
+^Y>^k &yYou died.
+^k>^k &y&RYour health has dropped below &C40%&R!
+^k>^k &y&yYour &Kdeactivated&y wrist calc bloops.
+^k>^k &yYou press the power button on the wrist calc.
+^k>^k &y&yYou wade through a pool of &Ysalty&y &Bwater&y.
+^k>^k &yThe way is blocked by some shale.
+DAILY FOR DAY 216 OF 2026 (friends only)
+Oops
+Litteratus
+Unlocked Thursday, 28 May 2026 09:10
+Unlocked Tuesday, 26 May 2026 15:01
+Unlocked Thursday, 21 May 2026 17:29
+Mumblecore
+Dalet
+Vav
+DAILY FOR DAY 216 OF 2026
+W|A}}]
+W|B}}]
+ù&y Charge-based melee fighter
+ù&y Ability to freeze enemies
+ù&y Highly maneuverable
+ù&y {{W|Most survivable}} starting build
+ù&y Melee fighter
+ù&y Highly-armored
+ù&y Emits sleep gas to disable enemies
+ù&y {{W|Highly survivable}} starting build
+ù&y Primarily ranged fighter
+ù&y Quick and maneuverable
+ù&y Flies
+ù&y Mental-based ranged fighter
+ù&y Effective crowd control and map vision
+ù&y {{W|Medium survivable}} starting build
+ù&y Hybrid melee fighter and mental caster
+ù&y Ability to set enemies on fire
+ù&y Causes harvestable plants to grow nearby
+ù&y {{W|Challenging}} starting build
+^g°
+^y±
+atomic clock
+stained пробирается of a {{Y|gel}} weep
+cosmic *cult*
+host of *CultSymbol*
+All-Seeing *cult*
+sect of *CultSymbol*
+entangled *cult*
+family of *CultSymbol*
+lacuna of *DimensionSymbol*
+orbit of *DimensionSymbol*
+2C49E211
+Fashwam
+Fashwam прибыли в солончак глубина 1 и начали свою невероятную одиссею через Куд.
+Press {{hotkey|Space}} or {{hotkey|}}
+Press +Space and then choose a direction or press .
+^Bß
+sfx_artifact_examination_success_total
+iron battle axe {{c|}}6 {{r|}}1d2+1
+Fashwam написал(а) влиятельную книгу «{{W|Афоризмы о птицах}}».
+Fashwam написал(а) влиятельную книгу «использованный за Получения Вещи, первое издание».
+Look [{{C|1}}/{{C|2}}] | {{W|Esc}} | {{hotkey|(F1)}} {{W|l}}ock | {{hotkey|+/-}} change selection | {{hotkey|Space}} interact | {{hotkey|Ц}} walk
+CmdMoveToPointOfInterestMenu
+Fashwam..
+Fashwam в священном ритуале.
+While journeying across the wavegraph hills, Fashwam discovered the rust wells. There they befriended water barons and sipped from the red iron spring.
+You swell with the inspiration to name your iron battle axe. Do you wish to?
+You select the name 'Ooh-OO-OOO-EEE-ee' for your iron battle axe. Choose a color for it.
+Ooh-OO-OOO-EEE-ee
+Ooh-OO-OOO-EEE-ee (no coloring)
+^kOoh-OO-OOO-EEE-ee^k&y (black)
+^kOoh-OO-OOO-EEE-ee^k&y (dark blue)
+^kOoh-OO-OOO-EEE-ee^k&y (blue)
+^kOoh-OO-OOO-EEE-ee^k&y (cyan)
+^kOoh-OO-OOO-EEE-ee^k&y (dark cyan)
+^kOoh-OO-OOO-EEE-ee^k&y (dark green)
+^kOoh-OO-OOO-EEE-ee^k&y (green)
+^kOoh-OO-OOO-EEE-ee^k&y (dark red)
+^kOoh-OO-OOO-EEE-ee^k&y (red)
+^kOoh-OO-OOO-EEE-ee^k&y (dark magenta)
+^kOoh-OO-OOO-EEE-ee^k&y (magenta)
+^kOoh-OO-OOO-EEE-ee^k&y (gold)
+^kOoh-OO-OOO-EEE-ee^k&y (brown)
+^kOoh-OO-OOO-EEE-ee^k&y (white)
+^kOoh-OO-OOO-EEE-ee^k&y (gray)
+{{agolgot|Ooh-OO-OOO-EEE-ee}} (agolgot)
+{{amorous|Ooh-OO-OOO-EEE-ee}} (amorous)
+{{arctic camouflage|Ooh-OO-OOO-EEE-ee}} (arctic camouflage)
+{{astral|Ooh-OO-OOO-EEE-ee}} (astral)
+{{auroral|Ooh-OO-OOO-EEE-ee}} (auroral)
+{{bee|Ooh-OO-OOO-EEE-ee}} (bee)
+{{bethsaida|Ooh-OO-OOO-EEE-ee}} (bethsaida)
+{{bio|Ooh-OO-OOO-EEE-ee}} (bio)
+{{blaze|Ooh-OO-OOO-EEE-ee}} (blaze)
+{{brainbrine|Ooh-OO-OOO-EEE-ee}} (brain brine)
+{{camouflage|Ooh-OO-OOO-EEE-ee}} (camouflage)
+{{chaotic|Ooh-OO-OOO-EEE-ee}} (chaotic)
+{{cloning|Ooh-OO-OOO-EEE-ee}} (cloning)
+{{cloudy|Ooh-OO-OOO-EEE-ee}} (cloudy)
+{{crochide|Ooh-OO-OOO-EEE-ee}} (crochide)
+{{cryogenic|Ooh-OO-OOO-EEE-ee}} (cryogenic)
+{{crystalline|Ooh-OO-OOO-EEE-ee}} (crystalline)
+{{crysteel|Ooh-OO-OOO-EEE-ee}} (crysteel)
+{{dark fiery|Ooh-OO-OOO-EEE-ee}} (dark fiery)
+{{defoliant|Ooh-OO-OOO-EEE-ee}} (defoliant)
+{{desert camouflage|Ooh-OO-OOO-EEE-ee}} (desert camouflage)
+{{displacer|Ooh-OO-OOO-EEE-ee}} (displacer)
+{{dreamsmoke|Ooh-OO-OOO-EEE-ee}} (dreamsmoke)
+{{eater|Ooh-OO-OOO-EEE-ee}} (Eater)
+{{electrical|Ooh-OO-OOO-EEE-ee}} (electrical)
+{{engraved|Ooh-OO-OOO-EEE-ee}} (engraved)
+{{entropic|Ooh-OO-OOO-EEE-ee}} (entropic)
+{{feathered|Ooh-OO-OOO-EEE-ee}} (feathered)
+{{fiery|Ooh-OO-OOO-EEE-ee}} (fiery)
+{{filthy|Ooh-OO-OOO-EEE-ee}} (filthy)
+{{forest|Ooh-OO-OOO-EEE-ee}} (forest)
+{{freezing|Ooh-OO-OOO-EEE-ee}} (freezing)
+{{fungicide|Ooh-OO-OOO-EEE-ee}} (fungicide)
+{{gaslight|Ooh-OO-OOO-EEE-ee}} (gaslight)
+{{ghostly|Ooh-OO-OOO-EEE-ee}} (ghostly)
+{{glittering|Ooh-OO-OOO-EEE-ee}} (glittering)
+{{glotrot|Ooh-OO-OOO-EEE-ee}} (glotrot)
+{{graffitied|Ooh-OO-OOO-EEE-ee}} (graffitied)
+{{hologram|Ooh-OO-OOO-EEE-ee}} (hologram)
+{{horned|Ooh-OO-OOO-EEE-ee}} (horned)
+{{hypertractor|Ooh-OO-OOO-EEE-ee}} (hypertractor)
+{{hypervelocity|Ooh-OO-OOO-EEE-ee}} (hypervelocity)
+{{icy|Ooh-OO-OOO-EEE-ee}} (icy)
+{{illuminated|Ooh-OO-OOO-EEE-ee}} (illuminated)
+{{implanted|Ooh-OO-OOO-EEE-ee}} (implanted)
+{{ironshank|Ooh-OO-OOO-EEE-ee}} (ironshank)
+{{issachari|Ooh-OO-OOO-EEE-ee}} (Issachari)
+{{jungle|Ooh-OO-OOO-EEE-ee}} (jungle)
+{{kaleidoslug|Ooh-OO-OOO-EEE-ee}} (kaleidoslug)
+{{lacquered|Ooh-OO-OOO-EEE-ee}} (lacquered)
+{{lah|Ooh-OO-OOO-EEE-ee}} (lah)
+{{lanterned|Ooh-OO-OOO-EEE-ee}} (lanterned)
+{{leafy|Ooh-OO-OOO-EEE-ee}} (leafy)
+{{leopard|Ooh-OO-OOO-EEE-ee}} (leopard)
+{{love|Ooh-OO-OOO-EEE-ee}} (love)
+{{lovesickness|Ooh-OO-OOO-EEE-ee}} (lovesickness)
+{{mercurial|Ooh-OO-OOO-EEE-ee}} (mercurial)
+{{metamorphic|Ooh-OO-OOO-EEE-ee}} (metamorphic)
+{{mirrorshades|Ooh-OO-OOO-EEE-ee}} (mirrorshades)
+{{moon|Ooh-OO-OOO-EEE-ee}} (moon)
+{{nanoneuro|Ooh-OO-OOO-EEE-ee}} (Nano-Neuro)
+{{nanotech|Ooh-OO-OOO-EEE-ee}} (nanotech)
+{{nectar|Ooh-OO-OOO-EEE-ee}} (nectar)
+{{nervous|Ooh-OO-OOO-EEE-ee}} (nervous)
+{{neutronic|Ooh-OO-OOO-EEE-ee}} (neutronic)
+{{ninefold|Ooh-OO-OOO-EEE-ee}} (ninefold)
+{{normal|Ooh-OO-OOO-EEE-ee}} (normal)
+{{normalish|Ooh-OO-OOO-EEE-ee}} (normalish)
+{{opalescent|Ooh-OO-OOO-EEE-ee}} (opalescent)
+{{overloaded|Ooh-OO-OOO-EEE-ee}} (overloaded)
+{{painted|Ooh-OO-OOO-EEE-ee}} (painted)
+{{paisley|Ooh-OO-OOO-EEE-ee}} (paisley)
+{{palladium mesh|Ooh-OO-OOO-EEE-ee}} (palladium mesh)
+{{patchwork|Ooh-OO-OOO-EEE-ee}} (patchwork)
+{{pearly|Ooh-OO-OOO-EEE-ee}} (pearly)
+{{peridot|Ooh-OO-OOO-EEE-ee}} (peridot)
+{{phase-harmonic|Ooh-OO-OOO-EEE-ee}} (phase-harmonic)
+{{plaid|Ooh-OO-OOO-EEE-ee}} (plaid)
+{{plasma|Ooh-OO-OOO-EEE-ee}} (plasma)
+{{plastifer|Ooh-OO-OOO-EEE-ee}} (plastifer)
+{{polarized|Ooh-OO-OOO-EEE-ee}} (polarized)
+{{prismatic|Ooh-OO-OOO-EEE-ee}} (prismatic)
+{{psionic|Ooh-OO-OOO-EEE-ee}} (psionic)
+{{psychalflesh|Ooh-OO-OOO-EEE-ee}} (psychalflesh)
+{{qas|Ooh-OO-OOO-EEE-ee}} (qas)
+{{qon|Ooh-OO-OOO-EEE-ee}} (qon)
+{{radiant|Ooh-OO-OOO-EEE-ee}} (radiant)
+{{rainbow|Ooh-OO-OOO-EEE-ee}} (rainbow)
+{{random|Ooh-OO-OOO-EEE-ee}} (random)
+{{refractive|Ooh-OO-OOO-EEE-ee}} (refractive)
+{{rermadon|Ooh-OO-OOO-EEE-ee}} (rermadon)
+{{resonance|Ooh-OO-OOO-EEE-ee}} (resonance)
+{{rocket|Ooh-OO-OOO-EEE-ee}} (rocket)
+{{rubbergum|Ooh-OO-OOO-EEE-ee}} (rubbergum)
+{{rusty|Ooh-OO-OOO-EEE-ee}} (rusty)
+{{scaled|Ooh-OO-OOO-EEE-ee}} (scaled)
+{{shade|Ooh-OO-OOO-EEE-ee}} (shade)
+{{shimmering|Ooh-OO-OOO-EEE-ee}} (shimmering)
+{{shugruith|Ooh-OO-OOO-EEE-ee}} (shugruith)
+{{sickly|Ooh-OO-OOO-EEE-ee}} (sickly)
+{{silvery|Ooh-OO-OOO-EEE-ee}} (silvery)
+{{skulk|Ooh-OO-OOO-EEE-ee}} (skulk)
+{{snail-encrusted|Ooh-OO-OOO-EEE-ee}} (snail-encrusted)
+{{snakeskin|Ooh-OO-OOO-EEE-ee}} (snakeskin)
+{{soul|Ooh-OO-OOO-EEE-ee}} (soul)
+{{sparkling|Ooh-OO-OOO-EEE-ee}} (sparkling)
+{{spaser|Ooh-OO-OOO-EEE-ee}} (spaser)
+{{sphynx|Ooh-OO-OOO-EEE-ee}} (sphynx)
+{{spiked|Ooh-OO-OOO-EEE-ee}} (spiked)
+{{spring-turret|Ooh-OO-OOO-EEE-ee}} (spring-turret)
+{{starry|Ooh-OO-OOO-EEE-ee}} (starry)
+{{structural|Ooh-OO-OOO-EEE-ee}} (structural)
+{{sun|Ooh-OO-OOO-EEE-ee}} (sun)
+{{sunset|Ooh-OO-OOO-EEE-ee}} (sunset)
+{{sunslag|Ooh-OO-OOO-EEE-ee}} (sunslag)
+{{syphon|Ooh-OO-OOO-EEE-ee}} (syphon)
+{{tarnished|Ooh-OO-OOO-EEE-ee}} (tarnished)
+{{tartan|Ooh-OO-OOO-EEE-ee}} (tartan)
+{{telemetric|Ooh-OO-OOO-EEE-ee}} (telemetric)
+{{thermo|Ooh-OO-OOO-EEE-ee}} (thermo)
+{{transkinetic|Ooh-OO-OOO-EEE-ee}} (transkinetic)
+{{turbow|Ooh-OO-OOO-EEE-ee}} (turbow)
+{{ubernostrum|Ooh-OO-OOO-EEE-ee}} (ubernostrum)
+{{urban camouflage|Ooh-OO-OOO-EEE-ee}} (urban camouflage)
+{{visage|Ooh-OO-OOO-EEE-ee}} (VISAGE)
+{{watery|Ooh-OO-OOO-EEE-ee}} (watery)
+{{zetachrome|Ooh-OO-OOO-EEE-ee}} (zetachrome)
+You name your iron battle axe '{{blaze|Ooh-OO-OOO-EEE-ee}}'.
+You name your iron battle axe '&rOo&Rh&W-&YO&rO-&RO&WO&YO&r-E&RE&WE&Y-&ree&y'.
+Blessed by divine beings, =name= discovered the legendary iron battle axe known as '{{blaze|Ooh-OO-OOO-EEE-ee}}'.
+Fashwam обнаружен легендарный железный боевой топор известный как '{{blaze|Ooh-OO-OOO-EEE-ee}}'.
+At a remote  near Torus Qaazoshan, Fashwam met with a group of  and commissed an iron battle axe named {{blaze|Ooh-OO-OOO-EEE-ee}}.
+This item is a named iron battle axe.
+20% chance on melee attack to sting your opponent ({{c|}}{{rules|8}} {{r|}}{{rules|1d6}})
+20% chance on melee attack to sting your opponent (&c&C7&y &r&C1d6&y)
+Venom confuses opponents for &C2d3+2&y rounds
+20% chance on melee attack to sting your opponent (&c&C8&y &r&C1d6&y)
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+{{R|boomrose}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d2)
+{{Y|steel}} arrow x10 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x83 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x3 {{b|}}0 {{K|	}}1
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{c|stun}} rod {{c|}}6 {{r|}}1d2 {{y|[odd trinket]}} [{{r|rusted}}]
+{{w|leather}} whip {{c|}}7 {{r|}}1d4
+{{Y|steel}} war hammer {{c|}}7 {{r|}}2d2
+club {{c|}}5 {{r|}}1d2
+desert kris {{c|}}6 {{r|}}1d3
+short bow {{c|}}4 {{r|}}1d2 {{y|[{{R|boomrose}} arrow]}}
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+You are now &WHungry&y and &YThirsty&y.
+You shake off the stun.
+You toggle &cHarvest Plants&y off.
+You toggle &cHarvest Plants&y on.
+You reload your Issachar rifle with lead slug x6.
+You beat at the flames on the &Rflaming&y cloth robe with your hands!
+Jewel-Encrusted: This item is much
+{{y|{{Y|salt-encrusted}} Yimula's}} Skills
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+y Покрыт 1 драм &Yразбавленная соль&y.
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+{{R|boomrose}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d2)
+{{Y|steel}} arrow x10 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x83 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x3 {{b|}}0 {{K|	}}1
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{c|stun}} rod {{c|}}6 {{r|}}1d2 {{y|[odd trinket]}} [{{r|rusted}}]
+{{w|leather}} whip {{c|}}7 {{r|}}1d4
+{{Y|steel}} war hammer {{c|}}7 {{r|}}2d2
+club {{c|}}5 {{r|}}1d2
+desert kris {{c|}}6 {{r|}}1d3
+iron battle axe {{c|}}6 {{r|}}1d2+1
+short bow {{c|}}4 {{r|}}1d2 {{y|[{{R|boomrose}} arrow]}}
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+You are now &WHungry&y and &YThirsty&y.
+You toggle &cHarvest Plants&y off.
+You toggle &cHarvest Plants&y on.
+You beat at the flames on the &Rflaming&y cloth robe with your hands!
+20% chance on melee attack to sting your opponent ({{c|}}{{rules|8}} {{r|}}{{rules|1d6}})
+20% chance on melee attack to sting your opponent (&c&C7&y &r&C1d6&y)
+Venom confuses opponents for &C2d3+2&y rounds
+20% chance on melee attack to sting your opponent (&c&C8&y &r&C1d6&y)
+{{y|{{Y|salt-encrusted}} Yimula's}} Skills
+Stinger damage: 1d6
+Venom confuses opponents for 2d3+2 round.
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+Oops
+Litteratus
+Unlocked Thursday, 28 May 2026 09:10
+Unlocked Tuesday, 26 May 2026 15:01
+Unlocked Thursday, 21 May 2026 17:29
+Mumblecore
+Dalet
+Vav
+{{W|[F]}} fire
+{{W|[R]}} reload
+{{K|ash-stained}} robes {{b|}}1 {{K|	}}1
+{{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+{{R|boomrose}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d2)
+{{Y|steel}} arrow x10 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x83 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x3 {{b|}}0 {{K|	}}1
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{c|stun}} rod {{c|}}6 {{r|}}1d2 {{y|[odd trinket]}} [{{r|rusted}}]
+{{w|leather}} whip {{c|}}7 {{r|}}1d4
+{{Y|steel}} war hammer {{c|}}7 {{r|}}2d2
+club {{c|}}5 {{r|}}1d2
+desert kris {{c|}}6 {{r|}}1d3
+iron battle axe {{c|}}6 {{r|}}1d2+1
+short bow {{c|}}4 {{r|}}1d2 {{y|[{{R|boomrose}} arrow]}}
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+Jewel-Encrusted: This item is much
+1d8 [lead slug x3]
+Ruf
+fo-Ufa
+You are now &WHungry&y and &YThirsty&y.
+Current location (S)
+Center, the Kamritum Meteoritefold (C)
+Suner, Камритумский метеоритный разлом, 1 глубина уровня
+Suner, Kamritum Meteoritefold, 1 stratum deep
+Foam None of the Matter
+Where All Else Fails You Can
+Yimula написал(а) влиятельную книгу «Where All Else Fails You Can».
+Awaken the Past Thousand Years
+Throughout the entirety of 3581 BR, Dalemasp laid waste to all of the omen-worshipping Province of Sherash, stealing oil from the heat lamps in the villages of antelopes and newly sentient beings. She became known as the Woe of Sherash.
+Dalemasp:
+You cannot light the {{B|{{B|wet}} campfire remains}} while they're in the pool of {{Y|salty}} {{B|water}}.
+You cannot light the &Bwet campfire remains&y while they're in the pool of &Ysalty&y &Bwater&y.
+Structure the Antecedent Energy
+Yimula написал(а) влиятельную книгу «Сооружение the Antecedent Энергия».
+wet Structure the Antecedent Energy
+You cannot start a campfire in the puddle of {{Y|salty}} {{B|water}}.
+You cannot start a campfire in the puddle of &Ysalty&y &Bwater&y.
+33 vinewafers into 99 servings of {{g|vinewafer sheaf}}.
+Some {{r|raw bear meat}} into 5 servings of {{w|bear jerky}}.
+A starapple into 5 servings of {{R|starapple jam}}.
+Some {{r|raw croc meat}} into 3 servings of {{g|croc jerky}}.
+2 {{r|raw boar meats}} into 6 servings of boar jerky.
+33 vinewafers into 99 servings of &gvinewafer sheaf&y.
+Some &rraw bear meat&y into 5 servings of &wbear jerky&y.
+A starapple into 5 servings of &Rstarapple jam&y.
+Some &rraw croc meat&y into 3 servings of &gcroc jerky&y.
+2 &rraw boar meats&y into 6 servings of boar jerky.
+sfx_artifact_examination_success_total
+{{Y|airfoil}} {{fungicide|fungicide}} grenade mk I
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{W|[F]}} fire
+{{W|[R]}} reload
+Covered in 1 dram of &Ysalty&y &Bwater&y.
+Yсолёный&y &Bвода&y.
+&Wпереваривание
+&y Вы жаждете вполсилы.
+&Bмокрое
+&y Покрыто 1 драмой &Yсолёный&y &Bвода&y.
+2 &rraw boar meats&y into 6 servings of boar jerky.
+Some &rraw bear meat&y into 5 servings of &wbear jerky&y.
+A starapple into 5 servings of &Rstarapple jam&y.
+Some &rraw croc meat&y into 3 servings of &gcroc jerky&y.
+33 vinewafers into 99 servings of &gvinewafer sheaf&y.
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+{{R|boomrose}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d2)
+{{Y|steel}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x83 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x3 {{b|}}0 {{K|	}}1
+Awaken the Past Thousand Years
+{{Y|airfoil}} {{fungicide|fungicide}} grenade mk I
+stun gas grenade mk I [{{r|rusted}}]
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{c|stun}} rod {{c|}}6 {{r|}}1d2 {{y|[odd trinket]}} [{{r|rusted}}]
+{{w|leather}} whip {{c|}}7 {{r|}}1d4
+{{Y|steel}} war hammer {{c|}}7 {{r|}}2d2
+club {{c|}}5 {{r|}}1d2
+desert kris {{c|}}6 {{r|}}1d3
+iron battle axe {{c|}}6 {{r|}}1d2+1
+short bow {{c|}}4 {{r|}}1d2 {{y|[{{R|boomrose}} arrow]}}
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+33 vinewafers into 99 servings of &gvinewafer sheaf&y.
+Some &rraw bear meat&y into 5 servings of &wbear jerky&y.
+A starapple into 5 servings of &Rstarapple jam&y.
+Some &rraw croc meat&y into 3 servings of &gcroc jerky&y.
+2 &rraw boar meats&y into 6 servings of boar jerky.
+«As Chavvah I am Chavvah, and I was too great to be drawn, the right temperature and whirrs matter away.»
+«So I am, and it lets out a mound of wet leaves, rootbind, and rotting flesh puts some elevation to the breasts, waist, and thigh.»
+T: 25°
+Total size: 25mb {asdbfasd-asdf-asdf-asdfasdf}
+KODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUMKODUM MU OTURTURUM KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+KODUM MU OTURTURUM
+20% chance on melee attack to sting your opponent ({{c|}}{{rules|8}} {{r|}}{{rules|1d6}})
+20% chance on melee attack to sting your opponent (&c&C7&y &r&C1d6&y)
+Venom confuses opponents for &C2d3+2&y rounds
+20% chance on melee attack to sting your opponent (&c&C8&y &r&C1d6&y)
+{{b|carbide}} arrow x8 {{c|}}4 {{r|}}1d2 (4/1d4+1)
+{{R|boomrose}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d2)
+{{Y|steel}} arrow x11 {{c|}}4 {{r|}}1d2 (4/1d3+1)
+lead slug x65 {{c|}}4 {{r|}}1d2
+wooden arrow x83 {{c|}}4 {{r|}}1d2 (4/1d4)
+worn burnoose x3 {{b|}}0 {{K|	}}1
+Awaken the Past Thousand Years
+{{Y|airfoil}} {{fungicide|fungicide}} grenade mk I
+stun gas grenade mk I [{{r|rusted}}]
+{{B-R-C-B-R-y-b-m-b-R-C-m-g-B-r sequence|jewel-encrusted}} {{w|bronze}} battle axe {{c|}}5 {{r|}}1d2
+{{c|stun}} rod {{c|}}6 {{r|}}1d2 {{y|[odd trinket]}} [{{r|rusted}}]
+{{w|leather}} whip {{c|}}7 {{r|}}1d4
+{{Y|steel}} war hammer {{c|}}7 {{r|}}2d2
+club {{c|}}5 {{r|}}1d2
+desert kris {{c|}}6 {{r|}}1d3
+iron battle axe {{c|}}6 {{r|}}1d2+1
+short bow {{c|}}4 {{r|}}1d2 {{y|[{{R|boomrose}} arrow]}}
+short bow {{c|}}4 {{r|}}1d4 {{y|[wooden arrow]}}
+33 vinewafers into 99 servings of &gvinewafer sheaf&y.
+Some &rraw bear meat&y into 5 servings of &wbear jerky&y.
+A starapple into 5 servings of &Rstarapple jam&y.
+Some &rraw croc meat&y into 3 servings of &gcroc jerky&y.
+2 &rraw boar meats&y into 6 servings of boar jerky.
+«As Chavvah I am Chavvah, and I was too great to be drawn, the right temperature and whirrs matter away.»
+«So I am, and it lets out a mound of wet leaves, rootbind, and rotting flesh puts some elevation to the breasts, waist, and thigh.»
+Perfect&y
+You flinch away as a
+arrow whistles past from the northeast!
+two-handed {{B|carbide}}-folding hammer {{c|}}8 {{r|}}2d6
+{{R|boomrose}} arrow x3 {{c|}}4 {{r|}}1d2 (4/1d2)
+wooden arrow x5 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{R|boomrose}} arrow x4 {{c|}}4 {{r|}}1d2 (4/1d2)
+whistles past from the northeast!
+{{Y|steel}} potter's knife {{c|}}7 {{r|}}1d4+1
+&Wпереваривание
+&y Вы жаждете вполсилы.
+wooden arrow x9 {{c|}}4 {{r|}}1d2 (4/1d4)
+{{Y|steel}} vinereaper {{c|}}7 {{r|}}1d3+1
+{{R|boomrose}} arrow x15 {{c|}}4 {{r|}}1d2 (4/1d2)
+wooden arrow x97 {{c|}}4 {{r|}}1d2 (4/1d4)
+furs x2 {{b|}}2 {{K|	}}-1
+1d8 [lead slug x3]
+shrine to Ythri-Xes, the Shrewd Scion of Pariahs
+One auspicious day, a babe was found swaddled with a shrewd scroll in each hand by a group of pariahs in Qagammu. They took her into their fold and fostered her, and she became known as Ythri-Xes, the Shrewd Scion of Pariahs.
+Ythri-Xes:
+sfx_newLocation_discovered_important
+Lionhearted =name= discovered the location of Qagammu, once thought lost to the sands of time.
+Yimula обнаружен расположение Qagammu, который когда-то считался затерянным в песках времени.
+In 1001 AR, Yimula appointed a corrupt administrator as minister of Qagammu. She mandated the practice of hoarding emeralds in their name.
+Venom confuses opponents for {{rules|2d3+4}} rounds
+{{B|quest:}} Visit Qagammu
+You flinch away as a &Ysteel&G arrow whistles past from the northeast!
