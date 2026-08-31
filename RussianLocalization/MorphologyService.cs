@@ -307,10 +307,15 @@ namespace RussianLocalization
                 if (number == MorphNumber.Plural) idx = 0;
                 else if (g != MorphGender.Fem) idx = 0;
             }
-            else if (targetCase == MorphCase.Acc && animate && number == MorphNumber.Singular && g == MorphGender.Neut)
+            else if (targetCase == MorphCase.Acc && animate)
             {
-                // pymorphy хранит для neut acc форму nom ("мокрое"); одуш. требует род.п.
-                idx = (int)MorphCase.Gen;
+                // У прилагательного нет собственной одушевлённости: в сгенерированной
+                // парадигме Acc часто совпадает с Nom. В составе именной группы
+                // одушевлённый мужской/средний род и множественное число требуют
+                // формы Gen ("вижу нового щелкуна", "вижу новых щелкунов").
+                // Жен. ед. сохраняет отдельную Acc-форму ("вижу новую ...").
+                if (number == MorphNumber.Plural || g == MorphGender.Masc || g == MorphGender.Neut)
+                    idx = (int)MorphCase.Gen;
             }
             return GetForm(forms, idx);
         }
@@ -326,6 +331,21 @@ namespace RussianLocalization
                 if (string.Equals(word, stripped, StringComparison.OrdinalIgnoreCase)) return true;
             }
             return false;
+        }
+
+        // Токен, не содержащий ни одной буквы, но содержащий хотя бы одну цифру:
+        // "5", "40%", "1d2", "(x3)", "12,5". Такие токены не склоняются ни в каком падеже.
+        private static bool IsNumericToken(string word)
+        {
+            if (string.IsNullOrEmpty(word)) return false;
+            bool hasDigit = false;
+            for (int i = 0; i < word.Length; i++)
+            {
+                char c = word[i];
+                if (char.IsLetter(c)) return false;
+                if (char.IsDigit(c)) hasDigit = true;
+            }
+            return hasDigit;
         }
 
         private static bool IsAdjectiveBase(string word)
@@ -387,6 +407,15 @@ namespace RussianLocalization
             if (suffix.Length > 0) clean = clean.Substring(0, clean.Length - suffix.Length);
 
             if (string.IsNullOrEmpty(clean)) return word;
+
+            // Числовой токен склонению не подлежит НИКОГДА. Decline() уже отсекает строки,
+            // целиком состоящие из цифр, но фраза вида "5 против 7" туда не попадает: она
+            // уходит в разбор по частям, где "5" не опознаётся ни как существительное, ни
+            // как прилагательное и потому становится «главным словом» группы. Дальше к нему
+            // приклеивалось падежное окончание, и игрок видел "[5у против 7]" вместо
+            // "[5 против 7]" (дательный приходил от предлога "по" в шаблоне промаха).
+            // Проверяем именно clean — цифры могли быть обёрнуты в цветовые коды ("&C40").
+            if (IsNumericToken(clean)) return word;
 
             // Возвратный постфикс -ся склонению не подлежит: склоняем основу, затем возвращаем
             // постфикс на место ("светящаяся" -> основа "светящая" -> род. "светящей" -> "светящейся").
@@ -839,7 +868,7 @@ namespace RussianLocalization
             return last == 'о' || last == 'е';
         }
 
-        public static string Decline(string nominative, MorphCase targetCase, MorphNumber number = MorphNumber.Singular)
+        public static string Decline(string nominative, MorphCase targetCase, MorphNumber number = MorphNumber.Singular, MorphGender? forcedGender = null)
         {
             if (string.IsNullOrEmpty(nominative)) return nominative;
 
@@ -903,12 +932,17 @@ namespace RussianLocalization
                 return nominative;
             }
 
-            if (targetCase == MorphCase.Nom && number == MorphNumber.Singular && !baseNominative.Contains(" ") && !baseNominative.Contains("-")) 
+            // Явный род из {{case:...|...|gender|...}} должен проходить даже для им.п.:
+            // иначе {{case:солоноватый|nom|fem|sg}} преждевременно возвращал мужскую форму.
+            if (forcedGender == null && targetCase == MorphCase.Nom && number == MorphNumber.Singular && !baseNominative.Contains(" ") && !baseNominative.Contains("-"))
                 return baseNominative + quantitySuffix;
 
             MaybeResetCache();
 
-            string cacheKey = baseNominative + "|" + (int)targetCase + "|" + (int)number;
+            // Род входит в ключ: один и тот же adjective может последовательно
+            // склоняться для разных heads (например, masc и fem).
+            string genderKey = forcedGender.HasValue ? ((int)forcedGender.Value).ToString() : "-";
+            string cacheKey = baseNominative + "|" + (int)targetCase + "|" + (int)number + "|" + genderKey;
             if (morphCache.TryGetValue(cacheKey, out string cached))
                 return cached + quantitySuffix;
 
@@ -988,7 +1022,7 @@ namespace RussianLocalization
                     headWord = TagSuffixRegex.Replace(headWord, "").Trim();
                 }
 
-                MorphGender phraseGender = DetectGenderForWord(headWord);
+                MorphGender phraseGender = forcedGender ?? DetectGenderForWord(headWord);
                 bool phraseAnim = DetectAnimacyForWord(headWord);
 
                 StringBuilder sb = new StringBuilder();
@@ -1037,7 +1071,7 @@ namespace RussianLocalization
             }
             else
             {
-                result = DeclineSingleWord(baseNominative, DetectGenderForWord(baseNominative), targetCase, number, DetectAnimacyForWord(baseNominative));
+                result = DeclineSingleWord(baseNominative, forcedGender ?? DetectGenderForWord(baseNominative), targetCase, number, DetectAnimacyForWord(baseNominative));
             }
 
             morphCache[cacheKey] = result;
@@ -1056,6 +1090,16 @@ namespace RussianLocalization
             string result = ApplyAdjectiveRules(adjective, gender, targetCase, number, animate);
             morphCache[cacheKey] = result;
             return result;
+        }
+
+        // Совместимый публичный вход для AdjectivePatches.
+        // В DescriptionBuilder род прилагательного приходит от главного существительного,
+        // поэтому передаём genderFromHead=true и не даём внутреннему определению рода
+        // переопределить согласование.
+        public static string ForceDeclineAdjective(string adjective, MorphGender targetGender, MorphCase targetCase, MorphNumber targetNumber)
+        {
+            if (string.IsNullOrEmpty(adjective)) return adjective;
+            return DeclineSingleWord(adjective, targetGender, targetCase, targetNumber, false, true);
         }
 
         public static MorphGender DetectGender(string genderStr)
@@ -1234,8 +1278,10 @@ namespace RussianLocalization
                 case MorphCase.Gen:
                     if (last == 'а')
                     {
-                        // После шипяных — ударение важно, но упрощаем
-                        return stem + "ы";
+                        // После г/к/х и шипящих пишется -и: руки, мухи, души.
+                        bool iEnding = stem.Length > 0 &&
+                            "гкхжчшщ".IndexOf(stem[stem.Length - 1]) >= 0;
+                        return stem + (iEnding ? "и" : "ы");
                     }
                     if (last == 'я') return stem + "и";
                     return word;
@@ -1363,7 +1409,14 @@ namespace RussianLocalization
                     goto case MorphCase.Nom;
                 case MorphCase.Nom:
                     if (last == 'ы' || last == 'и') return word; // уже мн.ч.
-                    if (last == 'а') return stem + "ы";
+                    if (last == 'а')
+                    {
+                        // После г/к/х и шипящих окончание -ы меняется на -и:
+                        // рука→руки, река→реки, душа→души.
+                        bool iEnding = stem.Length > 0 &&
+                            "гкхжчшщ".IndexOf(stem[stem.Length - 1]) >= 0;
+                        return stem + (iEnding ? "и" : "ы");
+                    }
                     if (last == 'я') return stem + "и";
                     if (last == 'о' || last == 'е') return stem + "а";
                     if (last == 'ь') return stem + "и"; // конь→кони, тень→тени
@@ -1444,6 +1497,8 @@ namespace RussianLocalization
                 stem = adj;
 
             bool sibilantStem = stem.Length > 0 && (stem[stem.Length - 1] == 'ж' || stem[stem.Length - 1] == 'ш' || stem[stem.Length - 1] == 'ч' || stem[stem.Length - 1] == 'щ');
+            bool kghcStem = stem.Length > 0 &&
+                "гкхц".IndexOf(stem[stem.Length - 1]) >= 0;
             // Мягкие окончания: -ний (последний→последнем), но НЕ -ный (длинный→длинном).
             bool softStem = sibilantStem || stem.EndsWith("ь") || adj.EndsWith("ний");
 
@@ -1466,21 +1521,24 @@ namespace RussianLocalization
 
             if (number == MorphNumber.Plural)
             {
+                // Для основ на г/к/х/ц множественное число также получает -ие/-их/-им:
+                // русский→русские, тихий→тихие, немецкий→немецкие.
+                bool pluralSoft = softStem || kghcStem;
                 switch (targetCase)
                 {
                     case MorphCase.Acc:
-                        if (animate) return stem + (softStem ? "их" : "ых");
-                        return stem + (softStem ? "ие" : "ые");
+                        if (animate) return stem + (pluralSoft ? "их" : "ых");
+                        return stem + (pluralSoft ? "ие" : "ые");
                     case MorphCase.Nom:
-                        return stem + (softStem ? "ие" : "ые");
+                        return stem + (pluralSoft ? "ие" : "ые");
                     case MorphCase.Gen:
-                        return stem + (softStem ? "их" : "ых");
+                        return stem + (pluralSoft ? "их" : "ых");
                     case MorphCase.Dat:
-                        return stem + (softStem ? "им" : "ым");
+                        return stem + (pluralSoft ? "им" : "ым");
                     case MorphCase.Ins:
-                        return stem + (softStem ? "ими" : "ыми");
+                        return stem + (pluralSoft ? "ими" : "ыми");
                     case MorphCase.Prep:
-                        return stem + (softStem ? "их" : "ых");
+                        return stem + (pluralSoft ? "их" : "ых");
                     default: return adj;
                 }
             }
@@ -1494,7 +1552,7 @@ namespace RussianLocalization
                         case MorphCase.Gen: return stem + (softStem ? "его" : "ого");
                         case MorphCase.Dat: return stem + (softStem ? "ему" : "ому");
                         case MorphCase.Acc: return animate ? stem + (softStem ? "его" : "ого") : adj;
-                        case MorphCase.Ins: return stem + (softStem ? "им" : "ым");
+                        case MorphCase.Ins: return stem + ((softStem || kghcStem) ? "им" : "ым");
                         case MorphCase.Prep: return stem + (softStem ? "ем" : "ом");
                         default: return adj;
                     }
@@ -1535,7 +1593,52 @@ namespace RussianLocalization
         public static string ApplyMorphMarkers(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
-            if (!text.Contains("{{case:")) return text;
+            if (!text.Contains("{{case:") && !text.Contains("{{agree:")) return text;
+
+            // `agree` is emitted by the dynamic combat/faction patterns for an
+            // adjective that must agree with a captured noun.  Keep it in the
+            // same per-match recovery path as `case`: one malformed payload
+            // must never make Regex.Replace return the whole original string.
+            if (text.Contains("{{agree:"))
+            {
+                try
+                {
+                    text = Regex.Replace(text,
+                        @"\{\{agree:([^|]+)\|([^|]+)\|([^|]+)\|([^}]+)\}\}",
+                        match =>
+                        {
+                            string adjective = match.Groups[1].Value.Trim();
+                            try
+                            {
+                                string target = Regex.Replace(
+                                    match.Groups[2].Value,
+                                    @"<[^>]+>|&[A-Za-z]|\{\{[^|]+\||\}\}",
+                                    "");
+                                target = target.Trim();
+                                string[] parts = target.Split(
+                                    new[] { ' ' },
+                                    StringSplitOptions.RemoveEmptyEntries);
+                                string head = parts.Length > 0 ? parts[parts.Length - 1] : target;
+                                MorphGender gender = DetectGenderForWord(head);
+                                MorphCase targetCase = ParseCase(match.Groups[3].Value.Trim().ToLowerInvariant());
+                                string number = match.Groups[4].Value.Trim().ToLowerInvariant();
+                                MorphNumber morphNumber = number == "pl" || number == "plural"
+                                    ? MorphNumber.Plural
+                                    : MorphNumber.Singular;
+                                return DeclineAdjective(adjective, gender, targetCase, morphNumber, false);
+                            }
+                            catch
+                            {
+                                return adjective;
+                            }
+                        });
+                }
+                catch
+                {
+                    // The case-marker pass below can still repair other
+                    // markers in the same string.
+                }
+            }
 
             // Падеж считается ПОМАТЧЕВО. Раньше try стоял вокруг всего Regex.Replace, и одно
             // исключение на одном слове оставляло НЕТРОНУТЫМИ все маркеры строки — игрок видел
@@ -1550,14 +1653,16 @@ namespace RussianLocalization
                     try
                     {
                         string caseStr = match.Groups[2].Value.Trim().ToLower();
+                        string genderStr = match.Groups[3].Value.Trim().ToLower();
                         string numberStr = match.Groups[4].Value.Trim().ToLower();
 
                         MorphCase mc = ParseCase(caseStr);
                         MorphNumber mn = numberStr == "pl" || numberStr == "plural" ? MorphNumber.Plural : MorphNumber.Singular;
+                        MorphGender? forcedGender = genderStr == "auto" ? (MorphGender?)null : ParseGender(genderStr);
 
-                        // Род здесь не нужен: Decline определяет его сам по главному слову фразы —
-                        // и для "auto", и для явного значения ветки раньше были идентичны.
-                        return Decline(word, mc, mn);
+                        // auto оставляет определение рода словарю; явное значение должно
+                        // пересогласовать прилагательное даже в именительном падеже.
+                        return Decline(word, mc, mn, forcedGender);
                     }
                     catch
                     {
@@ -1581,11 +1686,20 @@ namespace RussianLocalization
                 catch { }
             }
 
+            if (replaced.Contains("{{agree:"))
+            {
+                try
+                {
+                    replaced = Regex.Replace(replaced, @"\{\{agree:([^|}]+)(?:\|[^|}]*){0,3}\}\}", m => m.Groups[1].Value.Trim());
+                }
+                catch { }
+            }
+
             return replaced;
         }
         
         // Определение рода слова для морфологических маркеров
-        private static MorphGender DetectGenderForWord(string word)
+        public static MorphGender DetectGenderForWord(string word)
         {
             if (string.IsNullOrEmpty(word)) return MorphGender.Masc;
 
