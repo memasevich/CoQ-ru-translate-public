@@ -915,9 +915,13 @@ namespace RussianLocalization
 
                                 if (trimmedKey.Length == 1 &&
                                     System.Text.RegularExpressions.Regex.IsMatch(trimmedKey, @"^[A-Za-z]+$") &&
-                                    !IsGameAbbreviation(trimmedKey))
+                                    !IsGameAbbreviation(trimmedKey) &&
+                                    !(string.IsNullOrEmpty(kvp.Value) && trimmedKey.Equals("a", StringComparison.OrdinalIgnoreCase)))
                                 {
                                     // Слишком короткое английское слово (не сокращение) — опасно, пропускаем.
+                                    // Единственное исключение — артикль "a" с ПУСТЫМ переводом («выбросить
+                                    // артикль»). Именно "a", а не любой пустой ключ: "I" -> "" тихо съел бы
+                                    // местоимение. Одиночные буквы-тайлы защищены раньше, в TranslateText.
                                     continue;
                                 }
 
@@ -2923,8 +2927,12 @@ namespace RussianLocalization
             // чтобы словарь мог перевести цельное слово вместо отдельных букв.
             text = CompactColorFragments(text);
 
-            // Восстановление битых кавычек из-за кодировок консоли
-            text = text.Replace('½', '«').Replace('╗', '»');
+            // Восстановление битых кавычек из-за кодировок консоли (классический экран рисует
+            // кавычку по младшему байту кода: « -> ½, » -> ╗; строки из сейва/журнала могут
+            // вернуться в переводчик уже искажёнными).
+            // 2026-08-25: восстанавливаем в ASCII-кавычку, а не в «ёлочки» — все словари
+            // переведены на ASCII, и «ёлочки» в выводе снова сломались бы в классике.
+            text = text.Replace('½', '"').Replace('╗', '"');
 
 
             // Защита горячих клавиш и системных имен
@@ -4169,6 +4177,34 @@ namespace RussianLocalization
                 string wholePattern = TryTranslatePattern(text, out wholePatternOk);
                 if (wholePatternOk) return wholePattern;
 
+                // 2026-08-25: цветная разметка ВНУТРИ имени ("two-handed {{B|carbide}} long
+                // sword") режет фразу на сегменты: ни целая строка, ни куски в словаре не
+                // находятся, каждый сегмент переводится порознь — итог франкен со склейками
+                // («два-с рукакарбидный»). Пробуем ГОЛУЮ версию фразы (без {{тег|, }}, &X,
+                // <color>) по точному словарю, нормализованному ключу и паттернам. Компромисс
+                // тот же, что у голых кандидатов в TryTranslatePatternBody: внутренние цвета
+                // теряем, взамен — верная грамматика целой фразы.
+                string bareName = trimmedText;
+                if (bareName.IndexOf('&') >= 0) bareName = StripAmpColorCodes(bareName);
+                if (bareName.IndexOf('<') >= 0) bareName = ColorTagRegex.Replace(bareName, "");
+                bareName = QudTagPrefixRegex.Replace(bareName, "").Replace("}}", "");
+                while (bareName.Contains("  ")) bareName = bareName.Replace("  ", " ");
+                bareName = bareName.Trim();
+                if (bareName.Length > 0 && bareName != trimmedText)
+                {
+                    string bareHit;
+                    if (staticDictionary.TryGetValue(bareName, out bareHit)) return bareHit;
+                    string bareOrigKey;
+                    if (normalizedKeyDictionary.TryGetValue(SuperNormalize(bareName), out bareOrigKey) &&
+                        staticDictionary.TryGetValue(bareOrigKey, out bareHit))
+                    {
+                        return RestoreStrippedPunctuation(bareName, bareOrigKey, bareHit);
+                    }
+                    bool barePatternOk;
+                    string barePattern = TryTranslatePattern(bareName, out barePatternOk);
+                    if (barePatternOk) return barePattern;
+                }
+
                 return TranslateMarkup(text);
             }
 
@@ -4322,6 +4358,19 @@ namespace RussianLocalization
 
 
             
+            // 2026-08-25: паттерны раньше жили только в пути лога сообщений
+            // (TranslateInternalClean) и в разметочной ветке выше — обычные строки Modern UI
+            // («Disassembled 1 item of 4») до них не доходили и падали в пословный перевод.
+            // Пробуем паттерны до прозаического гейта: цельная грамматика и для прозы, и для
+            // коротких строк. Цена — линейный проход по паттернам на словарный промах,
+            // результат кэшируется в translationCache, внутри есть лимит длины и глубины.
+            if (string.IsNullOrEmpty(translatedCore))
+            {
+                bool corePatternOk;
+                string corePattern = TryTranslatePattern(trimmedCore, out corePatternOk);
+                if (corePatternOk) translatedCore = corePattern;
+            }
+
             if (string.IsNullOrEmpty(translatedCore))
             {
                 if (IsEnglishProse(normalizedCore))
@@ -4497,6 +4546,13 @@ namespace RussianLocalization
             new System.Text.RegularExpressions.Regex(@"</?color(?:=[^>]*)?>",
                 System.Text.RegularExpressions.RegexOptions.Compiled);
 
+        // Открывающий тег Qud-разметки "{{имя|" (имя — что угодно без | и скобок: "c", "rules",
+        // "W-Y-Y-Y-w sequence"...). Для построения «голой» версии строки закрывающие "}}"
+        // срезаются отдельно простым Replace.
+        private static readonly System.Text.RegularExpressions.Regex QudTagPrefixRegex =
+            new System.Text.RegularExpressions.Regex(@"\{\{[^|{}]*\|",
+                System.Text.RegularExpressions.RegexOptions.Compiled);
+
         private static string StripAmpColorCodes(string s)
         {
             if (string.IsNullOrEmpty(s) || s.IndexOf('&') < 0) return s;
@@ -4538,9 +4594,14 @@ namespace RussianLocalization
         }
 
         // Собираем карту шаблонов из общего словаря ОДИН раз при инициализации.
-        // Берём запись, только если набор имён переменных в переводе ТОЧНО совпадает с оригиналом.
-        // Иначе игра подставит значение не туда (или не подставит вовсе) — а это уже поломка
-        // логики, а не косметика. Замер по текущему словарю: годны ~10730 из ~11159 (96%).
+        // 2026-08-25: правило ОСЛАБЛЕНО. Раньше требовалось ТОЧНОЕ совпадение мультимножества
+        // имён переменных — и это выкидывало ~330 корректных переводов (замер: 10825 -> 11129
+        // принятых). Пропуск переменной оригинала — законный выбор перевода: русской грамматике
+        // возвратные/притяжательные часто не нужны («You've proven =player.reflexive= a friend»
+        // -> «Вы доказали, что являетесь другом»), игра просто не сделает эту подстановку.
+        // Дополнительные =ifplayerplural:...= в переводе тоже законны — это единственный способ
+        // передать ты/вы-окончания русских глаголов. Опасен только один случай: перевод ВВОДИТ
+        // переменную, которой нет в оригинале, — её подстановка непредсказуема. Его и запрещаем.
         private static void BuildTemplateDictionary()
         {
             try
@@ -4555,15 +4616,13 @@ namespace RussianLocalization
                     var kh = GameVarHeads(key);
                     if (kh.Count == 0) continue;
                     var vh = GameVarHeads(val);
-                    bool same = kh.Count == vh.Count;
-                    if (same)
+                    bool ok = true;
+                    for (int i = 0; i < vh.Count; i++)
                     {
-                        for (int i = 0; i < kh.Count; i++)
-                        {
-                            if (!string.Equals(kh[i], vh[i], StringComparison.Ordinal)) { same = false; break; }
-                        }
+                        if (string.Equals(vh[i], "ifplayerplural", StringComparison.Ordinal)) continue;
+                        if (!kh.Contains(vh[i])) { ok = false; break; }
                     }
-                    if (!same) { skipped++; continue; }
+                    if (!ok) { skipped++; continue; }
                     templateDictionary[key] = val;
                 }
                 LogInfo("[RussianLocalization] Templates ready: " + templateDictionary.Count +
@@ -4602,11 +4661,16 @@ namespace RussianLocalization
         // Английские связки и вспомогательные глаголы — надёжный признак развёрнутой прозы.
         // Их наличие означает, что у строки есть синтаксис, который пословная подстановка
         // гарантированно разрушит.
+        // 2026-08-25: добавлены you/your/yours — предложения от второго лица («You discharge
+        // 6000 units of electrical jolt») проскакивали фильтр и давали «Вы разряд 6000 единицы
+        // электрический рывок». Читаемый английский лучше такой каши; настоящее лечение,
+        // как и прежде, — фраза целиком в dictionary.json или паттерн в pattern_dictionary.json.
         private static readonly HashSet<string> EnglishProseMarkers = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "is", "are", "was", "were", "be", "been", "being", "am",
             "has", "have", "had", "will", "would", "shall", "should",
-            "can", "could", "may", "might", "must", "does", "do", "did"
+            "can", "could", "may", "might", "must", "does", "do", "did",
+            "you", "your", "yours"
         };
 
         // 2026-07-17: ПРИЧИНА «Я ЕСТЬ ГРУТ». Замер по word_replacements.txt (1181 замена):
@@ -4643,6 +4707,25 @@ namespace RussianLocalization
             return false;
         }
 
+        // Однозначные предлоги -> падеж зависимого слова (для пословного фолбэка).
+        // в/на/с/о/под НАРОЧНО отсутствуют: их падеж зависит от смысла (движение/место,
+        // «о стену» acc / «о стене» prep), наугад ставить нельзя. НЕ путать с PrepositionCases
+        // выше — тот словарь работает в паре с ветками уточнения InferCaseFromTemplate,
+        // которых у пословного прохода нет.
+        private static readonly Dictionary<string, MorphCase> WordFallbackPrepCases =
+            new Dictionary<string, MorphCase>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "к", MorphCase.Dat }, { "ко", MorphCase.Dat }, { "по", MorphCase.Dat },
+            { "от", MorphCase.Gen }, { "у", MorphCase.Gen }, { "для", MorphCase.Gen },
+            { "без", MorphCase.Gen }, { "из", MorphCase.Gen }, { "до", MorphCase.Gen },
+            { "мимо", MorphCase.Gen }, { "около", MorphCase.Gen }, { "возле", MorphCase.Gen },
+            { "после", MorphCase.Gen }, { "кроме", MorphCase.Gen }, { "против", MorphCase.Gen },
+            { "из-за", MorphCase.Gen }, { "из-под", MorphCase.Gen },
+            { "при", MorphCase.Prep },
+            { "над", MorphCase.Ins }, { "перед", MorphCase.Ins }, { "между", MorphCase.Ins },
+            { "через", MorphCase.Acc }, { "про", MorphCase.Acc }, { "сквозь", MorphCase.Acc }
+        };
+
         private static string TryWordReplacement(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
@@ -4650,7 +4733,11 @@ namespace RussianLocalization
             string[] words = text.Split(' ');
             if (words.Length == 0) return text;
 
-            var sb = new StringBuilder(text.Length * 2);
+            // Слова результата + пометка «слово взято из word_dictionary» (лемма в именительном).
+            // Пометка нужна проходу склонения после предлогов ниже: чужой (уже русский) текст
+            // источника не трогаем — там падеж может быть уже верным.
+            var outWords = new List<string>(words.Length + 4);
+            var freshWord = new List<bool>(words.Length + 4);
             int wordIdx = 0;
 
             while (wordIdx < words.Length)
@@ -4660,8 +4747,8 @@ namespace RussianLocalization
                 // ломает разметку, которую парсит игра.
                 if (words[wordIdx].StartsWith("{{"))
                 {
-                    if (sb.Length > 0) sb.Append(' ');
-                    sb.Append(words[wordIdx]);
+                    outWords.Add(words[wordIdx]);
+                    freshWord.Add(false);
                     wordIdx++;
                     continue;
                 }
@@ -4678,8 +4765,8 @@ namespace RussianLocalization
                          wtok[0] == '*' || wtok[wlen - 1] == '*' ||
                          (wlen > 1 && (wtok[0] == '=' || wtok[wlen - 1] == '='))))
                     {
-                        if (sb.Length > 0) sb.Append(' ');
-                        sb.Append(wtok);
+                        outWords.Add(wtok);
+                        freshWord.Add(false);
                         wordIdx++;
                         continue;
                     }
@@ -4753,19 +4840,73 @@ namespace RussianLocalization
 
                 if (bestMatch != null)
                 {
-                    if (sb.Length > 0) sb.Append(' ');
-                    sb.Append(bestMatch);
+                    // Пустой перевод (артикли the/a/an -> "") просто выпадает из результата —
+                    // раньше на его месте оставался двойной пробел.
+                    // freshWord=true (лемма, можно склонять) — ТОЛЬКО для однословных значений.
+                    // Части многословного значения («handed» -> «с руками») — авторский текст
+                    // уже в нужной форме: проходы склонения ниже превращали его в кашу
+                    // («с руками» -> «с рука», голова пары не находится из-за предлога).
+                    string[] pieces = bestMatch.Split(' ');
+                    int nonEmpty = 0;
+                    foreach (string pc in pieces) if (pc.Length > 0) nonEmpty++;
+                    bool singleWordValue = nonEmpty == 1;
+                    foreach (string piece in pieces)
+                    {
+                        if (piece.Length == 0) continue;
+                        outWords.Add(piece);
+                        freshWord.Add(singleWordValue);
+                    }
                     wordIdx += bestLen;
                 }
                 else
                 {
-                    if (sb.Length > 0) sb.Append(' ');
-                    sb.Append(words[wordIdx]);
+                    outWords.Add(words[wordIdx]);
+                    freshWord.Add(false);
                     wordIdx++;
                 }
             }
 
-            string result = sb.ToString();
+            // Согласование рода внутри свежих пар «прил. + сущ.»: «задний кость» -> «задняя
+            // кость», «безупречный электроника» -> «безупречная электроника». Это нормализация
+            // в именительном; проходы ниже (предлоги, числительные) при необходимости переведут
+            // пару в свой падеж. Одиночные слова Decline в именительном не трогает — пустой ход.
+            for (int i = 0; i + 1 < outWords.Count; i++)
+            {
+                if (!freshWord[i] || !freshWord[i + 1]) continue;
+                if (TryDeclineFreshAt(outWords, freshWord, i, MorphCase.Nom, MorphNumber.Singular)) i++;
+            }
+
+            // Склонение после ОДНОЗНАЧНЫХ предлогов: «падает к земля» -> «падает к земле»,
+            // «к глубокая пещера» -> «к глубокой пещере» (пары «прил. + сущ.» — тоже).
+            // Только для слов, взятых из word_dictionary на этом же проходе (см. freshWord).
+            for (int i = 0; i + 1 < outWords.Count; i++)
+            {
+                MorphCase prepCase;
+                if (!WordFallbackPrepCases.TryGetValue(outWords[i], out prepCase)) continue;
+                TryDeclineFreshAt(outWords, freshWord, i + 1, prepCase, MorphNumber.Singular);
+            }
+
+            // Согласование с числительными: «6000 единицы» -> «6000 единиц»,
+            // «3 глубокие слои» -> «3 глубоких слоёв». Русское правило: 1 -> им.ед. (лемма
+            // и так такая), 2-4 -> род.ед., 0/5-20/25-30... -> род.мн.
+            // ponytail: применяем только ветку род.мн. — для 2-4 словарь часто уже хранит
+            // паукальную форму («единицы»), и лишнее склонение сделало бы хуже; расширить,
+            // если «3 единица» начнёт мозолить глаза. Только слова из word_dictionary (freshWord).
+            for (int i = 0; i + 1 < outWords.Count; i++)
+            {
+                // Краевую пунктуацию срезаем с ОБЕИХ сторон: "[12000" из "Discharge [12000
+                // charge]" иначе не парсится и правило молча не срабатывает.
+                string numTok = outWords[i].Trim('[', ']', '(', ')', ',', ';', ':');
+                long n;
+                // > 9 цифр = не игровое количество (id, сиды) — и заведомо без переполнения long.
+                if (numTok.Length == 0 || numTok.Length > 9 || !long.TryParse(numTok, out n) || n < 0) continue;
+                int mod100 = (int)(n % 100), mod10 = (int)(n % 10);
+                bool genPl = (mod100 >= 11 && mod100 <= 14) || mod10 == 0 || mod10 >= 5;
+                if (!genPl) continue;
+                TryDeclineFreshAt(outWords, freshWord, i + 1, MorphCase.Gen, MorphNumber.Plural);
+            }
+
+            string result = string.Join(" ", outWords);
             try
             {
                 result = MorphologyService.Decline(result, MorphCase.Nom);
@@ -4775,6 +4916,94 @@ namespace RussianLocalization
                 LogError("[RussianLocalization] Word replacement declension failed: " + ex.Message);
             }
             return result;
+        }
+
+        // Границы «ядра» токена: краевую пунктуацию, экранированные "&&" и цветокоды "&X"
+        // потребляем ровно как скан кандидатов TryWordReplacement (ядро — буквы и цифры),
+        // иначе буква кода прилипает к слову и склонение молча не срабатывает.
+        private static void StripWordEdges(string tok, out int cs, out int ce)
+        {
+            cs = 0; ce = tok.Length;
+            while (cs < ce)
+            {
+                if (tok[cs] == '&' && cs + 1 < ce && tok[cs + 1] == '&') { cs += 2; continue; }
+                if (tok[cs] == '&' && cs + 1 < ce && char.IsLetter(tok[cs + 1])) { cs += 2; continue; }
+                if (!char.IsLetterOrDigit(tok[cs])) { cs++; continue; }
+                break;
+            }
+            while (ce > cs)
+            {
+                if (ce - 2 >= cs && tok[ce - 2] == '&' && tok[ce - 1] == '&') { ce -= 2; continue; }
+                if (ce - 2 >= cs && tok[ce - 2] == '&' && char.IsLetter(tok[ce - 1])) { ce -= 2; continue; }
+                if (!char.IsLetterOrDigit(tok[ce - 1])) { ce--; continue; }
+                break;
+            }
+        }
+
+        // Склоняет слово outWords[idx] (или пару «прилагательное + существительное»
+        // outWords[idx..idx+1], когда оба токена свежие и без пунктуации между ними)
+        // в заданный падеж/число. Трогает ТОЛЬКО токены, взятые из word_dictionary на
+        // текущем проходе (freshWord) — уже-русский текст источника не портим.
+        // Decline сам отказывается от латиницы, чисел и сложных фраз, поэтому неудача
+        // безопасна: токены остаются как были.
+        private static bool TryDeclineFreshAt(List<string> outWords, List<bool> freshWord,
+            int idx, MorphCase targetCase, MorphNumber number)
+        {
+            if (idx >= outWords.Count || !freshWord[idx]) return false;
+            string first = outWords[idx];
+            int cs, ce;
+            StripWordEdges(first, out cs, out ce);
+            if (cs >= ce) return false;
+            string core1 = first.Substring(cs, ce - cs);
+
+            // Пара «прил. + сущ.»: пробуем склонить фразой, если следующий токен тоже свежий,
+            // а у текущего нет хвостовой пунктуации (запятая/скобка рвёт именную группу).
+            // Однобуквенное ядро («о», «с» из словарных значений) прилагательным быть не может —
+            // пару не образуем, чтобы Decline не выбрал ложную голову.
+            if (core1.Length >= 2 && ce == first.Length && idx + 1 < outWords.Count && freshWord[idx + 1])
+            {
+                string second = outWords[idx + 1];
+                int cs2, ce2;
+                StripWordEdges(second, out cs2, out ce2);
+                if (cs2 < ce2)
+                {
+                    string core2 = second.Substring(cs2, ce2 - cs2);
+                    try
+                    {
+                        string pair = core1 + " " + core2;
+                        string declinedPair = MorphologyService.Decline(pair, targetCase, number);
+                        if (!string.IsNullOrEmpty(declinedPair) && declinedPair != pair)
+                        {
+                            int sp = declinedPair.IndexOf(' ');
+                            if (sp > 0 && declinedPair.IndexOf(' ', sp + 1) < 0)
+                            {
+                                outWords[idx] = first.Substring(0, cs) + declinedPair.Substring(0, sp) + first.Substring(ce);
+                                outWords[idx + 1] = second.Substring(0, cs2) + declinedPair.Substring(sp + 1) + second.Substring(ce2);
+                                return true;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError("[RussianLocalization] Pair declension failed for '" + core1 + " " + core2 + "': " + ex.Message);
+                    }
+                }
+            }
+
+            try
+            {
+                string declined = MorphologyService.Decline(core1, targetCase, number);
+                if (!string.IsNullOrEmpty(declined) && declined != core1)
+                {
+                    outWords[idx] = first.Substring(0, cs) + declined + first.Substring(ce);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError("[RussianLocalization] Declension failed for '" + core1 + "': " + ex.Message);
+            }
+            return false;
         }
 
 
@@ -5701,6 +5930,18 @@ namespace RussianLocalization
                     case '\u042d': sb.Append("E"); break;
                     case '\u042e': sb.Append("Yu"); break;
                     case '\u042f': sb.Append("Ya"); break;
+
+                    // \u0422\u0438\u043f\u043e\u0433\u0440\u0430\u0444\u0438\u043a\u0430, \u043a\u043e\u0442\u043e\u0440\u043e\u0439 \u043d\u0435\u0442 \u0432 \u0442\u0430\u0439\u043b\u043e\u0432\u043e\u0439 \u043a\u0430\u0440\u0442\u0435 \u043a\u043b\u0430\u0441\u0441\u0438\u0447\u0435\u0441\u043a\u043e\u0433\u043e \u044d\u043a\u0440\u0430\u043d\u0430: \u0440\u0435\u043d\u0434\u0435\u0440\u0435\u0440
+                    // \u0431\u0435\u0440\u0451\u0442 \u0433\u043b\u0438\u0444 \u043f\u043e \u043c\u043b\u0430\u0434\u0448\u0435\u043c\u0443 \u0431\u0430\u0439\u0442\u0443 \u043a\u043e\u0434\u0430, \u043f\u043e\u044d\u0442\u043e\u043c\u0443 U+00AB (\u043b\u0435\u0432\u0430\u044f \u00ab\u0451\u043b\u043e\u0447\u043a\u0430\u00bb)
+                    // \u0440\u0438\u0441\u0443\u0435\u0442\u0441\u044f \u043a\u0430\u043a 1/2 (0xAB \u0432 CP437), \u0430 \u0442\u0438\u0440\u0435 U+2014 \u2014 \u043a\u0430\u043a \u0437\u043d\u0430\u043a \u0430\u0431\u0437\u0430\u0446\u0430 (0x14).
+                    // \u041f\u043e\u0434\u043c\u0435\u043d\u044f\u0435\u043c \u043d\u0430 ASCII-\u044d\u043a\u0432\u0438\u0432\u0430\u043b\u0435\u043d\u0442\u044b.
+                    case '\u00ab': case '\u00bb': case '\u201e': case '\u201c': case '\u201d':
+                    case '\u2039': case '\u203a':
+                        sb.Append('"'); break;
+                    case '\u2018': case '\u2019': sb.Append('\''); break;
+                    case '\u201a': sb.Append(','); break;
+                    case '\u2014': case '\u2013': sb.Append('-'); break;
+                    case '\u2026': sb.Append("..."); break;
 
                     default: sb.Append(c); break;
                 }
