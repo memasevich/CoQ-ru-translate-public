@@ -787,7 +787,20 @@ namespace RussianLocalization
             { "о", MorphCase.Prep },
             { "об", MorphCase.Prep },
             { "обо", MorphCase.Prep },
-            { "при", MorphCase.Prep }
+            { "при", MorphCase.Prep },
+            { "ко", MorphCase.Dat },
+            { "кроме", MorphCase.Gen },
+            { "против", MorphCase.Gen },
+            { "из-за", MorphCase.Gen },
+            { "из-под", MorphCase.Gen }
+        };
+
+        private static readonly HashSet<string> HeadStopWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "из", "от", "до", "без", "для", "у", "около", "возле", "мимо", "после", "к", "по",
+            "через", "про", "сквозь", "над", "под", "перед", "за", "между", "с", "со", "в", "во",
+            "на", "о", "об", "обо", "при", "и", "или", "а", "но",
+            "ко", "кроме", "против", "из-за", "из-под"
         };
 
         // ===== Списки исключений для fallback-правил =====
@@ -1002,6 +1015,23 @@ namespace RussianLocalization
                 }
 
                 string[] rawParts = Regex.Split(baseNominative, @"(\s+|-)", RegexOptions.IgnoreCase);
+
+                // Фраза, НАЧИНАЮЩАЯСЯ с предлога/союза («с руками», «из кабаньей кожи»), —
+                // предложная группа, а не именная: склонять в ней нечего, а поиск головы
+                // ошибается (стоп-слово обрывает поиск сразу, запасная ветка берет последнее
+                // слово: «с руками» -> Nom.Sg -> «с рука»). Возвращаем исходную строку.
+                for (int i = 0; i < rawParts.Length; i++)
+                {
+                    string first = TagPrefixRegex.Replace(rawParts[i], "");
+                    first = TagSuffixRegex.Replace(first, "").Trim();
+                    if (string.IsNullOrEmpty(first) || first == "-") continue;
+                    if (HeadStopWords.Contains(first))
+                    {
+                        morphCache[cacheKey] = baseNominative;
+                        return nominative;
+                    }
+                    break;
+                }
 
                 // ГЛАВНОЕ СЛОВО ФРАЗЫ = ПЕРВОЕ существительное, а не последнее.
                 // В русской именной группе всё, что стоит ПОСЛЕ главного существительного, —
