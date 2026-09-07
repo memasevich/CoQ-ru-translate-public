@@ -18,7 +18,7 @@ namespace RussianLocalization
             {
                 // Сначала переводим базовое существительное
                 string primaryBase = __instance.PrimaryBase;
-                string translatedBase = TranslationEngine.TranslateText(primaryBase, true);
+                string translatedBase = TranslationEngine.Translate(primaryBase);
                 if (string.IsNullOrEmpty(translatedBase)) translatedBase = primaryBase;
                 
                 string strippedBase = ConsoleLib.Console.ColorUtility.StripFormatting(translatedBase);
@@ -42,7 +42,7 @@ namespace RussianLocalization
                     int order = kvp.Value;
 
                     // Переводим компонент
-                    string translatedKey = TranslationEngine.TranslateText(key, true);
+                    string translatedKey = TranslationEngine.Translate(key);
                     if (string.IsNullOrEmpty(translatedKey)) translatedKey = key;
 
                     // Если это прилагательное (например, order = -500)
@@ -58,6 +58,41 @@ namespace RussianLocalization
                         if (stripped != declined && !string.IsNullOrEmpty(stripped))
                         {
                             translatedKey = translatedKey.Replace(stripped, declined);
+                        }
+                    }
+                    // Если это постфиксный модификатор (например, order >= 10: "of salt water", "of gleaming sludge", "with flint")
+                    else if (order >= 10 && key != primaryBase)
+                    {
+                        string trimmed = translatedKey.TrimStart();
+                        if (trimmed.StartsWith("of ", StringComparison.OrdinalIgnoreCase) ||
+                            trimmed.StartsWith("из ", StringComparison.OrdinalIgnoreCase) ||
+                            trimmed.StartsWith("Из ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            int prepLen = trimmed.StartsWith("of ", StringComparison.OrdinalIgnoreCase) ? 3 : 3;
+                            string rest = trimmed.Substring(prepLen).Trim();
+                            if (!string.IsNullOrEmpty(rest))
+                            {
+                                string declinedRest = MorphologyService.Decline(rest, MorphCase.Gen);
+                                translatedKey = "из " + declinedRest;
+                            }
+                        }
+                        else if (trimmed.StartsWith("with ", StringComparison.OrdinalIgnoreCase) ||
+                                 trimmed.StartsWith("с ", StringComparison.OrdinalIgnoreCase) ||
+                                 trimmed.StartsWith("со ", StringComparison.OrdinalIgnoreCase) ||
+                                 trimmed.StartsWith("С ", StringComparison.OrdinalIgnoreCase) ||
+                                 trimmed.StartsWith("Со ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            int prepLen = trimmed.StartsWith("with ", StringComparison.OrdinalIgnoreCase) ? 5 :
+                                          (trimmed.StartsWith("со ", StringComparison.OrdinalIgnoreCase) || trimmed.StartsWith("Со ", StringComparison.OrdinalIgnoreCase)) ? 3 : 2;
+                            string rest = trimmed.Substring(prepLen).Trim();
+                            if (!string.IsNullOrEmpty(rest))
+                            {
+                                string declinedRest = MorphologyService.Decline(rest, MorphCase.Ins);
+                                bool useSo = trimmed.StartsWith("со ", StringComparison.OrdinalIgnoreCase) ||
+                                             trimmed.StartsWith("Со ", StringComparison.OrdinalIgnoreCase) ||
+                                             (trimmed.StartsWith("with ", StringComparison.OrdinalIgnoreCase) && (rest.StartsWith("в", StringComparison.OrdinalIgnoreCase) || rest.StartsWith("с", StringComparison.OrdinalIgnoreCase)));
+                                translatedKey = (useSo ? "со " : "с ") + declinedRest;
+                            }
                         }
                     }
 

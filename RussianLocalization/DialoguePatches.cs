@@ -16,7 +16,7 @@ namespace RussianLocalization
                     string raw = Context.Value.ToString();
                     
                     // Переводим сгенерированное английское слово на русский
-                    string translated = TranslationEngine.TranslateText(raw);
+                    string translated = TranslationEngine.Translate(raw);
                     
                     // Если перевода нет, используем оригинал
                     if (string.IsNullOrEmpty(translated)) 
@@ -33,7 +33,7 @@ namespace RussianLocalization
                 }
                 catch (Exception ex)
                 {
-                    TranslationEngine.LogError("[RussianLocalization] Failed to process dialogue tag: " + ex.Message);
+                    TranslationEngine.LogInfo("[RussianLocalization] Failed to process dialogue tag: " + ex.Message);
                 }
             }
         }

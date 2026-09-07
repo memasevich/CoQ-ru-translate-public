@@ -69,7 +69,7 @@ namespace RussianLocalization
             if (__state.HasValue && !string.IsNullOrEmpty(__result))
             {
                 // Сначала переводим сгенерированное английское слово на русский
-                string translated = TranslationEngine.TranslateText(__result);
+                string translated = TranslationEngine.Translate(__result);
                 
                 // Если не нашли перевод, пробуем склонять оригинал (авось уже по-русски)
                 if (string.IsNullOrEmpty(translated)) 
@@ -84,7 +84,7 @@ namespace RussianLocalization
                 }
                 catch (Exception ex)
                 {
-                    TranslationEngine.LogError("[RussianLocalization] Failed to decline history tag: " + ex.Message);
+                    TranslationEngine.LogInfo("[RussianLocalization] Failed to decline history tag: " + ex.Message);
                 }
             }
         }

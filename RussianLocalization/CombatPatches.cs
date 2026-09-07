@@ -70,7 +70,7 @@ namespace RussianLocalization
         {
             if (string.IsNullOrWhiteSpace(source)) return source;
 
-            string result = TranslationEngine.TranslateText(source);
+            string result = TranslationEngine.Translate(source);
             result = result.Replace("стальной стальной", "стальной");
             result = result.Replace("слизью-запятнанной", "запятнанной слизью");
             result = result.Replace("слизь-запятнанный", "запятнанный слизью");
@@ -115,10 +115,10 @@ namespace RussianLocalization
                         bool isHit = verb == "hit" || verb == "hits";
                         bool attackerIsPlayer = CombatContext.Attacker.IsPlayer();
                         
-                        string attackerName = attackerIsPlayer ? "Вы" : TranslationEngine.TranslateText(CombatContext.Attacker.DisplayNameOnly);
+                        string attackerName = attackerIsPlayer ? "Вы" : TranslationEngine.Translate(CombatContext.Attacker.DisplayNameOnly);
                         attackerName = MorphologyService.Decline(attackerName, MorphCase.Nom);
 
-                        string defenderName = CombatContext.Defender.IsPlayer() ? "вас" : TranslationEngine.TranslateText(CombatContext.Defender.DisplayNameOnly);
+                        string defenderName = CombatContext.Defender.IsPlayer() ? "вас" : TranslationEngine.Translate(CombatContext.Defender.DisplayNameOnly);
                         // «попадать по» и «промахиваться по» требуют дательного,
                         // а не винительного: по щелкуну-охотнику.
                         defenderName = MorphologyService.Decline(defenderName, MorphCase.Dat);
@@ -163,7 +163,7 @@ namespace RussianLocalization
                     bool isHit = verb.StartsWith("hit");
                     
                     // Переводим субъекта
-                    string attackerName = attackerIsPlayer ? "Вы" : TranslationEngine.TranslateText(subjStr.Replace("The ", "").Replace("the ", ""));
+                    string attackerName = attackerIsPlayer ? "Вы" : TranslationEngine.Translate(subjStr.Replace("The ", "").Replace("the ", ""));
                     attackerName = MorphologyService.Decline(attackerName, MorphCase.Nom);
 
                     // Переводим объект
@@ -171,7 +171,7 @@ namespace RussianLocalization
                     if (!string.IsNullOrEmpty(objStr))
                     {
                         if (objStr.Equals("you", StringComparison.OrdinalIgnoreCase)) defenderName = "вас";
-                        else defenderName = MorphologyService.Decline(TranslationEngine.TranslateText(objStr.Replace("The ", "").Replace("the ", "")), MorphCase.Acc);
+                        else defenderName = MorphologyService.Decline(TranslationEngine.Translate(objStr.Replace("The ", "").Replace("the ", "")), MorphCase.Acc);
                     }
 
                     // Переводим оружие
@@ -210,7 +210,7 @@ namespace RussianLocalization
             }
             catch (Exception ex)
             {
-                TranslationEngine.LogError("[RussianLocalization] Combat hook failed: " + ex.Message);
+                TranslationEngine.LogInfo("[RussianLocalization] Combat hook failed: " + ex.Message);
             }
         }
     }
