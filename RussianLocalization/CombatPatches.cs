@@ -84,6 +84,8 @@ namespace RussianLocalization
         {
             try
             {
+                if (!TranslationEngine.Initialized || !TranslationEngine.IsEnabled) return;
+
                 // Старый формат консольных сообщений использует ampersand-цвета
                 // (&g, &Y, &C и т. п.). Этот перехват умеет восстановить только
                 // один {{color|...}}-тег и при перестроении строки терял границы
@@ -140,9 +142,13 @@ namespace RussianLocalization
                 }
                 
                 // СЦЕНАРИЙ 2: Дальний бой и мутации (парсинг прямо из текста)
-                Match rMatch = RangedRegex.Match(stripped);
-                if (rMatch.Success)
+                // Оптимизация: не гоняем тяжелый Regex на сообщения без упоминания попадания или промаха
+                if (stripped.IndexOf("hit", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    stripped.IndexOf("miss", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
+                    Match rMatch = RangedRegex.Match(stripped);
+                    if (rMatch.Success)
+                    {
                     string subjStr = rMatch.Groups[1].Value.Trim();
                     bool isCrit = rMatch.Groups[2].Success;
                     string verb = rMatch.Groups[3].Value.ToLower();
@@ -199,7 +205,8 @@ namespace RussianLocalization
 
                     Message = sb.ToString();
                     Message = Message.Substring(0, 1).ToUpper() + Message.Substring(1);
-                    return;
+                        return;
+                    }
                 }
 
                 // Кастомные сообщения

@@ -123,12 +123,36 @@ namespace RussianLocalization
 
 
         /// <summary>
-
-        /// Флаг вкл/выкл перевода. Можно переключать хоткеем (по умолч. F1).
-
+        /// Флаг вкл/выкл перевода. Можно переключать хоткеем (F10).
         /// </summary>
-
         public static bool IsEnabled = true;
+
+        public static void ToggleLocalization()
+        {
+            IsEnabled = !IsEnabled;
+            string status = IsEnabled ? "Русификатор ВКЛЮЧЁН [F10]" : "Русификатор ОТКЛЮЧЁН [F10]";
+            UnityEngine.Debug.Log("[RussianLocalization] " + status);
+            try
+            {
+                RuntimeTranslator.TriggerRescan();
+            }
+            catch { }
+            try
+            {
+                if (XRL.The.Game != null)
+                {
+                    XRL.Messages.MessageQueue.AddPlayerMessage("{{Y|" + status + "}}");
+                }
+                else
+                {
+                    XRL.UI.Popup.ShowBlock(status);
+                }
+            }
+            catch
+            {
+                try { XRL.UI.Popup.ShowBlock(status); } catch { }
+            }
+        }
 
 
 
@@ -2313,9 +2337,13 @@ namespace RussianLocalization
                             }
 
                         }
+                        catch { }
 
-            catch {}
-
+                        try
+                        {
+                            UpdateService.StartBackgroundCheck();
+                        }
+                        catch { }
                     }
 
 
@@ -2486,6 +2514,8 @@ namespace RussianLocalization
 
                     if (!DIAG_DISABLE_GAMETEXT_HOOK) { try { PatchGameText(); } catch (Exception exG) { LogError("[RussianLocalization] PatchGameText dispatch error: " + exG.ToString()); } }
                     try { PatchWelcomeWindow(); } catch (Exception exW) { LogError("[RussianLocalization] PatchWelcomeWindow dispatch error: " + exW.ToString()); }
+                    try { PatchHistoryAPI(); } catch (Exception exH) { LogError("[RussianLocalization] PatchHistoryAPI dispatch error: " + exH.ToString()); }
+                    try { MutationFactory_Patch.TranslateMutations(); } catch { }
 
                     }
 
@@ -7951,55 +7981,50 @@ namespace RussianLocalization
 
 
         // Runtime guard for the game version banner. In the current UI the version and
-
         // build can arrive as separate strings, so a dictionary entry for the complete
-
         // multi-line block is not guaranteed to run. Keep the credit visible whenever
-
         // the translated version line is rendered, while preserving an existing credit.
+        private static string VersionBannerCredit
+        {
+            get
+            {
+                try
+                {
+                    var v = UpdateService.GetCurrentInstalledVersion();
+                    if (v != null) return "Перевод v" + v.Major + "." + v.Minor + "." + v.Build + " by memasevich";
+                }
+                catch { }
+                return "Перевод v1.0.8 by memasevich";
+            }
+        }
 
-        private const string VersionBannerCredit = "Перевод v1.0.6 by memasevich";
-
-        private const string VersionBannerMarker = "Версия игры 1.0.5";
-
-
+        private const string VersionBannerMarker = "Версия игры";
 
         private static string EnsureVersionBannerAttribution(string text)
-
         {
-
             if (string.IsNullOrEmpty(text)) return text;
-
-            if (text.IndexOf(VersionBannerCredit, StringComparison.OrdinalIgnoreCase) >= 0) return text;
-
-
-
-            int markerIndex = text.IndexOf(VersionBannerMarker, StringComparison.OrdinalIgnoreCase);
-
-            if (markerIndex < 0) return text;
-
-
-
-            int markerEnd = markerIndex + VersionBannerMarker.Length;
-
-            int lineBreak = text.IndexOf('\n', markerEnd);
-
-            if (lineBreak >= 0)
-
+            if (text.IndexOf("by memasevich", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-
-                // Insert before the existing LF. This also works when Unity wraps the
-
-                // version/build lines in color tags or sends the following line separately.
-
-                return text.Insert(lineBreak, "\n" + VersionBannerCredit);
-
+                return System.Text.RegularExpressions.Regex.Replace(
+                    text,
+                    @"Перевод\s+v\d+\.\d+(?:\.\d+)?(?:\.\d+)?\s+by\s+memasevich",
+                    VersionBannerCredit,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             }
 
+            int markerIndex = text.IndexOf(VersionBannerMarker, StringComparison.OrdinalIgnoreCase);
+            if (markerIndex < 0) return text;
 
+            int markerEnd = markerIndex + VersionBannerMarker.Length;
+            int lineBreak = text.IndexOf('\n', markerEnd);
+            if (lineBreak >= 0)
+            {
+                // Insert before the existing LF. This also works when Unity wraps the
+                // version/build lines in color tags or sends the following line separately.
+                return text.Insert(lineBreak, "\n" + VersionBannerCredit);
+            }
 
-            return text.Insert(markerEnd, "\n" + VersionBannerCredit);
-
+            return text + "\n" + VersionBannerCredit;
         }
 
 
@@ -9292,6 +9317,7 @@ namespace RussianLocalization
 
         public static string TranslateMarkup(string text)
         {
+            if (!IsEnabled) return text;
             long startTicks = System.Diagnostics.Stopwatch.GetTimestamp();
             string translated = TranslateMarkup(text, 0);
             long stopTicks = System.Diagnostics.Stopwatch.GetTimestamp();
@@ -12966,13 +12992,10 @@ namespace RussianLocalization
 
 
         private static void LogAllGameplayText(string original, string translated, string route)
-
         {
-
+            if (!DebugFileLogging) return;
             try
-
             {
-
                 if (IsJunkText(original)) return;
 
                 string logOriginal = NormalizeLogText(original);
@@ -13052,12 +13075,12 @@ namespace RussianLocalization
             catch {}
         }
 
-        public static int SlowOperationThresholdMs = 5;
-        public static bool EnableSlowOperationLogging = true;
+        public static int SlowOperationThresholdMs = 50;
+        public static bool EnableSlowOperationLogging = false;
 
         public static void LogSlowOperation(string route, string original, string translated, double elapsedMs, string extraContext = null)
         {
-            if (!EnableSlowOperationLogging) return;
+            if (!EnableSlowOperationLogging || !DebugFileLogging) return;
             try
             {
                 string timeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
@@ -15501,6 +15524,22 @@ namespace RussianLocalization
                         harmony.Patch(mUpdate, postfix: new HarmonyMethod(updatePostfix));
                         patched++;
                     }
+
+                    var mShow = tMainMenu.GetMethod("Show",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (mShow != null && updatePostfix != null)
+                    {
+                        harmony.Patch(mShow, postfix: new HarmonyMethod(updatePostfix));
+                        patched++;
+                    }
+
+                    var mReshow = tMainMenu.GetMethod("Reshow",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (mReshow != null && updatePostfix != null)
+                    {
+                        harmony.Patch(mReshow, postfix: new HarmonyMethod(updatePostfix));
+                        patched++;
+                    }
                 }
 
                 // 2. OldMainMenuView.Update (Classic UI)
@@ -15529,10 +15568,195 @@ namespace RussianLocalization
             }
         }
 
+        public static void PatchHistoryAPI()
+        {
+            try
+            {
+                if (AnotherInstallAlreadyPatched("com.russianlocalization.historyapi", "PatchHistoryAPI")) return;
+
+                var harmony = new Harmony("com.russianlocalization.historyapi");
+                int patched = 0;
+
+                Type historyApiType = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { historyApiType = asm.GetType("Qud.API.HistoryAPI"); } catch { }
+                    if (historyApiType != null) break;
+                }
+                if (historyApiType == null) historyApiType = typeof(Qud.API.HistoryAPI);
+
+                if (historyApiType != null)
+                {
+                    // 1. ExpandVillageText(string, string, HistoricEntitySnapshot)
+                    try
+                    {
+                        var mString = AccessTools.Method(historyApiType, "ExpandVillageText",
+                            new Type[] { typeof(string), typeof(string), typeof(HistoryKit.HistoricEntitySnapshot) });
+                        var post1 = typeof(HistoryAPI_Patch).GetMethod("ExpandVillageText_Postfix1",
+                            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        if (mString != null && post1 != null)
+                        {
+                            harmony.Patch(mString, postfix: new HarmonyMethod(post1));
+                            patched++;
+                        }
+                    }
+                    catch (Exception ex1)
+                    {
+                        UnityEngine.Debug.LogWarning("[RussianLocalization] HistoryAPI ExpandVillageText(string) patch skipped: " + ex1.Message);
+                    }
+
+                    // 2. ExpandVillageText(StringBuilder, string, HistoricEntitySnapshot) — перегрузка со StringBuilder (может отсутствовать в версиях 2.0.212+)
+                    try
+                    {
+                        var mSb = AccessTools.Method(historyApiType, "ExpandVillageText",
+                            new Type[] { typeof(StringBuilder), typeof(string), typeof(HistoryKit.HistoricEntitySnapshot) });
+                        var post2 = typeof(HistoryAPI_Patch).GetMethod("ExpandVillageText_Postfix2",
+                            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                        if (mSb != null && post2 != null)
+                        {
+                            harmony.Patch(mSb, postfix: new HarmonyMethod(post2));
+                            patched++;
+                        }
+                    }
+                    catch (Exception ex2)
+                    {
+                        UnityEngine.Debug.LogWarning("[RussianLocalization] HistoryAPI ExpandVillageText(StringBuilder) patch skipped: " + ex2.Message);
+                    }
+                }
+
+                LogInfo("[RussianLocalization] Patched HistoryAPI dynamically, methods patched = " + patched);
+            }
+            catch (System.Exception ex)
+            {
+                LogError("[RussianLocalization] PatchHistoryAPI error: " + ex);
+            }
+        }
+
+        private const string TopRightBannerText =
+            "{{y|[F10] — отключение русификатора (эксп., глубоко в игре не тестировалось)}}";
+
+        private static UnityEngine.GameObject _topRightBannerObj = null;
+
+        public static void EnsureTopRightBanner(object instance)
+        {
+            if (instance == null) return;
+            try
+            {
+                if (_topRightBannerObj != null && _topRightBannerObj.activeInHierarchy)
+                {
+                    UpdateBannerContent(_topRightBannerObj);
+                    return;
+                }
+
+                var type = instance.GetType();
+                if (type.Name != "MainMenu") return;
+
+                var fVersionText = type.GetField("versionText",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (fVersionText == null) return;
+
+                var versionTextObj = fVersionText.GetValue(instance) as UnityEngine.Component;
+                if (versionTextObj == null) return;
+
+                var comp = instance as UnityEngine.Component;
+                var parent = comp != null ? comp.transform : versionTextObj.transform.parent;
+                if (parent == null) return;
+
+                var existing = parent.Find("RU_TopRightBanner");
+                UnityEngine.GameObject bannerGo = null;
+                if (existing != null)
+                {
+                    bannerGo = existing.gameObject;
+                }
+                else
+                {
+                    bannerGo = UnityEngine.Object.Instantiate(versionTextObj.gameObject, parent, false);
+                    bannerGo.name = "RU_TopRightBanner";
+
+                    var rt = bannerGo.GetComponent<UnityEngine.RectTransform>();
+                    if (rt != null)
+                    {
+                        rt.anchorMin = new UnityEngine.Vector2(1f, 1f); // верхний правый угол
+                        rt.anchorMax = new UnityEngine.Vector2(1f, 1f);
+                        rt.pivot = new UnityEngine.Vector2(1f, 1f);
+                        rt.anchoredPosition = new UnityEngine.Vector2(-20f, -20f);
+                        rt.sizeDelta = new UnityEngine.Vector2(950f, 60f);
+                        rt.localScale = UnityEngine.Vector3.one;
+                    }
+
+                    var tmp = bannerGo.GetComponent<TMPro.TextMeshProUGUI>();
+                    if (tmp != null)
+                    {
+                        tmp.alignment = TMPro.TextAlignmentOptions.TopRight;
+                    }
+                }
+
+                if (bannerGo != null)
+                {
+                    _topRightBannerObj = bannerGo;
+                    bannerGo.SetActive(true);
+                    UpdateBannerContent(bannerGo);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.LogWarning("[RussianLocalization] EnsureTopRightBanner error: " + ex);
+            }
+        }
+
+        private static void UpdateBannerContent(UnityEngine.GameObject bannerGo)
+        {
+            if (bannerGo == null) return;
+            try
+            {
+                var rt = bannerGo.GetComponent<UnityEngine.RectTransform>();
+                if (rt != null && rt.sizeDelta.y < 55f)
+                {
+                    rt.sizeDelta = new UnityEngine.Vector2(950f, 60f);
+                }
+
+                string line1 = "{{y|[F10] — отключение русификатора (эксп., глубоко в игре не тестировалось)}}";
+                string line2;
+                if (UpdateService.IsUpdateAvailable && UpdateService.AvailableRelease != null)
+                {
+                    line2 = "{{G|[F11 — Доступно обновление " + UpdateService.AvailableRelease.TagName + "! Нажмите для установки]}}";
+                }
+                else
+                {
+                    line2 = "{{y|[F11] — проверить обновления перевода}}";
+                }
+                string bannerText = line1 + "\n" + line2;
+
+                var skin = bannerGo.GetComponent<XRL.UI.UITextSkin>();
+                if (skin != null)
+                {
+                    skin.useBlockWrap = false;
+                    skin.blockWrap = 0;
+                    skin.SetText(bannerText);
+                }
+                else
+                {
+                    var tmp = bannerGo.GetComponent<TMPro.TextMeshProUGUI>();
+                    if (tmp != null)
+                    {
+                        string tmpLine1 = "<color=#E5C85C>[F10] — отключение русификатора (эксп., глубоко в игре не тестировалось)</color>";
+                        string tmpLine2 = UpdateService.IsUpdateAvailable && UpdateService.AvailableRelease != null
+                            ? "<color=#5CE57A>[F11 — Доступно обновление " + UpdateService.AvailableRelease.TagName + "! Нажмите для установки]</color>"
+                            : "<color=#E5C85C>[F11] — проверить обновления перевода</color>";
+                        tmp.text = tmpLine1 + "\n" + tmpLine2;
+                    }
+                }
+            }
+            catch { }
+        }
+
         private const string WelcomePrefKey = "RuLocalization_Welcome_v1_7";
 
-        public static void MainMenu_Update_Postfix()
+        public static void MainMenu_Update_Postfix(object __instance = null)
         {
+            try { EnsureTopRightBanner(__instance); } catch { }
+            try { UpdateService.OnMainMenuUpdate(__instance); } catch { }
+
             if (_welcomePopupShown) return;
 
             // Проверяем, показывали ли уже (сохранение между запусками игры)
@@ -15903,22 +16127,24 @@ namespace RussianLocalization
             {
 
                 System.Type t = null;
+                System.Type tPage = null;
 
                 foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
 
                 {
 
-                    try { t = asm.GetType("XRL.UI.BookUI"); } catch { }
+                    if (t == null) try { t = asm.GetType("XRL.UI.BookUI"); } catch { }
+                    if (tPage == null) try { tPage = asm.GetType("XRL.UI.BookPage"); } catch { }
 
-                    if (t != null) break;
+                    if (t != null && tPage != null) break;
 
                 }
 
-                if (t == null)
+                if (t == null && tPage == null)
 
                 {
 
-                    UnityEngine.Debug.Log("[RussianLocalization] XRL.UI.BookUI not found — book word-wrap hook skipped.");
+                    UnityEngine.Debug.Log("[RussianLocalization] XRL.UI.BookUI and BookPage not found — book word-wrap hook skipped.");
 
                     return;
 
@@ -15932,71 +16158,72 @@ namespace RussianLocalization
 
                 var harmony = new Harmony("com.russianlocalization.bookui");
 
-                var pre = typeof(TranslationEngine).GetMethod("BookUI_AutoformatPages_Prefix",
-
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-
                 int patched = 0;
 
-
-
-                if (pre != null)
-
+                // 1. Патч BookUI.AutoformatPages для форматированных книг (Format="Auto")
+                if (t != null)
                 {
+                    var pre = typeof(TranslationEngine).GetMethod("BookUI_AutoformatPages_Prefix",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
 
-                    // Две перегрузки: (Title, Text, Format, Margins) и
-
-                    // (Title, Text, Format, Left, Right, Top, Bottom). Имена первых двух
-
-                    // параметров в обеих одинаковы — Harmony связывает префикс по имени.
-
-                    foreach (var m in t.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
-
-                                                   System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
-
+                    if (pre != null)
                     {
-
-                        if (m == null || m.IsGenericMethodDefinition) continue;
-
-                        if (m.Name != "AutoformatPages") continue;
-
-
-
-                        var ps = m.GetParameters();
-
-                        if (ps.Length < 2) continue;
-
-                        if (ps[0].ParameterType != typeof(string) || ps[1].ParameterType != typeof(string)) continue;
-
-                        if (ps[0].Name != "Title" || ps[1].Name != "Text") continue;
-
-
-
-                        try
-
+                        foreach (var m in t.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
+                                                       System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance))
                         {
+                            if (m == null || m.IsGenericMethodDefinition) continue;
+                            if (m.Name != "AutoformatPages") continue;
 
-                            harmony.Patch(m, prefix: new HarmonyMethod(pre));
+                            var ps = m.GetParameters();
+                            if (ps.Length < 2) continue;
+                            if (ps[0].ParameterType != typeof(string) || ps[1].ParameterType != typeof(string)) continue;
+                            if (ps[0].Name != "Title" || ps[1].Name != "Text") continue;
 
-                            patched++;
-
+                            try
+                            {
+                                harmony.Patch(m, prefix: new HarmonyMethod(pre));
+                                patched++;
+                            }
+                            catch (Exception exPatch)
+                            {
+                                UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch BookUI.AutoformatPages: " + exPatch.Message);
+                            }
                         }
-
-                        catch (Exception exPatch)
-
-                        {
-
-                            UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch BookUI.AutoformatPages: " + exPatch.Message);
-
-                        }
-
                     }
-
                 }
 
+                // 2. Патч BookPage(Title, Data) для неформатированных книг (Format="")
+                // В Books.xml более половины книг (28 штук) имеют Format="", поэтому AutoformatPages
+                // для них не вызывается вообще. Патч конструктора BookPage переводит текст ДО нарезки
+                // на строки по 77 символов, сохраняя корректный перенос русского текста.
+                if (tPage != null)
+                {
+                    var prePage = typeof(TranslationEngine).GetMethod("BookPage_Constructor_Prefix",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
 
+                    if (prePage != null)
+                    {
+                        foreach (var ctor in tPage.GetConstructors(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
+                                                                   System.Reflection.BindingFlags.Instance))
+                        {
+                            var ps = ctor.GetParameters();
+                            if (ps.Length == 2 && ps[0].ParameterType == typeof(string) && ps[1].ParameterType == typeof(string))
+                            {
+                                try
+                                {
+                                    harmony.Patch(ctor, prefix: new HarmonyMethod(prePage));
+                                    patched++;
+                                }
+                                catch (Exception exCtor)
+                                {
+                                    UnityEngine.Debug.LogWarning("[RussianLocalization] Failed to patch BookPage ctor: " + exCtor.Message);
+                                }
+                            }
+                        }
+                    }
+                }
 
-                UnityEngine.Debug.Log("[RussianLocalization] Patched XRL.UI.BookUI (book word-wrap fix), methods patched = " + patched + ".");
+                UnityEngine.Debug.Log("[RussianLocalization] Patched XRL.UI.BookUI & BookPage (book word-wrap fix), methods patched = " + patched + ".");
 
             }
 
@@ -16021,6 +16248,75 @@ namespace RussianLocalization
         // очень длинному тексту прямо в кадре открытия книги.
 
         private const int BookParagraphFallbackLimit = 20000;
+
+
+
+        public static void BookPage_Constructor_Prefix(ref string Title, ref string Data)
+        {
+            try
+            {
+                if (!Initialized || !IsEnabled) return;
+
+                if (!string.IsNullOrEmpty(Title))
+                {
+                    string translatedTitle = Translate(Title);
+                    if (!string.IsNullOrEmpty(translatedTitle)) Title = translatedTitle;
+                }
+
+                if (string.IsNullOrEmpty(Data)) return;
+
+                bool hasCyr, hasEng;
+                ScanAlpha(Data, out hasCyr, out hasEng);
+                if (hasCyr && !hasEng) return;
+
+                // 1. Попытка перевести страницу целиком
+                string whole = Translate(Data);
+                if (!string.IsNullOrEmpty(whole) && whole != Data)
+                {
+                    Data = whole;
+                    return;
+                }
+
+                // 2. Поабзацный перевод для процедурных или длинных страниц
+                if (Data.Length > BookParagraphFallbackLimit) return;
+
+                string[] parts = Data.Split('\n');
+                var sb = new StringBuilder(Data.Length + Data.Length / 3);
+                bool changed = false;
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    if (i > 0) sb.Append('\n');
+
+                    string part = parts[i];
+                    bool hadCr = part.Length > 0 && part[part.Length - 1] == '\r';
+                    if (hadCr) part = part.Substring(0, part.Length - 1);
+
+                    if (part.Trim().Length == 0)
+                    {
+                        sb.Append(part);
+                        if (hadCr) sb.Append('\r');
+                        continue;
+                    }
+
+                    string translatedPart = Translate(part);
+                    if (!string.IsNullOrEmpty(translatedPart) && translatedPart != part)
+                    {
+                        changed = true;
+                        sb.Append(translatedPart);
+                    }
+                    else
+                    {
+                        sb.Append(part);
+                    }
+                    if (hadCr) sb.Append('\r');
+                }
+                if (changed) Data = sb.ToString();
+            }
+            catch
+            {
+                // Книга должна открыться в любом случае
+            }
+        }
 
 
 
@@ -16084,11 +16380,7 @@ namespace RussianLocalization
 
                 // 2. Процедурно сгенерированная книга: целого ключа нет и быть не может —
 
-                //    текст собирается на лету. Переводим по абзацам. Все \n здесь авторские
-
-                //    (нарезки по ширине ещё не было), поэтому границы абзацев сохраняем
-
-                //    как есть — игра расставит переносы сама.
+                //    текст собирается на лету (включая кулинарные рецепты Cookbook). Переводим по абзацам.
 
                 if (Text.Length > BookParagraphFallbackLimit) return;
 
@@ -16134,23 +16426,10 @@ namespace RussianLocalization
 
 
 
-                    string translatedPart;
-                    if (translationCache.TryGetValue(part, out string cachedPart))
-                    {
-                        translatedPart = cachedPart;
-                    }
-                    else if (staticDictionary.TryGetValue(part, out string dictPart))
-                    {
-                        translatedPart = dictPart;
-                        translationCache[part] = dictPart;
-                    }
-                    else
-                    {
-                        translatedPart = part;
-                        translationCache[part] = part;
-                    }
+                    string translatedPart = Translate(part);
+                    if (string.IsNullOrEmpty(translatedPart)) translatedPart = part;
 
-                    if (!string.IsNullOrEmpty(translatedPart) && translatedPart != part)
+                    if (translatedPart != part)
                     {
                         changed = true;
                         sb.Append(translatedPart);
@@ -16174,6 +16453,144 @@ namespace RussianLocalization
 
             }
 
+        }
+
+
+
+        private static MethodInfo _clipTextMethod = null;
+        private static bool _clipTextMethodSearched = false;
+
+        public static string SafeClipText(string text, int width, bool keepNewlines = true)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            try
+            {
+                if (!_clipTextMethodSearched)
+                {
+                    _clipTextMethodSearched = true;
+                    foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        try
+                        {
+                            var t = asm.GetType("XRL.UI.StringFormat");
+                            if (t != null)
+                            {
+                                foreach (var m in t.GetMethods(BindingFlags.Public | BindingFlags.Static))
+                                {
+                                    if (m.Name == "ClipText")
+                                    {
+                                        var ps = m.GetParameters();
+                                        if (ps.Length >= 3 && ps[0].ParameterType == typeof(string) && ps[1].ParameterType == typeof(int) && ps[2].ParameterType == typeof(bool))
+                                        {
+                                            _clipTextMethod = m;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch { }
+                        if (_clipTextMethod != null) break;
+                    }
+                }
+
+                if (_clipTextMethod != null)
+                {
+                    var ps = _clipTextMethod.GetParameters();
+                    if (ps.Length == 3)
+                    {
+                        return (string)_clipTextMethod.Invoke(null, new object[] { text, width, keepNewlines });
+                    }
+                    if (ps.Length == 5)
+                    {
+                        return (string)_clipTextMethod.Invoke(null, new object[] { text, width, keepNewlines, true, false });
+                    }
+                }
+            }
+            catch { }
+            return text;
+        }
+
+        private static PropertyInfo _gameManagerInstanceProp = null;
+        private static PropertyInfo _gameManagerCurrentViewProp = null;
+        private static bool _gameManagerSearched = false;
+
+        private static bool IsBookViewActive()
+        {
+            try
+            {
+                if (!_gameManagerSearched)
+                {
+                    _gameManagerSearched = true;
+                    foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        try
+                        {
+                            var gmType = asm.GetType("GameManager") ?? asm.GetType("XRL.Core.GameManager");
+                            if (gmType != null)
+                            {
+                                var instProp = gmType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+                                var curViewProp = gmType.GetProperty("CurrentView", BindingFlags.Public | BindingFlags.Instance);
+                                if (instProp != null && curViewProp != null)
+                                {
+                                    _gameManagerInstanceProp = instProp;
+                                    _gameManagerCurrentViewProp = curViewProp;
+                                    break;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+
+                if (_gameManagerInstanceProp != null && _gameManagerCurrentViewProp != null)
+                {
+                    var instance = _gameManagerInstanceProp.GetValue(null, null);
+                    if (instance != null)
+                    {
+                        var view = _gameManagerCurrentViewProp.GetValue(instance, null) as string;
+                        if (view == "Book") return true;
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        public static bool NeedsBookLineWrap(string s, int maxLen = 74)
+        {
+            if (string.IsNullOrEmpty(s) || s.Length <= maxLen) return false;
+            int currentLineLen = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                char c = s[i];
+                if (c == '\n')
+                {
+                    currentLineLen = 0;
+                }
+                else if (c == '&' || c == '^')
+                {
+                    if (i + 1 < s.Length && s[i + 1] != c) i++;
+                }
+                else if (c == '{' && i + 1 < s.Length && s[i + 1] == '{')
+                {
+                    int close = s.IndexOf("}}", i, StringComparison.Ordinal);
+                    if (close > i)
+                    {
+                        int pipe = s.IndexOf('|', i);
+                        if (pipe > i && pipe < close)
+                        {
+                            i = pipe;
+                        }
+                    }
+                }
+                else
+                {
+                    currentLineLen++;
+                    if (currentLineLen > maxLen) return true;
+                }
+            }
+            return false;
         }
 
 
@@ -17470,7 +17887,7 @@ namespace RussianLocalization
 
                 if (!TranslationEngine.Initialized || string.IsNullOrEmpty(text)) return;
 
-                if (text.IndexOf("memasevich", StringComparison.OrdinalIgnoreCase) >= 0) return;
+                if (text.IndexOf("memasevich", StringComparison.OrdinalIgnoreCase) >= 0 || text.IndexOf("[F10]", StringComparison.OrdinalIgnoreCase) >= 0) return;
 
                 
 
@@ -17564,6 +17981,11 @@ namespace RussianLocalization
                 if (!string.IsNullOrEmpty(tr) && tr != text)
                 {
                     text = tr;
+                }
+
+                if (IsBookViewActive() && NeedsBookLineWrap(text, 74))
+                {
+                    text = SafeClipText(text, 72, true);
                 }
 
                 if (DIAG_LOG_SETTEXT_INPUT)
@@ -17985,16 +18407,39 @@ namespace RussianLocalization
                     }
 
                 }
-
             }
 
+            [System.Runtime.InteropServices.DllImport("user32.dll")]
+            private static extern short GetAsyncKeyState(int vKey);
+            private const int VK_F10 = 0x79;
+            private const int VK_F1 = 0x70;
+            private static bool _f10WasPressed;
+            private static bool _f1WasPressed;
 
+            private void Update()
+            {
+                try
+                {
+                    bool f10 = (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
+                    if (f10 && !_f10WasPressed)
+                    {
+                        TranslationEngine.ToggleLocalization();
+                    }
+                    _f10WasPressed = f10;
+
+                    bool f1 = (GetAsyncKeyState(VK_F1) & 0x8000) != 0;
+                    if (f1 && !_f1WasPressed)
+                    {
+                        TranslationEngine.ToggleLocalization();
+                    }
+                    _f1WasPressed = f1;
+                }
+                catch { }
+            }
 
             private void LateUpdate()
-
             {
-
-                if (!TranslationEngine.Initialized || !_typesResolved) return;
+                if (!TranslationEngine.Initialized || !TranslationEngine.IsEnabled || !_typesResolved) return;
 
 
 
@@ -18133,127 +18578,73 @@ namespace RussianLocalization
             // чтобы динамически обновляемый текст (лог, HP, описания) тоже подхватывался.
 
             private static void ScanAllActiveUIDocuments()
-
             {
+                if (!TranslationEngine.IsEnabled) return;
 
                 // 1. Прямое сканирование всех активных UI Toolkit панелей через UIElementsUtility
-
                 int panelCount = 0;
-
                 try
-
                 {
-
                     System.Type utilityType = null;
-
                     foreach (var ass in System.AppDomain.CurrentDomain.GetAssemblies())
-
                     {
-
                         utilityType = ass.GetType("UnityEngine.UIElements.UIElementsUtility");
-
                         if (utilityType != null) break;
-
                     }
-
                     if (utilityType != null)
-
                     {
-
                         // Сканируем кэш-словарь
-
                         var cacheField = utilityType.GetField("s_UIElementsCache", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-
                         if (cacheField != null)
-
                         {
-
                             var dict = cacheField.GetValue(null) as System.Collections.IDictionary;
-
                             if (dict != null)
-
                             {
-
                                 var values = dict.Values;
-
                                 foreach (var panel in values)
-
                                 {
-
                                     if (panel == null) continue;
-
                                     var visualTreeProp = panel.GetType().GetProperty("visualTree", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-
                                     if (visualTreeProp == null) continue;
-
                                     var root = visualTreeProp.GetValue(panel);
-
                                     if (root == null) continue;
-
                                     WalkVisualTree(root, 0);
-
                                     panelCount++;
-
                                 }
-
                             }
-
                         }
 
-
-
-                        // Сканируем список для итерации (в зависимости от внутреннего состояния Unity)
-
-                        var listField = utilityType.GetField("s_PanelsIterationList", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-
-                        if (listField != null)
-
+                        // Сканируем список для итерации ТОЛЬКО если в кэше ничего не найдено
+                        if (panelCount == 0)
                         {
-
-                            var list = listField.GetValue(null) as System.Collections.IList;
-
-                            if (list != null)
-
+                            var listField = utilityType.GetField("s_PanelsIterationList", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                            if (listField != null)
                             {
-
-                                foreach (var panel in list)
-
+                                var list = listField.GetValue(null) as System.Collections.IList;
+                                if (list != null)
                                 {
-
-                                    if (panel == null) continue;
-
-                                    var visualTreeProp = panel.GetType().GetProperty("visualTree", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-
-                                    if (visualTreeProp == null) continue;
-
-                                    var root = visualTreeProp.GetValue(panel);
-
-                                    if (root == null) continue;
-
-                                    WalkVisualTree(root, 0);
-
-                                    panelCount++;
-
+                                    foreach (var panel in list)
+                                    {
+                                        if (panel == null) continue;
+                                        var visualTreeProp = panel.GetType().GetProperty("visualTree", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                                        if (visualTreeProp == null) continue;
+                                        var root = visualTreeProp.GetValue(panel);
+                                        if (root == null) continue;
+                                        WalkVisualTree(root, 0);
+                                        panelCount++;
+                                    }
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
                 catch (Exception ex)
-
                 {
-
                     try { System.IO.File.WriteAllText("C:\\Users\\Lecoo\\AppData\\LocalLow\\Freehold Games\\CavesOfQud\\uielements_debug_err.txt", ex.ToString()); } catch {}
-
                 }
 
-
-
+                // Если панели уже обработаны через UIElementsUtility, тяжелый поиск по всей сцене пропускаем
+                if (panelCount > 0) return;
                 if (_rootProp == null || _cachedUIDocumentType == null) return;
 
 
@@ -18440,7 +18831,7 @@ namespace RussianLocalization
                                         _uiLastText[id] = cur;
                                     }
 
-                                    if (_uiLastText.Count > 4096)
+                                    if (_uiLastText.Count > 16384)
                                     {
                                         _uiLastText.Clear();
                                     }
@@ -19337,6 +19728,7 @@ namespace RussianLocalization
 
             public static string TranslateTextStrict(string text)
             {
+                if (!TranslationEngine.IsEnabled) return text;
                 long startTicks = System.Diagnostics.Stopwatch.GetTimestamp();
                 string translated = TranslateTextStrictCore(text);
                 long stopTicks = System.Diagnostics.Stopwatch.GetTimestamp();
@@ -19973,7 +20365,19 @@ namespace RussianLocalization
 
 
 
-                        UnityEngine.Debug.Log("[RussianLocalization] Forced cyrillic font for text '" + textComponent.text + "' (switched from '" + oldFontName + "' to '" + cyrillicFallback.name + "')");
+                        if (TranslationEngine.DebugFileLogging)
+
+
+
+                        {
+
+
+
+                            UnityEngine.Debug.Log("[RussianLocalization] Forced cyrillic font for text '" + textComponent.text + "' (switched from '" + oldFontName + "' to '" + cyrillicFallback.name + "')");
+
+
+
+                        }
 
 
 
@@ -20606,61 +21010,23 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(UnityEngine.UI.Text), "text", MethodType.Setter)]
-
-
-
     public static class UnityUIText_Patch
-
-
-
     {
-
-
-
         public static void Prefix(ref string value)
-
-
-
         {
-
-
-
-            if (TranslationEngine.Initialized)
-
-
-
+            if (TranslationEngine.Initialized && TranslationEngine.IsEnabled)
             {
-
-
-
                 if (!UITextReentrancyGuard.TryEnter()) return;
-
                 try
-
                 {
-
                     value = TranslationEngine.Translate(value);
-
                 }
-
                 finally
-
                 {
-
                     UITextReentrancyGuard.Exit();
-
                 }
-
-
-
             }
-
-
-
         }
-
-
-
     }
 
 
@@ -20670,59 +21036,23 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(TMPro.TMP_Text), "text", MethodType.Setter)]
-
     [HarmonyPriority(100)]
-
-
-
     public static class TMPText_Patch
-
-
-
     {
-
-
-
         public static void Prefix(ref string value)
-
-
-
         {
-
-
-
-            if (TranslationEngine.Initialized)
-
-
-
+            if (TranslationEngine.Initialized && TranslationEngine.IsEnabled)
             {
-
-
-
                 if (!UITextReentrancyGuard.TryEnter()) return;
-
                 try
-
                 {
-
                     value = TranslationEngine.Translate(value);
-
                 }
-
                 finally
-
                 {
-
                     UITextReentrancyGuard.Exit();
-
                 }
-
-
-
             }
-
-
-
         }
 
 
@@ -22353,7 +22683,7 @@ namespace RussianLocalization
 
 
 
-            if (TranslationEngine.Initialized)
+            if (TranslationEngine.Initialized && TranslationEngine.IsEnabled)
 
 
 
@@ -22419,7 +22749,7 @@ namespace RussianLocalization
 
 
 
-            if (TranslationEngine.Initialized)
+            if (TranslationEngine.Initialized && TranslationEngine.IsEnabled)
 
 
 
@@ -22485,7 +22815,7 @@ namespace RussianLocalization
 
 
 
-            if (TranslationEngine.Initialized)
+            if (TranslationEngine.Initialized && TranslationEngine.IsEnabled)
 
 
 
@@ -22551,7 +22881,7 @@ namespace RussianLocalization
 
 
 
-            if (TranslationEngine.Initialized)
+            if (TranslationEngine.Initialized && TranslationEngine.IsEnabled)
 
 
 
@@ -22617,7 +22947,7 @@ namespace RussianLocalization
 
 
 
-            if (TranslationEngine.Initialized)
+            if (TranslationEngine.Initialized && TranslationEngine.IsEnabled)
 
 
 
@@ -22762,68 +23092,28 @@ namespace RussianLocalization
 
 
         public static void get_Short_Postfix(ref string __result)
-
-
-
         {
-
-
-
             if (DIAG_DISABLE_DESCRIPTION_HOOKS) return;
-
-            if (!TranslationEngine.Initialized || string.IsNullOrEmpty(__result)) return;
-
+            if (!TranslationEngine.Initialized || !TranslationEngine.IsEnabled || string.IsNullOrEmpty(__result)) return;
             if (_descriptionDepth >= MaxDescriptionRecursionDepth) return;
 
-
-
             _descriptionDepth++;
-
             try
-
             {
-
                 __result = TranslationEngine.Translate(__result);
-
             }
-
             finally
-
             {
-
                 _descriptionDepth--;
-
             }
-
-
-
         }
 
-
-
-
-
-
-
         [HarmonyPostfix]
-
-
-
         [HarmonyPatch("get_Long")]
-
-
-
         public static void get_Long_Postfix(ref string __result)
-
-
-
         {
-
-
-
             if (DIAG_DISABLE_DESCRIPTION_HOOKS) return;
-
-            if (!TranslationEngine.Initialized || string.IsNullOrEmpty(__result)) return;
+            if (!TranslationEngine.Initialized || !TranslationEngine.IsEnabled || string.IsNullOrEmpty(__result)) return;
 
             if (_descriptionDepth >= MaxDescriptionRecursionDepth) return;
 
@@ -23480,182 +23770,141 @@ namespace RussianLocalization
 
 
     [HarmonyPatch(typeof(XRL.MutationFactory))]
-
     public static class MutationFactory_Patch
-
     {
-
         private static bool _done;
-
-
+        private static bool _inProgress;
 
         // Переводит строковый член (поле ИЛИ записываемое свойство) на месте.
-
         // Безопасно: если члена нет или он не записываемая строка — ничего не делает.
-
         private static void TrMember(object obj, string member)
-
         {
-
             if (obj == null) return;
-
             var t = obj.GetType();
-
             var f = t.GetField(member);
-
             if (f != null && f.FieldType == typeof(string))
-
             {
-
                 var v = f.GetValue(obj) as string;
-
                 if (!string.IsNullOrEmpty(v))
-
                     f.SetValue(obj, TranslationEngine.TranslateTextStrict(v));
-
                 return;
-
             }
-
             var p = t.GetProperty(member);
-
             if (p != null && p.PropertyType == typeof(string) && p.CanRead && p.CanWrite)
-
             {
-
                 var v = p.GetValue(obj) as string;
-
                 if (!string.IsNullOrEmpty(v))
-
                     p.SetValue(obj, TranslationEngine.TranslateTextStrict(v));
-
             }
-
         }
 
-
-
         [HarmonyPostfix]
-
-        [HarmonyPatch("MutationsByName", MethodType.Getter)]
-
-        public static void MutationsByName_Getter_Postfix(object __result)
-
+        [HarmonyPatch("Init")]
+        public static void Init_Postfix()
         {
+            TranslateMutations();
+        }
 
-            if (_done || !TranslationEngine.Initialized) return;
-
+        public static void TranslateMutations()
+        {
+            if (_done || _inProgress || !TranslationEngine.Initialized) return;
+            _inProgress = true;
             try
-
             {
+                try { XRL.MutationFactory.CheckInit(); } catch { }
 
                 // Категории мутаций (заголовки в пикере): только описание/заголовок, не id.
-
-                var cats = XRL.MutationFactory.CategoriesByName as System.Collections.IDictionary;
+                System.Collections.IEnumerable cats = null;
+                var propCatsByName = typeof(XRL.MutationFactory).GetProperty("CategoriesByName", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                if (propCatsByName != null)
+                {
+                    try { cats = propCatsByName.GetValue(null) as System.Collections.IDictionary; } catch { }
+                }
+                if (cats == null)
+                {
+                    var mGetCats = typeof(XRL.MutationFactory).GetMethod("GetCategories", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                    if (mGetCats != null)
+                    {
+                        try { cats = mGetCats.Invoke(null, null) as System.Collections.IEnumerable; } catch { }
+                    }
+                }
 
                 if (cats != null)
-
                 {
-
-                    foreach (System.Collections.DictionaryEntry de in cats)
-
+                    foreach (var item in cats)
                     {
+                        object catObj = item;
+                        if (item is System.Collections.DictionaryEntry de) catObj = de.Value;
+                        if (catObj == null) continue;
 
-                        TrMember(de.Value, "DisplayName");
-
-                        TrMember(de.Value, "Help");
-
+                        TrMember(catObj, "DisplayName");
+                        TrMember(catObj, "Help");
                     }
-
                 }
-
-
 
                 // Записи мутаций: имя (XMLDisplayName) + описания. Name/Class/Type НЕ трогаем (это id).
-
-                var byName = __result as System.Collections.IDictionary;
-
-                if (byName != null)
-
+                System.Collections.IEnumerable mutations = null;
+                var propMutByName = typeof(XRL.MutationFactory).GetProperty("MutationsByName", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                if (propMutByName != null)
                 {
-
-                    foreach (System.Collections.DictionaryEntry de in byName)
-
+                    try { mutations = propMutByName.GetValue(null) as System.Collections.IDictionary; } catch { }
+                }
+                if (mutations == null)
+                {
+                    var mGetMut = typeof(XRL.MutationFactory).GetMethod("GetMutationEntries", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                    if (mGetMut != null)
                     {
-
-                        var e = de.Value;
-
-                        TrMember(e, "XMLDisplayName");
-
-                        TrMember(e, "DisplayName");
-
-                        TrMember(e, "Help");
-
-                        TrMember(e, "Snippet");
-
-                        TrMember(e, "BearerDescription");
-
+                        try { mutations = mGetMut.Invoke(null, null) as System.Collections.IEnumerable; } catch { }
                     }
-
-                    _done = true;
-
-                    UnityEngine.Debug.Log("[RussianLocalization] Translated loaded Mutations in memory.");
-
                 }
 
-            }
+                if (mutations != null)
+                {
+                    int count = 0;
+                    foreach (var item in mutations)
+                    {
+                        object e = item;
+                        if (item is System.Collections.DictionaryEntry de) e = de.Value;
+                        if (e == null) continue;
 
+                        TrMember(e, "XMLDisplayName");
+                        TrMember(e, "DisplayName");
+                        TrMember(e, "Help");
+                        TrMember(e, "Snippet");
+                        TrMember(e, "BearerDescription");
+                        count++;
+                    }
+
+                    if (count > 0)
+                    {
+                        _done = true;
+                        UnityEngine.Debug.Log("[RussianLocalization] Translated loaded Mutations in memory (" + count + " entries).");
+                    }
+                }
+            }
             catch (Exception ex)
-
             {
-
                 UnityEngine.Debug.LogError("[RussianLocalization] Mutation translation error: " + ex.ToString());
-
             }
-
-        }
-
-    }
-
-
-
-    [HarmonyPatch(typeof(HistoryKit.HistoricStringExpander))]
-
-    public static class HistoricStringExpander_Patch
-
-    {
-
-        [HarmonyPostfix]
-
-        [HarmonyPatch("ExpandString", new Type[] { typeof(string), typeof(System.Random) })]
-
-        public static void ExpandString_Postfix1(ref string __result)
-
-        {
-
-            if (TranslationEngine.Initialized && !string.IsNullOrEmpty(__result))
-
+            finally
             {
-
-                __result = TranslationEngine.Translate(__result);
-
+                _inProgress = false;
             }
-
         }
 
     }
 
 
 
-    [HarmonyPatch(typeof(Qud.API.HistoryAPI))]
+    // HistoricStringExpander_Patch удалён: слепой перевод ExpandString
+    // ломал генерацию мира и султанов (переводил внутренние spice-ключи вроде 'wealth' -> 'богатство').
+    // Корректный перевод истории выполняется через HistoricStringExpander_ExpandQuery_Patch в HistoryPatches.cs.
+
+
 
     public static class HistoryAPI_Patch
 
     {
-
-        [HarmonyPostfix]
-
-        [HarmonyPatch("ExpandVillageText", new Type[] { typeof(string), typeof(string), typeof(HistoryKit.HistoricEntitySnapshot) })]
 
         public static void ExpandVillageText_Postfix1(ref string __result)
 
@@ -23672,10 +23921,6 @@ namespace RussianLocalization
         }
 
 
-
-        [HarmonyPostfix]
-
-        [HarmonyPatch("ExpandVillageText", new Type[] { typeof(StringBuilder), typeof(string), typeof(HistoryKit.HistoricEntitySnapshot) })]
 
         public static void ExpandVillageText_Postfix2(StringBuilder Text)
 
@@ -23707,67 +23952,7 @@ namespace RussianLocalization
 
 
 
-    // --- ХОТКЕЙ ДЛЯ ВКЛ/ВЫКЛ ПЕРЕВОДА ---
 
-    // По умолчанию F1. Использует WinAPI GetAsyncKeyState — работает на уровне ОС,
-
-    // не зависит от игровой системы ввода.
-
-    [HarmonyPatch]
-
-    public static class ToggleHotkey_Patch
-
-    {
-
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-
-        private static extern short GetAsyncKeyState(int vKey);
-
-
-
-        private const int VK_F1 = 0x70;
-
-        private static bool _wasPressed = false;
-
-
-
-        // Вешаемся на ScreenBuffer.Write — он вызывается каждый кадр при отрисовке.
-
-        [HarmonyPrefix]
-
-        [HarmonyPatch(typeof(ConsoleLib.Console.ScreenBuffer), "Write",
-
-            new System.Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(bool) })]
-
-        public static void Write_Prefix()
-
-        {
-
-            if (!TranslationEngine.Initialized) return;
-
-
-
-            bool isPressed = (GetAsyncKeyState(VK_F1) & 0x8000) != 0;
-
-            if (isPressed && !_wasPressed)
-
-            {
-
-                TranslationEngine.IsEnabled = !TranslationEngine.IsEnabled;
-
-                UnityEngine.Debug.Log("[RussianLocalization] перевод " +
-
-                    (TranslationEngine.IsEnabled ? "включён" : "отключён") +
-
-                    " (F1)");
-
-            }
-
-            _wasPressed = isPressed;
-
-        }
-
-    }
 
 
 

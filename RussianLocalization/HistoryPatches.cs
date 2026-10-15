@@ -10,7 +10,8 @@ namespace RussianLocalization
         public static void Prefix(ref string query, out MorphCase? __state)
         {
             __state = null;
-            if (string.IsNullOrEmpty(query)) return;
+            if (string.IsNullOrEmpty(query) || !TranslationEngine.Initialized || !TranslationEngine.IsEnabled) return;
+            if (query.Contains("@") || query.IndexOf("spice", StringComparison.OrdinalIgnoreCase) >= 0) return;
 
             string inner = query;
             bool hasBrackets = inner.Length > 0 && inner[0] == '<';
