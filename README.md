@@ -1,10 +1,10 @@
+<div align="center">
+
 # Caves of Qud — Полный русский перевод
 
-<p align="center">
-  <img src="RussianLocalization/preview.png" alt="Caves of Qud Russian Localization" width="650"/>
-</p>
+<img src="RussianLocalization/preview.png" alt="Caves of Qud Russian Localization" width="320"/>
 
-<p align="center">
+<p>
   <a href="https://github.com/memasevich/CoQ-ru-translate-public/releases/latest">
     <img src="https://img.shields.io/github/v/release/memasevich/CoQ-ru-translate-public?color=brightgreen&label=Версия%20перевода&style=flat-square" alt="Latest Release"/>
   </a>
@@ -17,6 +17,8 @@
     <img src="https://img.shields.io/badge/Поддержать-Boosty-F15F2C?style=flat-square" alt="Boosty"/>
   </a>
 </p>
+
+</div>
 
 ---
 
