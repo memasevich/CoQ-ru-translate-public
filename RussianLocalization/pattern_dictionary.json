@@ -1,4 +1,4 @@
-{
+﻿{
   "^\\{\\{c\\|\\{\\{W\\|\\[Tab\\]\\}\\} \\{\\{y\\|Trade\\}\\}\\}\\}$": "{{c|{{W|[Tab]}} {{y|Торговля}}}}",
   "^\\{\\{W\\|\\{\\{W\\|\\[Tab\\]\\}\\} \\{\\{y\\|Trade\\}\\}\\}\\}$": "{{W|{{W|[Tab]}} {{y|Торговля}}}}",
   "^(?::: )?(?:<color=[^>]*>)?You pass by (?:a |an |the )?(?<obj>[^.]+?)\\.(?:</color>)?$": "Вы проходите мимо {{case:{obj}|gen|auto|sg}}.",
@@ -6050,11 +6050,11 @@
   "^(?::: )?STAT \\[(?<stat>[A-Za-z]+) (?<n>\\d+)\\] ::\\s*$": "СТАТ [{stat} {n}] ::",
   "^(?::: )?COOLDOWN \\[(?<n>\\d+)\\] ::\\s*$": "ПЕРЕЗАРЯДКА [{n}] ::",
   "^(?<name>.+?)The (?<n>\\d+)(?<ord>st|nd|rd|th)Round$": "{name} — {n}-й раунд",
-  "^(?=1[.]0[.][0-9]+\\s*[{][{]K[|]build )1[.]0[.][0-9]+\\s*[{][{]K[|]build (?<bld>[^}]+)[}][}]$": "Версия игры 1.0.5\nПеревод v1.0.6 by memasevich\n{{K|сборка {bld}}}",
+  "^(?=1[.]0[.][0-9]+\\s*[{][{]K[|]build )1[.]0[.][0-9]+\\s*[{][{]K[|]build (?<bld>[^}]+)[}][}]$": "Версия игры 1.0.5\nПеревод v1.0.8 by memasevich\n{{K|сборка {bld}}}",
   "^(?<loc>.+?), (?<n>\\d+) strata deep$": "{loc}, глубина {n}-го слоя",
   "^Weapon Tier: (?<n>\\d+)$": "Уровень оружия: {n}",
   "^Starting Cost \\{\\{g\\|\\[(?<cost>\\d+) sp\\]\\}\\} \\[(?<rank>\\d+/\\d+)\\]$": "Начальная стоимость {{g|[{cost} о.н.]}} [{rank}]",
-  "^(?<ver>1\\.0\\.\\d+)\\s*(?:\\r?\\n)?\\{\\{K\\|build (?<bld>[^\\}]+)\\}\\}$": "Версия игры {ver}\nПеревод v1.0.6 by memasevich\n{{K|сборка {bld}}}",
+  "^(?<ver>\\d+\\.\\d+\\.\\d+)\\s*(?:\\r?\\n)?\\{\\{K\\|build (?<bld>[^\\}]+)\\}\\}$": "Версия игры {ver}\nПеревод v1.0.8 by memasevich\n{{K|сборка {bld}}}",
   "^(?:<color=[^>]+>)*(?:\\s*|\\{\\{[^}]+\\}\\})*(?:\\[|\\<|<color=[^>]+>)*\\s*Back\\s*(?:\\]|\\>|</color>)*(?:\\s*|\\{\\{[^}]+\\}\\})*(?:</color>)*$": "Назад",
   "^(?:Back|back)\\s*\\((?:slot|Slot)\\)$": "Спина (слот)",
   "^(?:Num|Keypad|Numpad|NumPad)\\s*(?<digit>\\d)$": "Num {digit}",
@@ -7188,7 +7188,7 @@
   "^(?s)Friend, there was a time where my clan used to spend our days hunting and\\s+gathering\\. But after discovering the divinity of those with (?<faction1>.+?),\\s+we changed our priorities and consecrated new rituals\\. May (?<curse>.+?) take\\s+us, (?<npc>.+?) lost our (?<item>.+?)\\. We need someone to recover it,\\s+friend\\. Will you do it\\? We hear it has been taken to (?<loc>.+?)\\. We will\\s+reward your work\\.$": "Друг, было время, когда мой клан проводил дни на охоте и собирательстве. Но после открытия божественности тех, у кого {faction1}, мы изменили наши приоритеты и освятили новые ритуалы. Пусть {curse} заберет нас, {npc} потерял(а) наш {item}. Нам нужен кто-то, кто вернет его, друг. Сделаешь это? Мы слышали, что его отнесли в {loc}. Мы вознаградим твою работу.",
   "^(?s)Nomad, welcome to the village of (?<village>.+?)\\. We are a people who pay homage to\\s+those with (?<faction1>.+?) and detest (?<detest>.+?)\\. Per\\s+our custom, you may drink of our freshwater and quench your thirst\\.$": "Кочевник, добро пожаловать в поселение {village}. Мы — народ, который чтит тех, у кого {faction1}, и ненавидит {detest}. По нашему обычаю, ты можешь испить нашей пресной воды и утолить жажду.",
   "^(?s)While wandering around the (?<loc1>.+?), (?<name>.+?) discovered (?<loc2>.+?)\\. There (?:he|she|it|they) befriended (?<faction>.+?) and dug into the earth's strata\\.?$": "Блуждая по {loc1}, {name} обнаружил(а) {loc2}. Там он(а) подружился(ась) с {faction} и погрузился(ась) в земные недра.",
-  "^1\\.0\\.\\d+\\s*(?:\\r?\\n)?\\{\\{K\\|build (?<bld>[^\\}]+)\\}\\}$": "Версия игры 1.0.5\nПеревод v1.0.5 by memasevich\n{{K|сборка {bld}}}",
+  "^1\\.0\\.\\d+\\s*(?:\\r?\\n)?\\{\\{K\\|build (?<bld>[^\\}]+)\\}\\}$": "Версия игры 1.0.5\nПеревод v1.0.8 by memasevich\n{{K|сборка {bld}}}",
   "^L$": "Л",
   "^T:(?<n1>\\d+)°$": "T:{n1}°",
   "^T:(?<temp>-?\\d+)$": "Т:{temp}°",
