@@ -7994,7 +7994,7 @@ namespace RussianLocalization
                     if (v != null) return "Перевод v" + v.Major + "." + v.Minor + "." + v.Build + " by memasevich";
                 }
                 catch { }
-                return "Перевод v1.0.8 by memasevich";
+                return "Перевод v1.0.9 by memasevich";
             }
         }
 
@@ -15716,16 +15716,19 @@ namespace RussianLocalization
                 }
 
                 string line1 = "{{y|[F10] — отключение русификатора (эксп., глубоко в игре не тестировалось)}}";
-                string line2;
-                if (UpdateService.IsUpdateAvailable && UpdateService.AvailableRelease != null)
+                string line2 = null;
+                if (!UpdateService.IsSteamWorkshopInstall())
                 {
-                    line2 = "{{G|[F11 — Доступно обновление " + UpdateService.AvailableRelease.TagName + "! Нажмите для установки]}}";
+                    if (UpdateService.IsUpdateAvailable && UpdateService.AvailableRelease != null)
+                    {
+                        line2 = "{{G|[F11 — Доступно обновление " + UpdateService.AvailableRelease.TagName + "! Нажмите для установки]}}";
+                    }
+                    else
+                    {
+                        line2 = "{{y|[F11] — проверить обновления перевода}}";
+                    }
                 }
-                else
-                {
-                    line2 = "{{y|[F11] — проверить обновления перевода}}";
-                }
-                string bannerText = line1 + "\n" + line2;
+                string bannerText = line2 != null ? (line1 + "\n" + line2) : line1;
 
                 var skin = bannerGo.GetComponent<XRL.UI.UITextSkin>();
                 if (skin != null)
@@ -15740,10 +15743,14 @@ namespace RussianLocalization
                     if (tmp != null)
                     {
                         string tmpLine1 = "<color=#E5C85C>[F10] — отключение русификатора (эксп., глубоко в игре не тестировалось)</color>";
-                        string tmpLine2 = UpdateService.IsUpdateAvailable && UpdateService.AvailableRelease != null
-                            ? "<color=#5CE57A>[F11 — Доступно обновление " + UpdateService.AvailableRelease.TagName + "! Нажмите для установки]</color>"
-                            : "<color=#E5C85C>[F11] — проверить обновления перевода</color>";
-                        tmp.text = tmpLine1 + "\n" + tmpLine2;
+                        string tmpLine2 = null;
+                        if (!UpdateService.IsSteamWorkshopInstall())
+                        {
+                            tmpLine2 = UpdateService.IsUpdateAvailable && UpdateService.AvailableRelease != null
+                                ? "<color=#5CE57A>[F11 — Доступно обновление " + UpdateService.AvailableRelease.TagName + "! Нажмите для установки]</color>"
+                                : "<color=#E5C85C>[F11] — проверить обновления перевода</color>";
+                        }
+                        tmp.text = tmpLine2 != null ? (tmpLine1 + "\n" + tmpLine2) : tmpLine1;
                     }
                 }
             }
@@ -15760,7 +15767,7 @@ namespace RussianLocalization
                     if (v != null) return "RuLocalization_Welcome_v" + v.Major + "_" + v.Minor + "_" + v.Build;
                 }
                 catch { }
-                return "RuLocalization_Welcome_v1_0_8";
+                return "RuLocalization_Welcome_v1_0_9";
             }
         }
 
@@ -15801,11 +15808,15 @@ namespace RussianLocalization
         {
             try
             {
+                string f11Bullet = UpdateService.IsSteamWorkshopInstall()
+                    ? "  {{K|• Обновления: русификатор обновляется автоматически через Steam Workshop}}\n\n"
+                    : "  {{W|• [F11] — ручная проверка обновлений (перевод обновляется в 1 клик прямо из игры!)}}\n\n";
+
                 string message = 
                     "{{R|С}}{{O|п}}{{W|а}}{{G|с}}{{C|и}}{{B|б}}{{M|о}} {{W|всем, кто играет с этим переводом!}}\n\n" +
                     "{{C|Горячие клавиши и новшества:}}\n" +
                     "  {{W|• [F10] — быстрое включение / отключение русификатора на лету прямо в игре}}\n" +
-                    "  {{W|• [F11] — ручная проверка обновлений (перевод обновляется в 1 клик прямо из игры!)}}\n\n" +
+                    f11Bullet +
                     "{{Y|Коротко про книги: все 28 сюжетных книг (лор, предания, стихи), свитки и фрески султанов переведены полностью. Но случайные процедурные книги в библиотеках игра генерирует алгоритмом цепей Маркова из английских кусочков в псевдонаучный бред. Переводить их на лету нет смысла — это вызовет секундные зависания и нечитаемую кашу слов, поэтому они оставлены как есть.}}\n\n" +
                     "{{Y|Если вы увидели ошибки, непереведённые фразы или баги — пожалуйста, не поленитесь отправить логи (где их найти и как скинуть, подробно написано в описании мода). Это очень помогает находить и оперативно исправлять проблемы!}}\n\n" +
                     "{{Y|А если перевод вам нравится — не поленитесь поставить лайк и добавить в избранное в}} {{C|Steam Workshop}}{{Y|! Это здорово помогает продвигать мод в топ и развивать наше русскоязычное сообщество.}}\n\n" +
