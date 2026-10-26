@@ -172,6 +172,10 @@ namespace RussianLocalization
 
         internal static readonly bool DebugFileLogging = false;
 
+        // 2026-10-26: Умный легковесный лог ТОЛЬКО непереведённого геймплейного текста
+        // (пишется в Documents\CavesOfQud_RU_Logs\untranslated_gameplay.txt без нагрузки на FPS)
+        internal static bool EnableUntranslatedLogging = true;
+
 
 
         // FIX B1 (2026-07-20): методы Popup, чей string-результат — ВВОД ПОЛЬЗОВАТЕЛЯ
@@ -350,6 +354,9 @@ namespace RussianLocalization
         // Оптимизация: используем ConcurrentDictionary вместо HashSet+lock, чтобы убрать contention на каждый вызов Translate.
 
         private static ConcurrentDictionary<string, byte> loggedAllTexts = new ConcurrentDictionary<string, byte>();
+
+        // Дедупликация умного лога непереведённого геймплейного текста (в памяти, 0 дубликатов на диске)
+        private static ConcurrentDictionary<string, byte> loggedUntranslatedTexts = new ConcurrentDictionary<string, byte>(StringComparer.Ordinal);
 
 
 
@@ -2289,6 +2296,7 @@ namespace RussianLocalization
                     // GameplayLogFileName evaluated dynamically
 
                     HydrateGameplayLogCache();
+                    HydrateUntranslatedLogCache();
 
 
 
@@ -12425,7 +12433,7 @@ namespace RussianLocalization
 
             // Не пишем all_gameplay_texts.txt в папку мода — только в Documents
 
-            bool externalLog = filename == "all_gameplay_texts.txt" || filename == "translation_defects.txt" || filename == "slow_operations.txt";
+            bool externalLog = filename == "all_gameplay_texts.txt" || filename == "translation_defects.txt" || filename == "slow_operations.txt" || filename == "untranslated_gameplay.txt";
 
             if (!externalLog && !string.IsNullOrEmpty(CachedModPath))
 
@@ -12991,8 +12999,92 @@ namespace RussianLocalization
 
 
 
+        /// <summary>
+        /// Предзагрузка уже зафиксированных непереведённых строк из Documents\CavesOfQud_RU_Logs\untranslated_gameplay.txt.
+        /// Исключает повторную запись одних и тех же строк при перезапусках игры.
+        /// </summary>
+        private static void HydrateUntranslatedLogCache()
+        {
+            try
+            {
+                string docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                if (string.IsNullOrEmpty(docsPath)) return;
+                string targetFolder = Path.Combine(docsPath, "CavesOfQud_RU_Logs");
+                if (!Directory.Exists(targetFolder)) return;
+
+                string logPath = Path.Combine(targetFolder, "untranslated_gameplay.txt");
+                if (!File.Exists(logPath)) return;
+
+                using (StreamReader reader = new StreamReader(logPath, Encoding.UTF8))
+                {
+                    string line;
+                    StringBuilder rawSb = new StringBuilder();
+                    bool inRaw = false;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (line.StartsWith("---"))
+                        {
+                            if (inRaw && rawSb.Length > 0)
+                            {
+                                string rawNorm = NormalizeLogText(rawSb.ToString());
+                                if (!string.IsNullOrEmpty(rawNorm))
+                                {
+                                    loggedUntranslatedTexts.TryAdd(rawNorm, 0);
+                                }
+                            }
+                            rawSb.Length = 0;
+                            inRaw = false;
+                        }
+                        else if (line.StartsWith("[RAW]:"))
+                        {
+                            inRaw = true;
+                            rawSb.Append(line.Substring(6).TrimStart());
+                        }
+                        else if (line.StartsWith("[RES]:"))
+                        {
+                            inRaw = false;
+                            if (rawSb.Length > 0)
+                            {
+                                string rawNorm = NormalizeLogText(rawSb.ToString());
+                                if (!string.IsNullOrEmpty(rawNorm))
+                                {
+                                    loggedUntranslatedTexts.TryAdd(rawNorm, 0);
+                                }
+                            }
+                            rawSb.Length = 0;
+                        }
+                        else if (inRaw)
+                        {
+                            rawSb.Append("\n").Append(line);
+                        }
+                    }
+
+                    if (inRaw && rawSb.Length > 0)
+                    {
+                        string rawNorm = NormalizeLogText(rawSb.ToString());
+                        if (!string.IsNullOrEmpty(rawNorm))
+                        {
+                            loggedUntranslatedTexts.TryAdd(rawNorm, 0);
+                        }
+                    }
+                }
+
+                LogInfo("[RussianLocalization] Hydrated " + loggedUntranslatedTexts.Count + " untranslated gameplay entries from untranslated_gameplay.txt");
+            }
+            catch (Exception ex)
+            {
+                LogError("[RussianLocalization] Failed to hydrate untranslated log cache: " + ex.Message);
+            }
+        }
+
         private static void LogAllGameplayText(string original, string translated, string route)
         {
+            if (EnableUntranslatedLogging)
+            {
+                TryLogUntranslatedGameplay(original, translated, route);
+            }
+
             if (!DebugFileLogging) return;
             try
             {
@@ -13072,6 +13164,70 @@ namespace RussianLocalization
 
             }
 
+            catch {}
+        }
+
+        /// <summary>
+        /// 2026-10-26: Умный легковесный перехват ТОЛЬКО непереведённого/частично переведённого текста.
+        /// Не трогает полностью переведённые строки, числа, теги и служебный код игры.
+        /// За счёт ConcurrentDictionary в памяти пишется на SSD ровно 1 раз за сессию, обеспечивая 0 влияние на FPS.
+        /// </summary>
+        private static void TryLogUntranslatedGameplay(string original, string translated, string route)
+        {
+            if (!EnableUntranslatedLogging || !IsEnabled) return;
+            if (string.IsNullOrEmpty(original)) return;
+
+            try
+            {
+                string trimmedOrig = original.Trim();
+                if (trimmedOrig.Length < 3) return;
+
+                if (IsJunkText(trimmedOrig)) return;
+
+                // Пропускаем строки, состоящие только из изолированных тегов без текста
+                if (trimmedOrig.StartsWith("<") && trimmedOrig.EndsWith(">") && trimmedOrig.IndexOf(' ') < 0) return;
+                if (trimmedOrig.StartsWith("{{") && trimmedOrig.EndsWith("}}") && trimmedOrig.IndexOf(' ') < 0) return;
+
+                // Проверяем наличие английских букв в оригинале вне тегов
+                bool origHasCyr, origHasEng;
+                ScanAlpha(trimmedOrig, out origHasCyr, out origHasEng);
+                if (!origHasEng) return; // Нет английских букв — нечего переводить (числа, спецсимволы, уже русский текст)
+
+                // Проверяем результат перевода
+                string trimmedTrans = (translated ?? string.Empty).Trim();
+                bool transHasCyr, transHasEng;
+                ScanAlpha(trimmedTrans, out transHasCyr, out transHasEng);
+
+                // Если результат полностью на кириллице без остатков английского — переведено успешно
+                if (transHasCyr && !transHasEng) return;
+
+                // Текст считается непереведённым, если:
+                // 1) В результате перевода вообще нет кириллицы, но есть английский (полный пропуск перевода)
+                // 2) ИЛИ результат в точности равен оригиналу и не содержит кириллицы
+                bool isFullUntranslated = (!transHasCyr && transHasEng) ||
+                                          (string.Equals(trimmedOrig, trimmedTrans, StringComparison.Ordinal) && !transHasCyr);
+                // 3) Частично переведённый текст (есть кириллица, но также остался английский кусок)
+                bool isPartial = transHasCyr && transHasEng;
+
+                if (!isFullUntranslated && !isPartial) return;
+
+                string normOrig = NormalizeLogText(trimmedOrig);
+                if (string.IsNullOrEmpty(normOrig)) return;
+
+                // Дедупликация: пишем на диск ровно один раз
+                if (!loggedUntranslatedTexts.TryAdd(normOrig, 0)) return;
+
+                string timeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                string routeName = string.IsNullOrEmpty(route) ? "unknown" : route;
+                string kind = isPartial ? "PARTIAL" : "UNTRANSLATED";
+
+                string entry = "---" + Environment.NewLine +
+                               "[" + timeStamp + "] [" + kind + "] [ROUTE]: " + routeName + Environment.NewLine +
+                               "[RAW]: " + normOrig + Environment.NewLine +
+                               "[RES]: " + NormalizeLogText(trimmedTrans) + Environment.NewLine;
+
+                AppendToLogFile("untranslated_gameplay.txt", entry);
+            }
             catch {}
         }
 
