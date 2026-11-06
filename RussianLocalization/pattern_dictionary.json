@@ -1,5 +1,5 @@
 {
-  "^(?<pref>(?::: |&[A-Za-z]|<color=[^>]*>|\\s)*)Rummaging over your surroundings, you find these ingredients: (?<ingredients>.+?)\\.?(?:\\s+|\\r?\\n)+You toss them in a pot and stir\\.(?<suff>(?:</color>|\\s)*)$": "{pref}Обыскивая окрестности, вы находите следующие ингредиенты: {ingredients}.\n\nВы бросаете всё это в котёл и перемешиваете.{suff}",
+  "^(?<pref>(?::: |&[A-Za-z]|<color=[^>]*>|\\s)*)Rummaging over your surroundings, you find these ingredients: (?<ingredients>.+?)\\.?(?:\\s+|\\r?\\n)+You toss them in a pot and stir\\.(?<suff>(?:</color>|\\s)*)$": "{pref}Обыскивая окрестности, вы находите следующие ингредиенты: {case:ingredients|list}.\n\nВы бросаете всё это в котёл и перемешиваете.{suff}",
   "^(?<pref>(?::: |&[A-Za-z]|<color=[^>]*>|\\s)*)(?:You pass by|you pass by) (?<items>.+?)\\.(?<suff>(?:</color>|\\s)*)$": "{pref}Вы проходите мимо {items:gen}.{suff}",
   "^\\{\\{c\\|\\{\\{W\\|\\[Tab\\]\\}\\} \\{\\{y\\|Trade\\}\\}\\}\\}$": "{{c|{{W|[Tab]}} {{y|Торговля}}}}",
   "^\\{\\{W\\|\\{\\{W\\|\\[Tab\\]\\}\\} \\{\\{y\\|Trade\\}\\}\\}\\}$": "{{W|{{W|[Tab]}} {{y|Торговля}}}}",
@@ -7282,10 +7282,10 @@
   "^(?<pref>(?:▶|:: )*)Press (?<keys>.+?) to interact\\.?$": "{pref}Нажмите {keys} для взаимодействия.",
   "^(?<pref>(?:▶|:: )*)Press (?<keys>.+?) to open your inventory\\.?$": "{pref}Нажмите {keys}, чтобы открыть снаряжение.",
   "^(?<pref>(?:▶|:: )*)Press (?<keys>.+?) to wait a turn\\.?$": "{pref}Нажмите {keys}, чтобы пропустить ход.",
-  "^(?::: )?You toss (?<ingredients>.+?) into a pot and stir\\.(?:</color>)?$": "Вы бросаете {ingredients} в котёл и помешиваете.",
-  "^You toss (?<ingredients>.+?) into a pot and stir$": "Вы бросаете {ingredients} в котёл и помешиваете.",
-  "^(?::: )?You gather whatever you can find for your meal: (?<ingredients>.+?)(?:\\r?\\n)+You toss them in a pot and stir\\.(?:</color>)?$": "Вы собираете всё, что удалось найти для трапезы: {ingredients}.\n\nВы бросаете всё это в котёл и помешиваете.",
-  "^(?::: )?You gather some fixings: (?<ingredients>.+?)(?:\\r?\\n)+You toss them in a pot and stir\\.(?:</color>)?$": "Вы собираете кое-какую снедь: {ingredients}.\n\nВы бросаете всё это в котёл и помешиваете.",
+  "^(?::: )?You toss (?<ingredients>.+?) into a pot and stir\\.(?:</color>)?$": "Вы бросаете {case:ingredients|list} в котёл и помешиваете.",
+  "^You toss (?<ingredients>.+?) into a pot and stir$": "Вы бросаете {case:ingredients|list} в котёл и помешиваете.",
+  "^(?::: )?You gather whatever you can find for your meal: (?<ingredients>.+?)(?:\\r?\\n)+You toss them in a pot and stir\\.(?:</color>)?$": "Вы собираете всё, что удалось найти для трапезы: {case:ingredients|list}.\n\nВы бросаете всё это в котёл и помешиваете.",
+  "^(?::: )?You gather some fixings: (?<ingredients>.+?)(?:\\r?\\n)+You toss them in a pot and stir\\.(?:</color>)?$": "Вы собираете кое-какую снедь: {case:ingredients|list}.\n\nВы бросаете всё это в котёл и помешиваете.",
   "^(?::: )?You toss them in a pot and stir\\.(?:</color>)?$": "Вы бросаете всё это в котёл и помешиваете.",
   "^(?<pref>.*?)The most advanced artifact in your possession was (?:an? )?(?<item>.*?)\\.(?<suff>.*?)$": "{pref}Самым совершенным артефактом в вашем распоряжении был(а): {item}.{suff}",
   "^(?::: )?(?:The )?(?<target>.+?) take(?:s)? no damage from bleeding\\.?$": "{target} не получает урона от кровотечения.",
@@ -7303,5 +7303,10 @@
   "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)(?:\\{\\{W\\|)?Medium survivable(?:\\}\\})? starting build(?<suf>(?:</color>)?\\s*)$": "{bld}{{W|Средняя живучесть}} стартовой сборки{suf}",
   "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)(?:\\{\\{W\\|)?Challenging(?:\\}\\})? starting build(?<suf>(?:</color>)?\\s*)$": "{bld}{{W|Сложная}} стартовая сборка{suf}",
   "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)Starts with a (?<item>.+?)(?<suf>(?:</color>)?\\s*)$": "{bld}Начинает с {{case:{item}|ins|auto|sg}}{suf}",
-  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)Starts with (?<item>.+?)(?<suf>(?:</color>)?\\s*)$": "{bld}Начинает с {{case:{item}|ins|auto|sg}}{suf}"
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)Starts with (?<item>.+?)(?<suf>(?:</color>)?\\s*)$": "{bld}Начинает с {{case:{item}|ins|auto|sg}}{suf}",
+  "^(?:<color=[^>]+>)?(?:\\{\\{rules\\|)?Swarmer: This creature receives \\+(?<hit>\\d+) to hit in melee and \\+(?<pen>\\d+) to penetration rolls for each other hostile swarmer beyond the first who is in another square adjacent to (?<pronoun>his|her|its) target\\.(?: \\(currently \\+(?<curr>\\d+)\\))?(?:\\}\\})?(?:</color>)?$": "Стайный: это существо получает +{hit} к попаданию в ближнем бою и +{pen} к броскам пробития за каждого другого враждебного члена стаи помимо первого, находящегося в соседней клетке с его целью. (сейчас +{curr})",
+  "^(?:<color=[^>]+>)?(?:\\{\\{rules\\|)?Swarm Alpha: As long as this creature is adjacent to (?<pronoun>his|her|its) target, (?<pronoun2>he|she|it) grants (?<bonus>\\+?\\d+) to the swarm bonuses of each other swarmer who is adjacent to (?<pronoun3>his|her|its) target\\.(?:\\}\\})?(?:</color>)?$": "Альфа стаи: пока это существо находится рядом со своей целью, оно даёт +{bonus} к бонусам стаи каждому другому члену стаи, находящемуся рядом с целью.",
+  "^She has devoured the infant child\\.?$": "Она проглотила младенца.",
+  "^He has devoured the infant child\\.?$": "Он проглотил младенца.",
+  "^It has devoured the infant child\\.?$": "Оно проглотило младенца."
 }

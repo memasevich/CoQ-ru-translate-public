@@ -7135,10 +7135,10 @@ namespace RussianLocalization
                                     else if (caseName == "nom" || caseName == "raw") targetCase = MorphCase.Nom;
                                     foreach (var it in items)
                                     {
-                                        string itTrim = System.Text.RegularExpressions.Regex.Replace(it.Trim(), @"^(?:a|an|the|some)\s+", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                                        if (string.IsNullOrEmpty(itTrim)) continue;
-                                        var measMatch = System.Text.RegularExpressions.Regex.Match(itTrim,
-                                            @"^(?:(?<meas>a pinch of|a dash of|a smidgen of|a sprinkle of|a nip of|a (?:[a-zA-Z]+\s+)?dram of|\d+\s+drams? of|some|a|an)\s+)?(?<core>.+)$",
+                                        string itRaw = it.Trim();
+                                        if (string.IsNullOrEmpty(itRaw)) continue;
+                                        var measMatch = System.Text.RegularExpressions.Regex.Match(itRaw,
+                                            @"^(?:(?<meas>(?:a\s+)?pinch of|(?:a\s+)?dash of|(?:a\s+)?smidgen of|(?:a\s+)?sprinkle of|(?:a\s+)?nip of|(?:a\s+)?(?:[a-zA-Z]+\s+)?dram of|\d+\s+drams? of|some|a|an)\s+)?(?<core>.+)$",
                                             System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                                         if (measMatch.Success && measMatch.Groups["meas"].Success && !string.IsNullOrEmpty(measMatch.Groups["meas"].Value))
                                         {
@@ -7154,11 +7154,11 @@ namespace RussianLocalization
                                                 trCore = MorphologyService.Decline(trCore, MorphCase.Gen);
                                             }
                                             string measRu = "";
-                                            if (meas.StartsWith("a pinch of") || meas.StartsWith("a sprinkle of")) measRu = "щепотку ";
-                                            else if (meas.StartsWith("a dash of")) measRu = "каплю ";
-                                            else if (meas.StartsWith("a smidgen of")) measRu = "чуточку ";
-                                            else if (meas.StartsWith("a nip of")) measRu = "кусочек ";
-                                            else if (meas.StartsWith("a dram of")) measRu = "драм ";
+                                            if (meas.Contains("pinch of") || meas.Contains("sprinkle of")) measRu = "щепотку ";
+                                            else if (meas.Contains("dash of")) measRu = "каплю ";
+                                            else if (meas.Contains("smidgen of")) measRu = "чуточку ";
+                                            else if (meas.Contains("nip of")) measRu = "кусочек ";
+                                            else if (meas == "a dram of" || meas == "dram of") measRu = "драм ";
                                             else if (meas.Contains("dram of"))
                                             {
                                                 string mat = meas.Replace("a ", "").Replace(" dram of", "").Trim();
@@ -7171,6 +7171,7 @@ namespace RussianLocalization
                                             transItems.Add(measRu + trCore);
                                             continue;
                                         }
+                                        string itTrim = System.Text.RegularExpressions.Regex.Replace(itRaw, @"^(?:a|an|the|some)\s+", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                                         string tr = ContainsCyrillic(itTrim) ? itTrim : TranslateText(itTrim, true);
                                         if (!ContainsCyrillic(tr)) tr = TranslateRecordFinalName(itTrim);
                                         if (ContainsCyrillic(tr))
@@ -10804,6 +10805,11 @@ namespace RussianLocalization
             if (elapsedMs >= SlowOperationThresholdMs)
             {
                 LogSlowOperation("TranslateText", text, translated, elapsedMs);
+            }
+
+            if (translated != null && translated.Contains("Луна и солнце, friend!"))
+            {
+                translated = translated.Replace("Луна и солнце, friend!", "Луна и солнце, друг!");
             }
 
             LogAllGameplayText(text, translated, "TranslateText");
