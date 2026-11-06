@@ -20401,7 +20401,7 @@
   "sight": "виде",
   "sight of": "вид",
   "sighting": "обнаружение",
-  "sightless": "беззрелый",
+  "sightless": "незрячий",
   "Sightless Way": "Незрячий Путь",
   "sigil": "сигил",
   "sigils": "сигилы",
@@ -23499,7 +23499,7 @@
   "the shield": "щит",
   "the short blade": "короткий клинок",
   "the Shrine at": "Храм в",
-  "the Sightless Way": "Безглазый Путь",
+  "the Sightless Way": "Незрячий Путь",
   "The sin": "Грех",
   "the six-day stilt": "Шестидневного Столпа",
   "the Six-Day Stilt watch over you": "Шестидневный Столп хранит тебя",
@@ -28411,5 +28411,7 @@
   "nonasludge": "нонаслизень",
   "decasludge": "декаслизень",
   "tetrasludge": "тетраслизень",
-  "pentasludge": "пентаслизень"
+  "pentasludge": "пентаслизень",
+  "Remembrance": "память",
+  "In Remembrance": "В память"
 }

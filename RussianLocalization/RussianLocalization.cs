@@ -154,7 +154,14 @@ namespace RussianLocalization
             }
         }
 
+        /// <summary>
+        /// Постоянное логирование всех игровых текстов ([RAW]/[RES] для проверки качества и выявления ошибок перевода).
+        /// Работает на постоянной основе (пишет уникальные пары в Documents\CavesOfQud_RU_Logs\all_gameplay_texts_DD_MM_YYYY.txt).
+        /// </summary>
+        public const bool EnableAllGameplayTextLogging = true;
+        public static bool EnableReviewLogging { get => EnableAllGameplayTextLogging; set { } }
 
+        public static void ToggleReviewLogging() { }
 
         public static string CachedModPath = null;
 
@@ -372,7 +379,7 @@ namespace RussianLocalization
 
             new System.Text.RegularExpressions.Regex(
 
-                @"\{\{[^{}]*\}\}|\{[A-Za-z0-9_]+(?::[a-z]+)?\}|\{\d+\}|%[0-9]+|%[A-Za-z_][A-Za-z0-9_]*",
+                @"\{[A-Za-z0-9_]+(?::[a-z]+)?\}|\{\d+\}|%[0-9]+|%[A-Za-z_][A-Za-z0-9_]*",
 
                 System.Text.RegularExpressions.RegexOptions.Compiled);
 
@@ -464,7 +471,7 @@ namespace RussianLocalization
 
         private static readonly System.Text.RegularExpressions.Regex FactionSplitRegex = 
 
-            new System.Text.RegularExpressions.Regex(@"(?=<color=#[0-9A-Fa-f]+>[^<\r\n]+</color><color=#[0-9A-Fa-f]+>\s*(?:are\s+interested|is\s+interested|don't\s+care|doesn't\s+care|despise|dislike|favor))", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            new System.Text.RegularExpressions.Regex(@"(?=(?:</color>\s*)?<color=#[0-9A-Fa-f]+>[^<\r\n]+</color><color=#[0-9A-Fa-f]+>(?:[\s\r\n]|</color>\s*<color=#[0-9A-Fa-f]+>)*(?:are\s+interested|is\s+interested|don't\s+care|doesn't\s+care|despise|dislike|favor))", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
 
 
@@ -3137,11 +3144,12 @@ namespace RussianLocalization
                 string key = m.Groups["k"].Value;
                 int afterIdx = m.Index + m.Length;
 
-                // Если следующий символ — кириллица (например, {{hotkey|c}}Собрать или {{hotkey|f}}Наполнить)
-                if (afterIdx < text.Length && (IsCyrillic(text[afterIdx]) || text[afterIdx] == ' ' || text[afterIdx] == '<' || text[afterIdx] == '{'))
+                // Удаляем хоткей ТОЛЬКО если это однобуквенный префикс действия, слитный со следующим русским словом:
+                // например, "{{hotkey|c}}Собрать" -> "Собрать", но НЕ "Нажмите {{hotkey|Space}} или" и НЕ "Нажмите {{hotkey|c}} чтобы"
+                if (key.Length == 1 && afterIdx < text.Length && !char.IsWhiteSpace(text[afterIdx]))
                 {
                     int scan = afterIdx;
-                    while (scan < text.Length && (char.IsWhiteSpace(text[scan]) || text[scan] == '<' || text[scan] == '{'))
+                    while (scan < text.Length && (text[scan] == '<' || text[scan] == '{'))
                     {
                         if (text[scan] == '<') { while (scan < text.Length && text[scan] != '>') scan++; if (scan < text.Length) scan++; }
                         else if (text[scan] == '{' && scan + 1 < text.Length && text[scan + 1] == '{') { while (scan < text.Length && text[scan] != '}') scan++; if (scan < text.Length) scan++; if (scan < text.Length && text[scan] == '}') scan++; }
@@ -3881,7 +3889,13 @@ namespace RussianLocalization
 
                 input.IndexOf("You convinced ", StringComparison.OrdinalIgnoreCase) >= 0 ||
 
-                input.IndexOf("In sacred ritual you shared your ", StringComparison.OrdinalIgnoreCase) >= 0;
+                input.IndexOf("In sacred ritual you shared your ", StringComparison.OrdinalIgnoreCase) >= 0 ||
+
+                input.IndexOf("you were killed by", StringComparison.OrdinalIgnoreCase) >= 0 ||
+
+                input.IndexOf("You journeyed to ", StringComparison.OrdinalIgnoreCase) >= 0 ||
+
+                input.IndexOf("The most advanced artifact in your possession was", StringComparison.OrdinalIgnoreCase) >= 0;
 
             if (!looksLikeRecord) return false;
 
@@ -4123,6 +4137,48 @@ namespace RussianLocalization
 
                 TimeSpan.FromMilliseconds(100));
 
+            result = System.Text.RegularExpressions.Regex.Replace(
+                result,
+                @"(?<prefix>(?:\{\{[A-Za-z&]+\|[^{}\r\n]*\}\}|[·•*])\s*)?On the (?<day>\d+)(?:st|nd|rd|th) of (?<date>[^,\r\n]+), you were killed by (?:a |an )?(?<killer>[^.\r\n]+)\.",
+                m =>
+                {
+                    changed = true;
+                    string date = TranslateRecordProperName(m.Groups["date"].Value.Trim());
+                    string killer = TranslateRecordFinalName(m.Groups["killer"].Value.Trim());
+                    if (ContainsCyrillic(killer))
+                    {
+                        killer = MorphologyService.Decline(killer, MorphCase.Nom);
+                    }
+                    return m.Groups["prefix"].Value + "В " + m.Groups["day"].Value +
+                           "-й день " + date + " вас убил " + killer + ".";
+                },
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase,
+                TimeSpan.FromMilliseconds(100));
+
+            result = System.Text.RegularExpressions.Regex.Replace(
+                result,
+                @"(?<prefix>(?:\{\{[A-Za-z&]+\|[^{}\r\n]*\}\}|[·•*])\s*)?You journeyed to (?<place>[^.\r\n]+)\.",
+                m =>
+                {
+                    changed = true;
+                    string place = TranslateRecordProperName(m.Groups["place"].Value.Trim());
+                    return m.Groups["prefix"].Value + "Вы отправились в " + place + ".";
+                },
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase,
+                TimeSpan.FromMilliseconds(100));
+
+            result = System.Text.RegularExpressions.Regex.Replace(
+                result,
+                @"^(\s*)You were killed by (?:a |an )?(?<killer>[^.\r\n]+)\.",
+                m =>
+                {
+                    changed = true;
+                    string killer = TranslateRecordFinalName(m.Groups["killer"].Value.Trim());
+                    return m.Groups[1].Value + "Вас убил " + killer + ".";
+                },
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline,
+                TimeSpan.FromMilliseconds(100));
+
 
 
             result = System.Text.RegularExpressions.Regex.Replace(
@@ -4335,9 +4391,7 @@ namespace RussianLocalization
 
                 result,
 
-                @"^(?<prefix>.*?)(?<core>(?:You|The|There)\b.*)$",
-
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                @"^(?<prefix>(?:&[a-zA-Z]|\^[a-zA-Z]>[^\s]*\s*|\^[a-zA-Z]|::\s*|▶|\{\{[^}]+\}\}|\s)*)(?<core>.+)$");
 
             if (!sentence.Success) return result;
 
@@ -4356,6 +4410,32 @@ namespace RussianLocalization
                 changed = true;
 
                 return prefix + direct;
+
+            }
+
+            bool patSuccess;
+
+            string patTrans = TryTranslatePattern(core, out patSuccess);
+
+            if (patSuccess && ContainsCyrillic(patTrans))
+
+            {
+
+                changed = true;
+
+                return prefix + patTrans;
+
+            }
+
+            string strictTrans = TranslateTextStrict(core);
+
+            if (!string.IsNullOrEmpty(strictTrans) && strictTrans != core && ContainsCyrillic(strictTrans))
+
+            {
+
+                changed = true;
+
+                return prefix + strictTrans;
 
             }
 
@@ -5780,11 +5860,23 @@ namespace RussianLocalization
 
                 { "don't care about you, but aggressive ones will attack you", "не обращают на вас внимания, но агрессивные особи будут атаковать вас" },
 
+                { "don't care about you, but agressive ones will attack you", "не обращают на вас внимания, но агрессивные особи будут атаковать вас" },
+
                 { "don't care about you, but aggressive members will attack you", "не обращают на вас внимания, но агрессивные представители будут атаковать вас" },
+
+                { "don't care about you, but agressive members will attack you", "не обращают на вас внимания, но агрессивные представители будут атаковать вас" },
 
                 { "doesn't care about you, but aggressive ones will attack you", "не обращает на вас внимания, но агрессивные особи будут атаковать вас" },
 
+                { "doesn't care about you, but agressive ones will attack you", "не обращает на вас внимания, но агрессивные особи будут атаковать вас" },
+
                 { "doesn't care about you, but aggressive members will attack you", "не обращает на вас внимания, но агрессивные представители будут атаковать вас" },
+
+                { "doesn't care about you, but agressive members will attack you", "не обращает на вас внимания, но агрессивные представители будут атаковать вас" },
+
+                { "agressive ones will attack you", "агрессивные особи будут атаковать вас" },
+
+                { "aggressive ones will attack you", "агрессивные особи будут атаковать вас" },
 
                 { "despise you. Even docile ones will attack you", "презирают вас. Даже миролюбивые особи будут атаковать вас" },
 
@@ -7006,7 +7098,7 @@ namespace RussianLocalization
                                     return string.Join(", ", parts);
                                 }
 
-                                if (name == "items")
+                                if (name == "items" || name == "ingredients" || name == "list")
                                 {
                                     string val = group.Value;
                                     string uniform = System.Text.RegularExpressions.Regex.Replace(val, @",?\s+and\s+", ", ");
@@ -7014,6 +7106,35 @@ namespace RussianLocalization
                                     var transItems = new List<string>();
                                     foreach (var it in items)
                                     {
+                                        string itTrim = it.Trim();
+                                        var measMatch = System.Text.RegularExpressions.Regex.Match(itTrim,
+                                            @"^(?:(?<meas>a pinch of|a dash of|a smidgen of|a sprinkle of|a nip of|a dram of|\d+\s+drams? of|some|a|an)\s+)?(?<core>.+)$",
+                                            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                                        if (measMatch.Success && measMatch.Groups["meas"].Success && !string.IsNullOrEmpty(measMatch.Groups["meas"].Value))
+                                        {
+                                            string meas = measMatch.Groups["meas"].Value.ToLowerInvariant();
+                                            string core = measMatch.Groups["core"].Value;
+                                            string trCore = TranslateText(core, true);
+                                            if (!ContainsCyrillic(trCore))
+                                            {
+                                                trCore = TranslateRecordFinalName(core);
+                                            }
+                                            if (ContainsCyrillic(trCore))
+                                            {
+                                                trCore = MorphologyService.Decline(trCore, MorphCase.Gen);
+                                            }
+                                            string measRu = "";
+                                            if (meas.StartsWith("a pinch of") || meas.StartsWith("a sprinkle of")) measRu = "щепотку ";
+                                            else if (meas.StartsWith("a dash of")) measRu = "каплю ";
+                                            else if (meas.StartsWith("a smidgen of")) measRu = "чуточку ";
+                                            else if (meas.StartsWith("a nip of")) measRu = "кусочек ";
+                                            else if (meas.StartsWith("a dram of")) measRu = "драму ";
+                                            else if (meas.Contains("dram")) measRu = System.Text.RegularExpressions.Regex.Replace(meas, @"(\d+)\s+drams?\s+of", "$1 драм ");
+                                            else if (meas.StartsWith("some")) measRu = "немного ";
+                                            else if (meas == "a" || meas == "an") measRu = "";
+                                            transItems.Add(measRu + trCore);
+                                            continue;
+                                        }
                                         string tr = TranslateText(it.Trim(), true);
                                         if (ContainsCyrillic(tr))
                                         {
@@ -10476,13 +10597,27 @@ namespace RussianLocalization
 
                         // место -> Prep («видите крокодила на западе»). Решает глагол слева.
 
-                        string lowerContext = leftContext.ToLowerInvariant();
+                        // 2026-10-26: Проверяем слова по границам токенов, а не подстрокой lowerContext.Contains(mv),
 
-                        foreach (string mv in MotionVerbs)
+                        // иначе "сидит на..." или "сидите на..." ложно матчили подстроку "иди" и требовали винительный падеж ("сидит на подушку").
+
+                        for (int j = 0; j < words.Length; j++)
 
                         {
 
-                            if (lowerContext.Contains(mv)) return MorphCase.Acc;
+                            string cw = words[j].Trim(new[] { '.', ',', '!', '?', ':', ';', '"', '\'', '[', ']', '{', '}', '|', '<', '>', '/', '=' }).ToLowerInvariant();
+
+                            if (string.IsNullOrEmpty(cw)) continue;
+
+                            foreach (string mv in MotionVerbs)
+
+                            {
+
+                                if (cw == mv || (mv.Length >= 6 && cw.StartsWith(mv)))
+
+                                    return MorphCase.Acc;
+
+                            }
 
                         }
 
@@ -12839,15 +12974,17 @@ namespace RussianLocalization
 
 
 
-                string logFileName = !string.IsNullOrEmpty(GameplayLogFileName) ? GameplayLogFileName : "all_gameplay_texts.txt";
+                string[] candidates = new string[] {
+                    !string.IsNullOrEmpty(GameplayLogFileName) ? GameplayLogFileName : "all_gameplay_texts.txt",
+                    "gameplay_review.txt"
+                };
 
-                string logPath = Path.Combine(targetFolder, logFileName);
+                foreach (string logFileName in candidates)
+                {
+                    string logPath = Path.Combine(targetFolder, logFileName);
+                    if (!File.Exists(logPath)) continue;
 
-                if (!File.Exists(logPath)) return;
-
-
-
-                using (StreamReader reader = new StreamReader(logPath, Encoding.UTF8))
+                    using (StreamReader reader = new StreamReader(logPath, Encoding.UTF8))
 
                 {
 
@@ -12983,7 +13120,9 @@ namespace RussianLocalization
 
 
 
-                LogInfo("[RussianLocalization] Hydrated " + loggedAllTexts.Count + " gameplay log entries from " + logFileName);
+                }
+
+                LogInfo("[RussianLocalization] Hydrated " + loggedAllTexts.Count + " gameplay log entries.");
 
             }
 
@@ -13085,7 +13224,7 @@ namespace RussianLocalization
                 TryLogUntranslatedGameplay(original, translated, route);
             }
 
-            if (!DebugFileLogging) return;
+            if (!EnableAllGameplayTextLogging && !DebugFileLogging && !EnableReviewLogging) return;
             try
             {
                 if (IsJunkText(original)) return;
@@ -13118,24 +13257,6 @@ namespace RussianLocalization
 
 
 
-                // 2026-09-03: Умная фильтрация: если строка уже есть в словаре, результат равен словарю
-                // и не содержит дефектов (--минусы, лишние скобки, битые символы), не спамим в лог.
-                string origTrim = original != null ? original.Trim() : "";
-                string transTrim = translated != null ? translated.Trim() : "";
-                if (!string.IsNullOrEmpty(origTrim) && staticDictionary.TryGetValue(origTrim, out string dictVal))
-                {
-                    if (string.Equals(dictVal.Trim(), transTrim, StringComparison.Ordinal))
-                    {
-                        bool hasDefect = transTrim.Contains("--") ||
-                                         (transTrim.Contains("))") && !origTrim.Contains("))")) ||
-                                         (transTrim.Contains("]]") && !origTrim.Contains("]]")) ||
-                                         transTrim.Contains("ø");
-                        if (!hasDefect) return;
-                    }
-                }
-
-
-
                 ValidateRuntimeTranslation(original, translated);
 
 
@@ -13158,7 +13279,14 @@ namespace RussianLocalization
 
                                        "[RES]: " + logTranslated + Environment.NewLine;
 
-                    AppendToLogFile("all_gameplay_texts.txt", fullEntry);
+                    if (EnableAllGameplayTextLogging || DebugFileLogging)
+                    {
+                        AppendToLogFile("all_gameplay_texts.txt", fullEntry);
+                    }
+                    if (EnableReviewLogging && !EnableAllGameplayTextLogging)
+                    {
+                        AppendToLogFile("gameplay_review.txt", fullEntry);
+                    }
 
                 }
 
@@ -15973,7 +16101,7 @@ namespace RussianLocalization
                     "{{C|Горячие клавиши и новшества:}}\n" +
                     "  {{W|• [F10] — быстрое включение / отключение русификатора на лету прямо в игре}}\n" +
                     f11Bullet +
-                    "{{Y|Коротко про книги: все 28 сюжетных книг (лор, предания, стихи), свитки и фрески султанов переведены полностью. Но случайные процедурные книги в библиотеках игра генерирует алгоритмом цепей Маркова из английских кусочков в псевдонаучный бред. Переводить их на лету нет смысла — это вызовет секундные зависания и нечитаемую кашу слов, поэтому они оставлены как есть.}}\n\n" +
+                    "{{Y|Коротко про книги: все 52 сюжетные и лорные книги разработчиков (история султанов, трактаты Баратрума, стихи, дневники, мануалы), свитки и фрески переведены на 100%. Но случайные процедурные белые книги в библиотеках генерируются алгоритмом цепей Маркова из обрывков английского корпуса — они оставлены в оригинале.}}\n\n" +
                     "{{Y|Если вы увидели ошибки, непереведённые фразы или баги — пожалуйста, не поленитесь отправить логи (где их найти и как скинуть, подробно написано в описании мода). Это очень помогает находить и оперативно исправлять проблемы!}}\n\n" +
                     "{{Y|А если перевод вам нравится — не поленитесь поставить лайк и добавить в избранное в}} {{C|Steam Workshop}}{{Y|! Это здорово помогает продвигать мод в топ и развивать наше русскоязычное сообщество.}}\n\n" +
                     "{{Y|Огромное спасибо всем за присланные логи, донаты и тёплые отзывы. Список всех оптимизаций и исправлений выкладываю на}} {{O|Boosty}}.\n\n" +
@@ -23406,6 +23534,8 @@ namespace RussianLocalization
     public static class QuestLoader_Patch
 
     {
+        private static readonly System.Reflection.FieldInfo QuestGospelField = typeof(XRL.World.Quest).GetField("Gospel");
+        private static readonly System.Reflection.FieldInfo QuestHagiographField = typeof(XRL.World.Quest).GetField("Hagiograph");
 
         [HarmonyPostfix]
 
@@ -23449,13 +23579,18 @@ namespace RussianLocalization
 
                             quest.Achievement = TranslationEngine.TranslateTextStrict(quest.Achievement);
 
-                        if (!string.IsNullOrEmpty(quest.Gospel))
-
-                            quest.Gospel = TranslationEngine.TranslateTextStrict(quest.Gospel);
-
-                        if (!string.IsNullOrEmpty(quest.Hagiograph))
-
-                            quest.Hagiograph = TranslationEngine.TranslateTextStrict(quest.Hagiograph);
+                        if (QuestGospelField != null)
+                        {
+                            string gospelVal = QuestGospelField.GetValue(quest) as string;
+                            if (!string.IsNullOrEmpty(gospelVal))
+                                QuestGospelField.SetValue(quest, TranslationEngine.TranslateTextStrict(gospelVal));
+                        }
+                        if (QuestHagiographField != null)
+                        {
+                            string hagioVal = QuestHagiographField.GetValue(quest) as string;
+                            if (!string.IsNullOrEmpty(hagioVal))
+                                QuestHagiographField.SetValue(quest, TranslationEngine.TranslateTextStrict(hagioVal));
+                        }
 
                             
 
