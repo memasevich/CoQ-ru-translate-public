@@ -6777,7 +6777,7 @@ namespace RussianLocalization
             "Year of the", "sultan they worship", "interested in trading", "interested in sharing",
             "dislikes you", "dislike you", "despise you", "despises you", "favor you", "favors you",
             "don't care about you", "doesn't care about you", "won't attack you", "will attack you",
-            "Venom confuses", "You toggle", "electrical arc", "whistles past", "You name your",
+            "Venom confuses", "You toggle", "electrical arc", "workshop to the west", "in his workshop", "whistles past", "You name your",
             "You swim through", "Press {{hotkey|Space}}", "The Cabal of", "The Kith of", "The Cult of",
             "The Coral", "Kinfolk", "Wife Kith", "Gru-Agoufouz", "becomes confused", "Damage:",
             "Melee attacks cool", "Uncertainty radius", "Stinger damage", "Swarm Alpha",
@@ -23753,7 +23753,37 @@ namespace RussianLocalization
 
             {
 
-                if (!string.IsNullOrEmpty(blueprint.Text))
+                if (blueprint.Attributes != null && blueprint.Attributes.TryGetValue("Target", out string targetVal) && targetVal == "AboutTheDromad2")
+
+                {
+
+                    if (blueprint.Text == "I do." || blueprint.Text == "I do")
+
+                    {
+
+                        blueprint.Text = "Да, знаю.";
+
+                    }
+
+                    else if (blueprint.Text == "I do not." || blueprint.Text == "I do not")
+
+                    {
+
+                        blueprint.Text = "Нет, не знаю.";
+
+                    }
+
+                    else if (!string.IsNullOrEmpty(blueprint.Text))
+
+                    {
+
+                        blueprint.Text = TranslationEngine.TranslateTextStrict(blueprint.Text);
+
+                    }
+
+                }
+
+                else if (!string.IsNullOrEmpty(blueprint.Text))
 
                 {
 

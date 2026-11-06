@@ -7308,5 +7308,7 @@
   "^(?:<color=[^>]+>)?(?:\\{\\{rules\\|)?Swarm Alpha: As long as this creature is adjacent to (?<pronoun>his|her|its) target, (?<pronoun2>he|she|it) grants (?<bonus>\\+?\\d+) to the swarm bonuses of each other swarmer who is adjacent to (?<pronoun3>his|her|its) target\\.(?:\\}\\})?(?:</color>)?$": "Альфа стаи: пока это существо находится рядом со своей целью, оно даёт +{bonus} к бонусам стаи каждому другому члену стаи, находящемуся рядом с целью.",
   "^She has devoured the infant child\\.?$": "Она проглотила младенца.",
   "^He has devoured the infant child\\.?$": "Он проглотил младенца.",
-  "^It has devoured the infant child\\.?$": "Оно проглотило младенца."
+  "^It has devoured the infant child\\.?$": "Оно проглотило младенца.",
+  "^(?<pref>(?:<color=[^>]+>)?)(?:Поговорите с|Speak to|Talk to)\\s+Argyve,\\s+in\\s+his\\s+workshop\\s+to\\s+the\\s+west\\.?(?<suff>(?:</color>)?)$": "{pref}Поговорите с Аргивом, в его мастерской на западе.{suff}",
+  "^(?<pref>(?:<color=[^>]+>)?)(?:Поговорите с|Speak to|Talk to|Find|Найдите)\\s+(?<who>[A-Za-zА-Яа-я]+),\\s+in\\s+(?<pro>his|her|its|their)\\s+(?<place>[a-zA-Z\\s]+?)\\s+to\\s+the\\s+(?<dir>[a-z]+)\\.?(?<suff>(?:</color>)?)$": "{pref}Поговорите с {case:who|acc}, в {pro:pro} {case:place|pre} на {case:dir|pre}.{suff}"
 }
