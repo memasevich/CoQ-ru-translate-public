@@ -7294,5 +7294,14 @@
   "^(?<pref>(?:▶|:: )*)You stop bleeding\\.?$": "{pref}Кровотечение останавливается.",
   "^Starting Cost (?:<color=[^>]+>)?\\{\\{(?<clr>[a-zA-Z])\\|\\[(?<cost>\\d+) sp\\]\\}\\}(?:</color>)?$": "Начальная стоимость {{{clr}|[{cost} ОН]}}",
   "^Starting Cost \\[(?<cost>\\d+) sp\\]$": "Начальная стоимость [{cost} ОН]",
-  "^Starting Cost \\{\\{(?<clr>[a-zA-Z])\\|\\[(?<cost>\\d+) sp\\]\\}\\}$": "Начальная стоимость {{{clr}|[{cost} ОН]}}"
+  "^Starting Cost \\{\\{(?<clr>[a-zA-Z])\\|\\[(?<cost>\\d+) sp\\]\\}\\}$": "Начальная стоимость {{{clr}|[{cost} ОН]}}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)Starts with cooking and gathering(?<suf>(?:</color>)?\\s*)$": "{bld}Начинает с навыками кулинарии и сбора урожая{suf}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)Starts with carbide hand bones(?<suf>(?:</color>)?\\s*)$": "{bld}Начинает с карбидными костями рук{suf}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)Starts with night vision(?<suf>(?:</color>)?\\s*)$": "{bld}Начинает с ночным зрением{suf}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)(?:\\{\\{W\\|)?Most survivable(?:\\}\\})? starting build(?<suf>(?:</color>)?\\s*)$": "{bld}{{W|Наиболее живучая}} стартовая сборка{suf}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)(?:\\{\\{W\\|)?Highly survivable(?:\\}\\})? starting build(?<suf>(?:</color>)?\\s*)$": "{bld}{{W|Очень живучая}} стартовая сборка{suf}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)(?:\\{\\{W\\|)?Medium survivable(?:\\}\\})? starting build(?<suf>(?:</color>)?\\s*)$": "{bld}{{W|Средняя живучесть}} стартовой сборки{suf}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)(?:\\{\\{W\\|)?Challenging(?:\\}\\})? starting build(?<suf>(?:</color>)?\\s*)$": "{bld}{{W|Сложная}} стартовая сборка{suf}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)Starts with a (?<item>.+?)(?<suf>(?:</color>)?\\s*)$": "{bld}Начинает с {{case:{item}|ins|auto|sg}}{suf}",
+  "^(?<bld>(?:<color=[^>]+>)?(?:&c)?(?:[ù∙•·])?(?:&y)?(?:</color>)?\\s*)Starts with (?<item>.+?)(?<suf>(?:</color>)?\\s*)$": "{bld}Начинает с {{case:{item}|ins|auto|sg}}{suf}"
 }

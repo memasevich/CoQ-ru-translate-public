@@ -429,7 +429,7 @@ namespace RussianLocalization
                 UnityEngine.Debug.LogWarning("[UpdateService] Не удалось прочитать версию из manifest.json: " + ex.Message);
             }
 
-            return new Version(1, 0, 8, 0);
+            return new Version(1, 0, 9, 0);
         }
 
         private static string CleanMarkdownChangelog(string raw)
