@@ -6807,7 +6807,8 @@ namespace RussianLocalization
             "Valiant ", "One auspicious day", "died of natural causes", "Spouse of ",
             "charges", "bleeding", "catalyzes", "congeal", "monosludge", "disludge", "parasang", "parasangs",
             "Your Strength", "Your Agility", "Your Toughness", "Your Intelligence", "Your Willpower", "Your Ego",
-            "While traveling around", "starts reacting with", "ACTIVE EFFECTS:", "Quill Fling", "strips a ", "tumbles a rough", "burrows into the ground", "You collect ", "You pass by a set"
+            "While traveling around", "starts reacting with", "ACTIVE EFFECTS:", "Quill Fling", "strips a ", "tumbles a rough", "burrows into the ground", "You collect ", "You pass by a set",
+            "increased your", "rapidly advanced", "sweet to the taste", "spores", "You are now", "pick up", "tube", "hits the spot", "spicy and delicious", "You have rapidly", "ranks to rank"
         };
 
 
