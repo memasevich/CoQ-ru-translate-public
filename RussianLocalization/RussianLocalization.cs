@@ -471,7 +471,7 @@ namespace RussianLocalization
 
         private static readonly System.Text.RegularExpressions.Regex FactionSplitRegex = 
 
-            new System.Text.RegularExpressions.Regex(@"(?=(?:</color>\s*)?<color=#[0-9A-Fa-f]+>[^<\r\n]+</color><color=#[0-9A-Fa-f]+>(?:[\s\r\n]|</color>\s*<color=#[0-9A-Fa-f]+>)*(?:are\s+interested|is\s+interested|don't\s+care|doesn't\s+care|despise|dislike|favor))", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            new System.Text.RegularExpressions.Regex(@"(?=(?:</color>\s*)?<color=#[0-9A-Fa-f]+>[^<\r\n]+</color><color=#[0-9A-Fa-f]+>(?:[\s\r\n]|</color>\s*<color=#[0-9A-Fa-f]+>)*(?:are\s+interested|is\s+interested|don't\s+care|doesn't\s+care|despise|dislike|favor))|(?<=\.\s+)(?=[A-Za-z0-9_\- ']+?\s+(?:are\s+interested|is\s+interested|don't\s+care|doesn't\s+care|despise|dislike|favor))", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
 
 
@@ -3843,15 +3843,18 @@ namespace RussianLocalization
                 return false;
 
             string s = text;
+            s = s.Replace("Starting Cost", "Начальная стоимость")
+                 .Replace("Cost:", "Стоимость:")
+                 .Replace("Cost", "Стоимость");
             s = s.Replace("sp]", "ОН]").Replace("sp}", "ОН}").Replace("sp ", "ОН ");
             s = s.Replace("Strength", "Сила").Replace("Agility", "Ловкость")
                  .Replace("Toughness", "Стойкость").Replace("Intelligence", "Интеллект")
                  .Replace("Willpower", "Сила воли").Replace("Ego", "Эго")
                  .Replace(" or ", " или ");
 
-            if (s.IndexOf("{{R|", StringComparison.Ordinal) >= 0 || s.IndexOf("{{G|", StringComparison.Ordinal) >= 0)
+            if (s.IndexOf("{{R|", StringComparison.OrdinalIgnoreCase) >= 0 || s.IndexOf("{{G|", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                s = System.Text.RegularExpressions.Regex.Replace(s, @"\{\{([RG])\|([A-Za-z0-9_ ']+)\}\}", match =>
+                s = System.Text.RegularExpressions.Regex.Replace(s, @"\{\{([RGrg])\|([A-Za-z0-9_ ']+)\}\}", match =>
                 {
                     string clr = match.Groups[1].Value;
                     string name = match.Groups[2].Value;
@@ -5735,6 +5738,8 @@ namespace RussianLocalization
 
         private static readonly System.Text.RegularExpressions.Regex FactionRegex = new System.Text.RegularExpressions.Regex(@"^<color=(?<c1>#[0-9A-Fa-f]+)>(?<faction>.*?)</color><color=(?<c2>#[0-9A-Fa-f]+)>(?<relation>.*?)(?<end></color>)?$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
 
+        private static readonly System.Text.RegularExpressions.Regex PlainTextFactionRegex = new System.Text.RegularExpressions.Regex(@"^(?<faction>[A-Za-z0-9_\- ']+?)\s+(?<relation>(?:don't\s+care|doesn't\s+care|are\s+interested|is\s+interested|despise|despises|dislike|dislikes|favor|favors)\b.*?)$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+
 
 
         // Классический UI использует цветокоды вида &r...&y вместо XML-тегов. В сообщениях
@@ -6450,6 +6455,27 @@ namespace RussianLocalization
                 }
 
             }
+            else
+            {
+                var plainMatch = PlainTextFactionRegex.Match(normalized);
+                if (plainMatch.Success)
+                {
+                    string faction = plainMatch.Groups["faction"].Value.Trim();
+                    string relation = plainMatch.Groups["relation"].Value.Trim();
+
+                    string translatedFaction = TranslateFactionCase(faction, "nom");
+                    if (string.IsNullOrEmpty(translatedFaction) || translatedFaction == faction) translatedFaction = TranslateInternal(faction);
+
+                    string translatedRelation = TranslateRelationText(relation);
+
+                    if (translatedRelation != relation)
+                    {
+                        success = true;
+                        bool endsWithDot = normalized.EndsWith(".");
+                        return lead + translatedFaction + " " + translatedRelation + (endsWithDot ? "." : "");
+                    }
+                }
+            }
 
 
 
@@ -7101,20 +7127,24 @@ namespace RussianLocalization
                                 if (name == "items" || name == "ingredients" || name == "list")
                                 {
                                     string val = group.Value;
-                                    string uniform = System.Text.RegularExpressions.Regex.Replace(val, @",?\s+and\s+", ", ");
+                                    string uniform = System.Text.RegularExpressions.Regex.Replace(val, @",?\s+and\s+(?:a\s+|an\s+|the\s+|some\s+)?", ", ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                                     string[] items = uniform.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
                                     var transItems = new List<string>();
+                                    MorphCase targetCase = MorphCase.Gen;
+                                    if (caseName == "acc") targetCase = MorphCase.Acc;
+                                    else if (caseName == "nom" || caseName == "raw") targetCase = MorphCase.Nom;
                                     foreach (var it in items)
                                     {
-                                        string itTrim = it.Trim();
+                                        string itTrim = System.Text.RegularExpressions.Regex.Replace(it.Trim(), @"^(?:a|an|the|some)\s+", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                                        if (string.IsNullOrEmpty(itTrim)) continue;
                                         var measMatch = System.Text.RegularExpressions.Regex.Match(itTrim,
-                                            @"^(?:(?<meas>a pinch of|a dash of|a smidgen of|a sprinkle of|a nip of|a dram of|\d+\s+drams? of|some|a|an)\s+)?(?<core>.+)$",
+                                            @"^(?:(?<meas>a pinch of|a dash of|a smidgen of|a sprinkle of|a nip of|a (?:[a-zA-Z]+\s+)?dram of|\d+\s+drams? of|some|a|an)\s+)?(?<core>.+)$",
                                             System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                                         if (measMatch.Success && measMatch.Groups["meas"].Success && !string.IsNullOrEmpty(measMatch.Groups["meas"].Value))
                                         {
                                             string meas = measMatch.Groups["meas"].Value.ToLowerInvariant();
                                             string core = measMatch.Groups["core"].Value;
-                                            string trCore = TranslateText(core, true);
+                                            string trCore = ContainsCyrillic(core) ? core : TranslateText(core, true);
                                             if (!ContainsCyrillic(trCore))
                                             {
                                                 trCore = TranslateRecordFinalName(core);
@@ -7128,17 +7158,24 @@ namespace RussianLocalization
                                             else if (meas.StartsWith("a dash of")) measRu = "каплю ";
                                             else if (meas.StartsWith("a smidgen of")) measRu = "чуточку ";
                                             else if (meas.StartsWith("a nip of")) measRu = "кусочек ";
-                                            else if (meas.StartsWith("a dram of")) measRu = "драму ";
+                                            else if (meas.StartsWith("a dram of")) measRu = "драм ";
+                                            else if (meas.Contains("dram of"))
+                                            {
+                                                string mat = meas.Replace("a ", "").Replace(" dram of", "").Trim();
+                                                string trMat = TranslateText(mat, true);
+                                                measRu = trMat + " драм ";
+                                            }
                                             else if (meas.Contains("dram")) measRu = System.Text.RegularExpressions.Regex.Replace(meas, @"(\d+)\s+drams?\s+of", "$1 драм ");
                                             else if (meas.StartsWith("some")) measRu = "немного ";
                                             else if (meas == "a" || meas == "an") measRu = "";
                                             transItems.Add(measRu + trCore);
                                             continue;
                                         }
-                                        string tr = TranslateText(it.Trim(), true);
+                                        string tr = ContainsCyrillic(itTrim) ? itTrim : TranslateText(itTrim, true);
+                                        if (!ContainsCyrillic(tr)) tr = TranslateRecordFinalName(itTrim);
                                         if (ContainsCyrillic(tr))
                                         {
-                                            tr = MorphologyService.Decline(tr, MorphCase.Gen);
+                                            tr = MorphologyService.Decline(tr, targetCase);
                                         }
                                         transItems.Add(tr);
                                     }
@@ -20087,6 +20124,14 @@ namespace RussianLocalization
             string modernUITranslated = TryTranslateModernUI(text, out success);
 
             if (success) return modernUITranslated;
+
+            bool factionSuccess;
+            string factionTrans = TryTranslateFactionReputation(text, out factionSuccess);
+            if (factionSuccess)
+            {
+                translationCache[text] = factionTrans;
+                return factionTrans;
+            }
 
 
 
