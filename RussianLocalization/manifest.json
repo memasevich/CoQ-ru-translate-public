@@ -1,7 +1,7 @@
-﻿{
+{
     "Name":  "Caves of Qud Russian Localization",
     "Author":  "Memasevich",
-    "Version":  "1.0.8",
+    "Version":  "1.0.9",
     "GameVersion":  "2.0.4",
-    "Description":  "Полный русский перевод для Caves of Qud v1.0.8. Добавлена система внутриигрового автообновления и проверки патчей через GitHub."
+    "Description":  "Полный русский перевод для Caves of Qud v1.0.9. Исправлена терминология водяной лозы, отредактировано описание Мехмета, оптимизирована логика обновлений для Мастерской Steam и GitHub."
 }

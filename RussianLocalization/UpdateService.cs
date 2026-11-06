@@ -76,12 +76,63 @@ namespace RussianLocalization
         }
 
         /// <summary>
+        /// Определяет, запущен ли данный экземпляр мода из Steam Workshop.
+        /// Для версий из Мастерской Steam обновление управляется клиентом Steam,
+        /// поэтому внутренний автоапдейтер GitHub отключается.
+        /// </summary>
+        public static bool IsSteamWorkshopInstall()
+        {
+            try
+            {
+                var mod = XRL.ModManager.GetMod(typeof(UpdateService).Assembly);
+                if (mod != null)
+                {
+                    if (mod.Source == XRL.ModSource.Steam)
+                    {
+                        return true;
+                    }
+                    if (!string.IsNullOrEmpty(mod.Path))
+                    {
+                        string norm = mod.Path.Replace('\\', '/').ToLowerInvariant();
+                        if (norm.Contains("/workshop/") || norm.Contains("/333640/"))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                string cachedPath = TranslationEngine.CachedModPath;
+                if (!string.IsNullOrEmpty(cachedPath))
+                {
+                    string norm = cachedPath.Replace('\\', '/').ToLowerInvariant();
+                    if (norm.Contains("/workshop/") || norm.Contains("/333640/"))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogWarning("[UpdateService] Ошибка при проверке источника мода: " + ex.Message);
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Запускает фоновую проверку при старте мода.
         /// </summary>
         public static void StartBackgroundCheck()
         {
             if (_checkStarted) return;
             _checkStarted = true;
+
+            if (IsSteamWorkshopInstall())
+            {
+                LastStatusMessage = "Мод запущен из Steam Workshop. Автообновления через GitHub отключены (управляется Steam).";
+                TranslationEngine.LogInfo("[UpdateService] " + LastStatusMessage);
+                return;
+            }
+
             StartPeriodicCheckAsync();
         }
 
@@ -92,13 +143,24 @@ namespace RussianLocalization
         {
             try
             {
+                bool isWorkshop = IsSteamWorkshopInstall();
+
                 // Проверка нажатия F11 для ручной проверки
                 bool f11Down = (GetAsyncKeyState(VK_F11) & 0x8000) != 0;
                 if (f11Down && !_f11WasPressed)
                 {
-                    CheckForUpdates(manual: true);
+                    if (isWorkshop)
+                    {
+                        ShowInGameNotification("Мод установлен через Steam Workshop — обновления загружаются автоматически клиентом Steam.");
+                    }
+                    else
+                    {
+                        CheckForUpdates(manual: true);
+                    }
                 }
                 _f11WasPressed = f11Down;
+
+                if (isWorkshop) return;
 
                 // Запуск автоматической проверки один раз при запуске игры
                 if (!_checkStarted)
@@ -367,7 +429,7 @@ namespace RussianLocalization
                 UnityEngine.Debug.LogWarning("[UpdateService] Не удалось прочитать версию из manifest.json: " + ex.Message);
             }
 
-            return new Version(1, 0, 8, 0);
+            return new Version(1, 0, 9, 0);
         }
 
         private static string CleanMarkdownChangelog(string raw)
