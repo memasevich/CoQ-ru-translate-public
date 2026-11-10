@@ -1,7 +1,7 @@
 {
     "Name": "Caves of Qud Russian Localization",
     "Author": "Memasevich",
-    "Version": "1.0.10",
+    "Version": "1.0.11",
     "GameVersion": "2.0.4",
-    "Description": "Полный русский перевод для Caves of Qud v1.0.10. Улучшены боевые шаблоны, исправлены фулкрет, пуховики, тоники, статусы еды, благодарность free2fqn за помощь в решении ошибок."
+    "Description": "Полный русский перевод для Caves of Qud v1.0.11. Нормализация хоткеев на латиницу (L, E, I, J, Q, K, Ctrl+F), благодарность free2fqn за помощь в решении ошибок."
 }
