@@ -1,4 +1,4 @@
-{
+﻿{
   "^(?<pref>(?::: |&[A-Za-z]|<color=[^>]*>|\\s)*)Rummaging over your surroundings, you find these ingredients: (?<ingredients>.+?)\\.?(?:\\s+|\\r?\\n)+You toss them in a pot and stir\\.(?<suff>(?:</color>|\\s)*)$": "{pref}Обыскивая окрестности, вы находите следующие ингредиенты: {case:ingredients|list}.\n\nВы бросаете всё это в котёл и перемешиваете.{suff}",
   "^(?<pref>(?::: |&[A-Za-z]|<color=[^>]*>|\\s)*)(?:You pass by|you pass by) (?<items>.+?)\\.(?<suff>(?:</color>|\\s)*)$": "{pref}Вы проходите мимо {items:gen}.{suff}",
   "^\\{\\{c\\|\\{\\{W\\|\\[Tab\\]\\}\\} \\{\\{y\\|Trade\\}\\}\\}\\}$": "{{c|{{W|[Tab]}} {{y|Торговля}}}}",
@@ -7342,5 +7342,15 @@
   "^(?::: )?You have rapidly advanced (?<x>.+?) by three ranks to rank (?<n>(?:&C|{{C\\|)?\\d+(?:&y|}})?|\\d+)!$": "Вы стремительно развили мутацию {{case:{x}|acc|auto|sg}} на три ранга до ранга {n}!",
   "^(?::: )?(?:<color=[^>]+>)?You have rapidly advanced (?<mut>.+?) by (?<ranks>.+?) (?:rank|ranks) to rank (?<r>(?:&C|{{C\\|)?\\d+(?:&y|}})?|\\d+)!(?:</color>)?$": "Вы стремительно развили мутацию {{case:{mut}|acc|auto|sg}} на {ranks} до ранга {r}!",
   "^(?::: )?(?:<color=[^>]+>)?You take (?<dmg>\\d+) damage from (?<source>.+?) spores!(?:</color>)?$": "Вы получаете {dmg} ед. урона от спор {{case:{source}|gen|auto|sg}}!",
-  "(?i)^(?<pref>(?:▶|:: )*?)(?:a |an |the )?small \\{\\{(?<tag>[a-zA-Z])\\|(?<color>[a-zA-Z]+)\\}\\}\\s+tube(?<suff>.*?)$": "{pref}маленькая {{{tag}|{{case:{color}|nom|fem|sg}}}} трубка{suff}"
+  "(?i)^(?<pref>(?:▶|:: )*?)(?:a |an |the )?small \\{\\{(?<tag>[a-zA-Z])\\|(?<color>[a-zA-Z]+)\\}\\}\\s+tube(?<suff>.*?)$": "{pref}маленькая {{{tag}|{{case:{color}|nom|fem|sg}}}} трубка{suff}",
+  "^counterweighted\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u0441 \u043F\u0440\u043E\u0442\u0438\u0432\u043E\u0432\u0435\u0441\u043E\u043C ({level})",
+  "^flexiweaved\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u044D\u043B\u0430\u0441\u0442\u0438\u0447\u043D\u043E\u0435 \u043F\u043B\u0435\u0442\u0435\u043D\u0438\u0435 ({level})",
+  "^gilded\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u043F\u043E\u0437\u043E\u043B\u043E\u0447\u0435\u043D\u043D\u044B\u0439 ({level})",
+  "^lacquered\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u043B\u0430\u043A\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439 ({level})",
+  "^fitted\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u043F\u043E\u0434\u043E\u0433\u043D\u0430\u043D\u043D\u044B\u0439 ({level})",
+  "^sturdy\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u043F\u0440\u043E\u0447\u043D\u044B\u0439 ({level})",
+  "^overpowered\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u043F\u0435\u0440\u0435\u0433\u0440\u0443\u0436\u0435\u043D\u043D\u044B\u0439 ({level})",
+  "^wool-lined\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u0441 \u0448\u0435\u0440\u0441\u0442\u044F\u043D\u043E\u0439 \u043F\u043E\u0434\u043A\u043B\u0430\u0434\u043A\u043E\u0439 ({level})",
+  "^sharp\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u043E\u0441\u0442\u0440\u044B\u0439 ({level})",
+  "^serrated\\((?\u003Clevel\u003E\\d\u002B)\\)$": "\u0437\u0430\u0437\u0443\u0431\u0440\u0435\u043D\u043D\u044B\u0439 ({level})"
 }
