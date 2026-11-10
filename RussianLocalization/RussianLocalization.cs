@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 
 
@@ -2520,6 +2520,9 @@ namespace RussianLocalization
                     // Динамический патч ScreenBuffer для поддержки пропущенных методов рендеринга ретро-консоли
 
                     try { PatchScreenBufferDynamic(); } catch (Exception exSB) { LogError("[RussianLocalization] PatchScreenBufferDynamic dispatch error: " + exSB.ToString()); }
+
+                    // Патч нормализации горячих клавиш: буквы клавиш (L, E, I, J, Q, K, Ctrl+F) всегда отображаются на латинице
+                    try { PatchHotkeys(); } catch (Exception exH) { LogError("[RussianLocalization] PatchHotkeys dispatch error: " + exH.ToString()); }
 
 
 
@@ -17527,6 +17530,285 @@ namespace RussianLocalization
         // __originalMethod — MethodInfo текущего метода (магическое имя Harmony 2.x).
 
         // __args — массив всех аргументов; модификация __args[i] меняет то, что получит оригинал.
+
+        
+        public static void PatchHotkeys()
+        {
+            try
+            {
+                if (AnotherInstallAlreadyPatched("com.russianlocalization.hotkeys", "PatchHotkeys")) return;
+
+                var harmony = new HarmonyLib.Harmony("com.russianlocalization.hotkeys");
+                int patched = 0;
+
+                // 1. ControlManager.getCommandInputDescription & getCommandInputFormatted
+                System.Type tControlManager = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { tControlManager = asm.GetType("ControlManager"); } catch { }
+                    if (tControlManager != null) break;
+                }
+
+                if (tControlManager != null)
+                {
+                    var postDesc = new HarmonyLib.HarmonyMethod(typeof(KeyboardLayoutNormalizer), nameof(KeyboardLayoutNormalizer.Postfix_NormalizeResult));
+
+                    var methodsDesc = tControlManager.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                    foreach (var m in methodsDesc)
+                    {
+                        if (m.Name == "getCommandInputDescription" || m.Name == "getCommandInputFormatted")
+                        {
+                            try
+                            {
+                                harmony.Patch(m, postfix: postDesc);
+                                patched++;
+                            }
+                            catch (System.Exception exM)
+                            {
+                                LogError("[RussianLocalization] Failed to patch ControlManager." + m.Name + ": " + exM);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    LogError("[RussianLocalization] ControlManager type not found.");
+                }
+
+                // 2. Qud.UI.HelpRow.setData
+                System.Type tHelpRow = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    try { tHelpRow = asm.GetType("Qud.UI.HelpRow"); } catch { }
+                    if (tHelpRow != null) break;
+                }
+
+                if (tHelpRow != null)
+                {
+                    var mSetData = tHelpRow.GetMethod("setData", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (mSetData != null)
+                    {
+                        var postHelpRow = new HarmonyLib.HarmonyMethod(typeof(KeyboardLayoutNormalizer), nameof(KeyboardLayoutNormalizer.Postfix_HelpRow_setData));
+                        try
+                        {
+                            harmony.Patch(mSetData, postfix: postHelpRow);
+                            patched++;
+                        }
+                        catch (System.Exception exH)
+                        {
+                            LogError("[RussianLocalization] Failed to patch HelpRow.setData: " + exH);
+                        }
+                    }
+                }
+
+                LogInfo("[RussianLocalization] PatchHotkeys initialized (" + patched + " methods hooked).");
+            }
+            catch (System.Exception ex)
+            {
+                LogError("[RussianLocalization] PatchHotkeys fatal error: " + ex);
+            }
+        }
+
+        public static class KeyboardLayoutNormalizer
+        {
+            private static readonly Dictionary<char, char> RuToEnKeyMap = new Dictionary<char, char>
+            {
+                {'й', 'q'}, {'Й', 'Q'},
+                {'ц', 'w'}, {'Ц', 'W'},
+                {'у', 'e'}, {'У', 'E'},
+                {'к', 'r'}, {'К', 'R'},
+                {'е', 't'}, {'Е', 'T'},
+                {'н', 'y'}, {'Н', 'Y'},
+                {'г', 'u'}, {'Г', 'U'},
+                {'ш', 'i'}, {'Ш', 'I'},
+                {'щ', 'o'}, {'Щ', 'O'},
+                {'з', 'p'}, {'З', 'P'},
+                {'х', '['}, {'Х', '['},
+                {'ъ', ']'}, {'Ъ', ']'},
+                {'ф', 'a'}, {'Ф', 'A'},
+                {'ы', 's'}, {'Ы', 'S'},
+                {'в', 'd'}, {'В', 'D'},
+                {'а', 'f'}, {'А', 'F'},
+                {'п', 'g'}, {'П', 'G'},
+                {'р', 'h'}, {'Р', 'H'},
+                {'о', 'j'}, {'О', 'J'},
+                {'л', 'k'}, {'Л', 'K'},
+                {'д', 'l'}, {'Д', 'L'},
+                {'ж', ';'}, {'Ж', ';'},
+                {'э', '\''}, {'Э', '\''},
+                {'я', 'z'}, {'Я', 'Z'},
+                {'ч', 'x'}, {'Ч', 'X'},
+                {'с', 'c'}, {'С', 'C'},
+                {'м', 'v'}, {'М', 'V'},
+                {'и', 'b'}, {'И', 'B'},
+                {'т', 'n'}, {'Т', 'N'},
+                {'ь', 'm'}, {'Ь', 'M'},
+                {'б', ','}, {'Б', '<'},
+                {'ю', '.'}, {'Ю', '>'},
+                {'ё', '`'}, {'Ё', '~'}
+            };
+
+            public static string NormalizeKeyCombo(string keyStr)
+            {
+                if (string.IsNullOrEmpty(keyStr)) return keyStr;
+
+                bool hasCyrillic = false;
+                for (int i = 0; i < keyStr.Length; i++)
+                {
+                    char c = keyStr[i];
+                    if ((c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') || c == 'ё' || c == 'Ё')
+                    {
+                        hasCyrillic = true;
+                        break;
+                    }
+                }
+                if (!hasCyrillic) return keyStr;
+
+                if (keyStr.Length == 1 && RuToEnKeyMap.TryGetValue(keyStr[0], out char enKey))
+                {
+                    return enKey.ToString();
+                }
+
+                if (keyStr.Contains("+"))
+                {
+                    string[] parts = keyStr.Split('+');
+                    bool modified = false;
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        string p = parts[i];
+                        if (p.Length == 1 && RuToEnKeyMap.TryGetValue(p[0], out char mapped))
+                        {
+                            parts[i] = mapped.ToString();
+                            modified = true;
+                        }
+                    }
+                    if (modified)
+                    {
+                        return string.Join("+", parts);
+                    }
+                }
+
+                return keyStr;
+            }
+
+            private static readonly System.Text.RegularExpressions.Regex HotkeyTagRegex = new System.Text.RegularExpressions.Regex(@"\{\{hotkey\|(?<key>[^}]+)\}\}", System.Text.RegularExpressions.RegexOptions.Compiled);
+            private static readonly System.Text.RegularExpressions.Regex PressKeyRegex = new System.Text.RegularExpressions.Regex(@"(?<=(?:Нажмите|Press)\s+)([А-Яа-яЁё])(?=[,\s\.\?!])", System.Text.RegularExpressions.RegexOptions.Compiled);
+            private static readonly System.Text.RegularExpressions.Regex PressKeyComboRegex = new System.Text.RegularExpressions.Regex(@"(?<=(?:Нажмите|Press)\s+)((?:(?:Ctrl|Alt|Shift|\ue816)\+)+[А-Яа-яЁё])(?=[,\s\.\?!])", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+            public static string NormalizeHotkeys(string text)
+            {
+                if (string.IsNullOrEmpty(text)) return text;
+
+                bool hasCyrillic = false;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    char c = text[i];
+                    if ((c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') || c == 'ё' || c == 'Ё')
+                    {
+                        hasCyrillic = true;
+                        break;
+                    }
+                }
+                if (!hasCyrillic) return text;
+
+                if (text.Contains("{{hotkey|"))
+                {
+                    text = HotkeyTagRegex.Replace(text, m =>
+                    {
+                        string inner = m.Groups["key"].Value;
+                        return "{{hotkey|" + NormalizeHotkeys(inner) + "}}";
+                    });
+                }
+
+                if (text.Contains("Нажмите ") || text.Contains("Press "))
+                {
+                    text = PressKeyComboRegex.Replace(text, m => NormalizeKeyCombo(m.Value));
+                    text = PressKeyRegex.Replace(text, m =>
+                    {
+                        char c = m.Value[0];
+                        if (RuToEnKeyMap.TryGetValue(c, out char en))
+                            return en.ToString();
+                        return m.Value;
+                    });
+                }
+
+                if (text.Contains(" or ") || text.Contains("{{y|or}}"))
+                {
+                    string delimiter = text.Contains("{{y|or}}") ? "{{y|or}}" : " or ";
+                    string[] parts = text.Split(new[] { delimiter }, StringSplitOptions.None);
+                    bool modified = false;
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        string orig = parts[i];
+                        string trimmed = orig.Trim();
+                        string norm = NormalizeKeyCombo(trimmed);
+                        if (norm != trimmed)
+                        {
+                            parts[i] = orig.Replace(trimmed, norm);
+                            modified = true;
+                        }
+                    }
+                    if (modified)
+                    {
+                        return string.Join(delimiter, parts);
+                    }
+                }
+
+                if (text.Contains(","))
+                {
+                    string[] parts = text.Split(',');
+                    bool modified = false;
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        string orig = parts[i];
+                        string trimmed = orig.Trim();
+                        string norm = NormalizeKeyCombo(trimmed);
+                        if (norm != trimmed)
+                        {
+                            parts[i] = orig.Replace(trimmed, norm);
+                            modified = true;
+                        }
+                    }
+                    if (modified)
+                    {
+                        return string.Join(",", parts);
+                    }
+                }
+
+                return NormalizeKeyCombo(text);
+            }
+
+            public static void Postfix_NormalizeResult(ref string __result)
+            {
+                if (string.IsNullOrEmpty(__result)) return;
+                try
+                {
+                    __result = NormalizeHotkeys(__result);
+                }
+                catch { }
+            }
+
+            public static void Postfix_HelpRow_setData(object __instance)
+            {
+                if (__instance == null) return;
+                try
+                {
+                    var helpRow = __instance as Qud.UI.HelpRow;
+                    if (helpRow != null && helpRow.description != null && !string.IsNullOrEmpty(helpRow.description.text))
+                    {
+                        string orig = helpRow.description.text;
+                        string norm = NormalizeHotkeys(orig);
+                        if (norm != orig)
+                        {
+                            helpRow.description.text = norm;
+                            helpRow.description.Apply();
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
 
         public static void Popup_Generic_Prefix(System.Reflection.MethodBase __originalMethod, object[] __args)
 
