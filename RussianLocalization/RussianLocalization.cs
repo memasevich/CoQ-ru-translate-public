@@ -16104,6 +16104,16 @@ namespace RussianLocalization
             try { EnsureTopRightBanner(__instance); } catch { }
             try { UpdateService.OnMainMenuUpdate(__instance); } catch { }
 
+            // Ручной вызов окна приветствия по клавише F9 в главном меню
+            try
+            {
+                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.F9))
+                {
+                    ShowWelcomeWindow();
+                }
+            }
+            catch { }
+
             if (_welcomePopupShown) return;
 
             // Проверяем, показывали ли уже (сохранение между запусками игры)
