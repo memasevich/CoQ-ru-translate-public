@@ -5741,7 +5741,7 @@ namespace RussianLocalization
 
         private static readonly System.Text.RegularExpressions.Regex FactionRegex = new System.Text.RegularExpressions.Regex(@"^<color=(?<c1>#[0-9A-Fa-f]+)>(?<faction>.*?)</color><color=(?<c2>#[0-9A-Fa-f]+)>(?<relation>.*?)(?<end></color>)?$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
 
-        private static readonly System.Text.RegularExpressions.Regex PlainTextFactionRegex = new System.Text.RegularExpressions.Regex(@"^(?<faction>[A-Za-z0-9_\- ']+?)\s+(?<relation>(?:don't\s+care|doesn't\s+care|are\s+interested|is\s+interested|despise|despises|dislike|dislikes|favor|favors)\b.*?)$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+        private static readonly System.Text.RegularExpressions.Regex PlainTextFactionRegex = new System.Text.RegularExpressions.Regex(@"^(?<faction>[A-Za-z0-9_\- ']+?)\s+(?<relation>(?:don't\s+care\s+about\s+you|doesn't\s+care\s+about\s+you|are\s+interested\s+in|is\s+interested\s+in|despise\s+you|despises\s+you|dislike\s+you|dislikes\s+you|favor\s+you|favors\s+you)\b.*?)$", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
 
 
 
@@ -6467,15 +6467,23 @@ namespace RussianLocalization
                     string relation = plainMatch.Groups["relation"].Value.Trim();
 
                     string translatedFaction = TranslateFactionCase(faction, "nom");
-                    if (string.IsNullOrEmpty(translatedFaction) || translatedFaction == faction) translatedFaction = TranslateInternal(faction);
-
-                    string translatedRelation = TranslateRelationText(relation);
-
-                    if (translatedRelation != relation)
+                    bool hasFactionTranslation = !string.IsNullOrEmpty(translatedFaction) && translatedFaction != faction;
+                    if (!hasFactionTranslation)
                     {
-                        success = true;
-                        bool endsWithDot = normalized.EndsWith(".");
-                        return lead + translatedFaction + " " + translatedRelation + (endsWithDot ? "." : "");
+                        translatedFaction = TranslateInternal(faction);
+                        hasFactionTranslation = !string.IsNullOrEmpty(translatedFaction) && translatedFaction != faction;
+                    }
+
+                    if (hasFactionTranslation)
+                    {
+                        string translatedRelation = TranslateRelationText(relation);
+
+                        if (translatedRelation != relation)
+                        {
+                            success = true;
+                            bool endsWithDot = normalized.EndsWith(".");
+                            return lead + translatedFaction + " " + translatedRelation + (endsWithDot ? "." : "");
+                        }
                     }
                 }
             }
